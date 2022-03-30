@@ -1,0 +1,17 @@
+name: python-fr
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - setuptools
+  - black
+  - numpy
+  - matplotlib
+  - pillow
+  - jupyter
+  - nbconvert
+  - jupytext
+  - pip:
+    - pygame
+
