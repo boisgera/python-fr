@@ -1,0 +1,104 @@
+<script>
+    // TODO: replace with clickable 📖, store inside (invis) the content ?
+
+    document.addEventListener("DOMContentLoaded", (event) => {
+        let collapse = document.querySelectorAll(".collapse")
+        for (let elt of collapse) {
+            let button = document.createElement("button");
+            let clone = elt.cloneNode(true);
+            clone.style.setProperty("display", "none");
+            button.appendChild(clone);
+            elt.replaceWith(button);
+
+            button.style.setProperty("height", "4.5em");
+            button.style.setProperty("width", "100%");
+
+            // button.style.setProperty("overflow", "hidden");
+
+            button.style.setProperty("position", "relative");
+            button.style.setProperty("border", "none");
+            button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+            button.style.setProperty("z-index", "10");
+            button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+            
+            /*
+            button.style.setProperty("position", "absolute");
+            button.style.setProperty("top", "0px");
+            button.style.setProperty("left", "0px");
+            button.style.setProperty("bottom", "0px");
+            button.style.setProperty("right", "0px");
+            */
+
+            let icon = document.createElement("img");
+            button.appendChild(icon);
+            // button.style.setProperty("border", "none");
+            // button.style.setProperty("background", "none");
+            // button.appendChild(button);
+            icon.setAttribute("src", "icons/chevron-down.svg");
+            button.style.setProperty("display", "flex");
+            button.style.setProperty("align-items", "center");
+            button.style.setProperty("justify-content", "center");
+            // button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+            button.addEventListener('click', (event) => {
+                button.replaceWith(elt)
+
+            });
+
+
+            button.addEventListener('mouseover', (event) => {
+                button.style.setProperty("cursor", "pointer");
+            });
+            
+            button.addEventListener('mouseout', (event) => {
+                button.style.setProperty("cursor", "auto");
+            });
+
+    /*
+    document.addEventListener("DOMContentLoaded", (event) => {
+        let collapse = document.querySelectorAll(".collapse")
+        for (let elt of collapse) {
+            let wrapper = document.createElement("div");
+            let clone = elt.cloneNode(true);
+            wrapper.appendChild(clone);
+            elt.replaceWith(wrapper);
+
+            wrapper.style.setProperty("height", "4.5em");
+            wrapper.style.setProperty("overflow", "hidden");
+            wrapper.style.setProperty("position", "relative");
+            wrapper.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+
+            let button = document.createElement("div");
+            wrapper.appendChild(button);
+            button.style.setProperty("z-index", "10");
+            button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+            button.style.setProperty("position", "absolute");
+            button.style.setProperty("top", "0px");
+            button.style.setProperty("left", "0px");
+            button.style.setProperty("bottom", "0px");
+            button.style.setProperty("right", "0px");
+            
+            let icon = document.createElement("img");
+            let button = document.createElement("button");
+            button.appendChild(icon);
+            button.style.setProperty("border", "none");
+            button.style.setProperty("background", "none");
+            button.appendChild(button);
+            icon.setAttribute("src", "icons/chevron-down.svg");
+            button.style.setProperty("display", "flex");
+            button.style.setProperty("align-items", "center");
+            button.style.setProperty("justify-content", "center");
+            button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+            button.addEventListener('click', (event) => {
+                wrapper.replaceWith(elt)
+
+            });
+
+
+*/
+        }
+    });    
+</script>

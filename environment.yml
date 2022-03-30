@@ -12,6 +12,8 @@ dependencies:
   - jupyter
   - nbconvert
   - jupytext
+  - pandoc
   - pip:
     - pygame
+    - pandoc==2.1
 

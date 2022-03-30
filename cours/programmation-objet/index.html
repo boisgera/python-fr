@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Sébastien Boisgérault" />
+  <title>Itération &amp; compréhensions</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+  <!--
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet">
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let h3 = document.createElement("h3");
+          h3.innerHTML = "Table des matières";
+          let toc = document.getElementById("TOC");
+          toc.prepend(h3);
+      });    
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let elts = document.querySelectorAll('body > :not(header):not(nav)');
+          let headers = [...elts].filter(elt =>  
+              ["H1", "H2", "H3", "H4", "H5", "H6"].includes(elt.tagName)
+          )
+          for (let header of headers) {
+              let anchor = document.createElement("a");
+              anchor.setAttribute("href", `#${header.id}`);
+              anchor.setAttribute("style", "text-decoration: None;");
+              anchor.innerHTML = header.outerHTML;
+              header.replaceWith(anchor);
+          }
+      });    
+  </script>
+  <script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+  <script>
+
+  function copyAttributes(source, target) {
+    return Array.from(source.attributes).forEach(attribute => {
+      target.setAttribute(
+        attribute.nodeName,
+        attribute.nodeValue,
+      );
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", (event) => {
+      let details = document.querySelectorAll("section.details")
+      details.forEach((elt) => {
+          let details = document.createElement("details");
+          details.innerHTML = elt.innerHTML;
+          copyAttributes(elt, details)
+          elt.replaceWith(details);
+          let header = details.querySelector("h1, h2, h3, h4")
+          let summary = document.createElement("summary")
+          summary.appendChild(header.cloneNode(true))
+          header.replaceWith(summary)
+      })
+  })
+
+  </script>
+  <script>
+      // TODO: replace with clickable 📖, store inside (invis) the content ?
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let button = document.createElement("button");
+              let clone = elt.cloneNode(true);
+              clone.style.setProperty("display", "none");
+              button.appendChild(clone);
+              elt.replaceWith(button);
+
+              button.style.setProperty("height", "4.5em");
+              button.style.setProperty("width", "100%");
+
+              // button.style.setProperty("overflow", "hidden");
+
+              button.style.setProperty("position", "relative");
+              button.style.setProperty("border", "none");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              
+              /*
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              */
+
+              let icon = document.createElement("img");
+              button.appendChild(icon);
+              // button.style.setProperty("border", "none");
+              // button.style.setProperty("background", "none");
+              // button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              // button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  button.replaceWith(elt)
+
+              });
+
+
+              button.addEventListener('mouseover', (event) => {
+                  button.style.setProperty("cursor", "pointer");
+              });
+              
+              button.addEventListener('mouseout', (event) => {
+                  button.style.setProperty("cursor", "auto");
+              });
+
+      /*
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let wrapper = document.createElement("div");
+              let clone = elt.cloneNode(true);
+              wrapper.appendChild(clone);
+              elt.replaceWith(wrapper);
+
+              wrapper.style.setProperty("height", "4.5em");
+              wrapper.style.setProperty("overflow", "hidden");
+              wrapper.style.setProperty("position", "relative");
+              wrapper.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+
+              let button = document.createElement("div");
+              wrapper.appendChild(button);
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              
+              let icon = document.createElement("img");
+              let button = document.createElement("button");
+              button.appendChild(icon);
+              button.style.setProperty("border", "none");
+              button.style.setProperty("background", "none");
+              button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  wrapper.replaceWith(elt)
+
+              });
+
+
+  */
+          }
+      });    
+  </script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Itération &amp; compréhensions</h1>
+<p class="author">👤 <a
+href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
+Boisgérault</a></p>
+<p class="affiliation">🏦 MINES ParisTech, Université PSL</p>
+<p class="license">⚖️ <a
+href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#objets-classes">Objets &amp; classes</a>
+<ul>
+<li><a href="#everything-is-an-object">Everything is an object!</a></li>
+<li><a href="#complex-numbers">Complex Numbers</a></li>
+<li><a href="#complex-numbers-without-objects">Complex numbers without
+objects</a></li>
+</ul></li>
+<li><a href="#objectification">Objectification</a></li>
+</ul>
+</nav>
+<h1 id="objets-classes">Objets &amp; classes</h1>
+<h2 id="everything-is-an-object">Everything is an object!</h2>
+<pre class="python"><code>isinstance(1, int)
+
+isinstance(1, object)
+
+isinstance(True, object)
+
+isinstance(&quot;jkjskjdks&quot;, object)
+
+isinstance([1, 2, 3], object)
+
+def f(x):
+    pass
+
+isinstance(f, object)
+
+import sys
+
+isinstance(sys, object)</code></pre>
+<h2 id="complex-numbers">Complex Numbers</h2>
+<pre class="python"><code>z = 1.0 - 2.0j
+
+z
+
+z = complex(1.0, -2.0) # construction / initialisation d&#39;un complexe / instanciation du type complex
+z
+
+z.real # accès aux attributs (ic &quot;real&quot;)
+
+z.real = 3.14 # ici &quot;real&quot; accessible en lecture seule
+
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+/tmp/ipykernel_73815/1104530040.py in &lt;module&gt;
+----&gt; 1 z.real = 3.14 # ici &quot;real&quot; accessible en lecture seule
+
+AttributeError: readonly attribute
+
+z.conjugate() # appel de méthode
+
+w = 1j
+
+w * z</code></pre>
+<h2 id="complex-numbers-without-objects">Complex numbers without
+objects</h2>
+<pre class="python"><code>z = (1.0, -2.0)
+
+def complex_get_real(z):
+    return z[0]
+
+complex_get_real(z)
+
+def complex_conjugate(z):
+    x, y = z
+    return (x, -y)
+
+complex_conjugate(z)
+
+def complex_multiply(w, z):
+    ...
+    pass</code></pre>
+<p>Our own complex class</p>
+<pre class="python"><code>import builtins
+complex = builtins.complex
+
+class Complex:
+    pass
+
+complex = Complex() # instance of Complex (default constructor only)
+
+Complex(1.0, -2.0)
+
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+/tmp/ipykernel_73815/2989908829.py in &lt;module&gt;
+----&gt; 1 Complex(1.0, -2.0)
+
+TypeError: Complex() takes no arguments
+
+class Complex:
+    def init(complex, real, imag):
+        complex.real = real
+        complex.imag = imag
+
+complex = Complex()
+Complex.init(complex, 1.0, -2.0)
+
+complex.real
+
+complex.imag
+
+class Complex:
+    def __init__(complex, real, imag):
+        complex.real = real
+        complex.imag = imag
+
+z = Complex(1.0, -2.0)
+
+z.real
+
+z.imag
+
+class Complex:
+    def __init__(complex, real, imag):
+        complex.real = real
+        complex.imag = imag
+    def conjugate_inplace(complex): # mutable version of conjugate
+        complex.imag = -complex.imag
+
+z = Complex(1.0, -2.0)
+Complex.conjugate_inplace(z)
+z.real, z.imag
+
+z = Complex(1.0, -2.0)
+z.conjugate_inplace() # méthode liée (&quot;bound method&quot;)
+z.real, z.imag
+
+class Complex:
+    def __init__(complex, real, imag):
+        complex.real = real
+        complex.imag = imag
+    def conjugate(complex):
+        return Complex(complex.real, -complex.imag)
+
+z = Complex(1.0, -2.0)
+w = z.conjugate()
+w.real, w.imag
+
+complex(1.0, 2.0) # eq to print(repr(complex(1.0, 2.0)))
+
+Complex(1.0, 2.0)
+
+print(repr(complex(1.0, 2.0))) # repr uses the dunder method __repr__ if it exist!
+
+w = Complex(1.0, 2.0)
+isinstance(w, Complex)
+
+isinstance(w, object)
+
+issubclass(Complex, object)
+
+dir(Complex)
+
+Complex.__repr__
+
+object.__repr__
+
+print(object.__repr__(w))
+
+w
+
+class Complex:
+    def __init__(complex, real, imag):
+        complex.real = real
+        complex.imag = imag
+    def conjugate(complex):
+        return Complex(complex.real, -complex.imag)
+    def __repr__(complex):
+        return f&quot;({complex.real}+{complex.imag}j)&quot; # doesn&#39;t alway work (e.g. when complex.imag &lt; 0)
+
+w = Complex(1.0, 2.0)
+
+w
+
+class Complex: # usual convention: denote &quot;self&quot; the current instance
+    def __init__(self, real, imag):
+        self.real = real
+        self.imag = imag
+    def conjugate(self):
+        return Complex(self.real, -self.imag)
+    def __repr__(self):
+        return f&quot;({self.real}+{self.imag}j)&quot; # doesn&#39;t alway work (e.g. when complex.imag &lt; 0)
+
+w = Complex(1.0, 2.0)
+w
+
+class Complex: # usual convention: denote &quot;self&quot; the current instance
+    def __init__(self, real, imag):
+        self.real = real
+        self.imag = imag
+    def conjugate(self):
+        return Complex(self.real, -self.imag)
+    def __repr__(self):
+        return f&quot;({self.real}+{self.imag}j)&quot; # doesn&#39;t alway work (e.g. when complex.imag &lt; 0)
+    def add(self, other):
+        return Complex(self.real + other.real, self.imag + other.imag)
+
+w = Complex(1.0, 2.0)
+z = Complex(0.0, 1.0)
+
+Complex.add(w, z) # usage d&#39;une méthode non-liée (à une instance)
+
+w.add(z) # usage d&#39;une méthode liée (à l&#39;instance w)
+
+w + z
+
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+/tmp/ipykernel_73815/2317218533.py in &lt;module&gt;
+----&gt; 1 w + z
+
+TypeError: unsupported operand type(s) for +: &#39;Complex&#39; and &#39;Complex&#39;
+
+class Complex: # usual convention: denote &quot;self&quot; the current instance
+    def __init__(self, real, imag):
+        self.real = real
+        self.imag = imag
+    def conjugate(self):
+        return Complex(self.real, -self.imag)
+    def __repr__(self):
+        return f&quot;({self.real}+{self.imag}j)&quot; # doesn&#39;t alway work (e.g. when complex.imag &lt; 0)
+    def __add__(self, other):
+        return Complex(self.real + other.real, self.imag + other.imag)
+
+w = Complex(1.0, 2.0)
+z = Complex(0.0, 1.0)
+
+Complex.__add__(w, z)
+
+w.__add__(z)
+
+w + z
+
+w.real
+
+w.real = -1.0 # nos instances de nombres complexes sont modifiables :(
+
+w.real = &quot;tagad tsoin tsoin&quot; # et ces modifications peuvent le rendre invalide :( :( :(
+
+w
+
+complex(1.0)
+
+Complex(1.0)
+
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+/tmp/ipykernel_73815/74783907.py in &lt;module&gt;
+----&gt; 1 Complex(1.0)
+
+TypeError: __init__() missing 1 required positional argument: &#39;imag&#39;
+
+class Complex: # usual convention: denote &quot;self&quot; the current instance
+    def __init__(self, real, imag=0.0):
+        self.real = real
+        self.imag = imag
+    def conjugate(self):
+        return Complex(self.real, -self.imag)
+    def __repr__(self):
+        return f&quot;({self.real}+{self.imag}j)&quot; # doesn&#39;t alway work (e.g. when complex.imag &lt; 0)
+    def add(self, other):
+        return Complex(self.real + other.real, self.imag + other.imag)
+
+Complex(1.0, 2.0)
+Complex(1.0)</code></pre>
+<h1 id="objectification">Objectification</h1>
+<pre><code>class Snake:
+    def __init__(self, geometry, direction):
+        self.geometry = geometry
+        self.direction = direction
+    def __iter__(self):
+        return iter(self.geometry)
+    def __len__(self):
+        return len(self.geometry)
+    def __getitem__(self, index):
+        return self.geometry[index]
+    def __eq__(self, other):
+        return (isinstance(other, Snake) and self.geometry == other.geometry and self.direction == other.direction)
+    
+
+geometry = [(10, 15), (11, 15), (12, 15)]
+direction = (0, 1)
+snake = Snake(geometry, direction)
+
+snake
+
+for (x, y) in snake:
+    print(x, y)
+
+(10, 15) in snake
+
+len(snake)
+
+snake[0]
+
+geometry = [(10, 15), (11, 15), (12, 15)]
+direction = (0, 1)
+snake == Snake(geometry, direction)
+
+fruit = (10, 10)
+
+_state = None
+
+class GameState:
+    def __init__(self, snake, fruit):
+        self.snake = snake
+        self.fruit = fruit
+        
+    def save(self):
+        global _state
+        _state = (self.snake, self.fruit)
+        
+    def load(): # does not depend on self
+        snake = _state[0]
+        fruit = _state[1]
+        return GameState(snake, fruit)
+    
+    load = staticmethod(load)
+
+_state = None
+
+class GameState:
+    def __init__(self, snake, fruit):
+        self.snake = snake
+        self.fruit = fruit
+        
+    def save(self):
+        global _state
+        _state = (self.snake, self.fruit)
+
+    @staticmethod # decorator ; equivalent to load = staticmethod(load)
+    def load(): # does not depend on self
+        snake = _state[0]
+        fruit = _state[1]
+        return GameState(snake, fruit)
+
+state = GameState(snake, fruit)
+
+state.fruit = (12, 12)
+
+_state
+
+state.save()
+
+_state
+
+state.fruit = (0, 0)
+
+state2 = state.load()
+
+state = GameState.load()
+
+state.fruit
+
+Héritage
+
+_state = None
+
+class GameState2: # sans héritage
+    def __init__(self, snake, fruit, score):
+        self.snake = snake
+        self.fruit = fruit
+        self.score = score
+        
+    def save(self):
+        global _state
+        _state = (self.snake, self.fruit, self.score)
+
+    @staticmethod # decorator ; equivalent to load = staticmethod(load)
+    def load(): # does not depend on self
+        snake = _state[0]
+        fruit = _state[1]
+        score = _state[2]
+        return GameState2(snake, fruit, score)
+    
+
+class GameState2(GameState): # avec héritage: GameState2 dérive de GameState
+    def __init__(self, snake, fruit, score):
+        super().__init__(snake, fruit) # stocke snake et fruit en attributs
+        self.score = score
+    def save(self):
+        global _state
+        super().save() # _state == (snake, fruit)
+        #state_list = list(_state)
+        #state_list.append(self.score)
+        #_state = tuple(state_list)
+        # shorter:
+        _state = _state + (self.score,)
+    @staticmethod # decorator ; equivalent to load = staticmethod(load)
+    def load(): # does not depend on self
+        state1 = GameState.load()
+        snake = state1.snake
+        fruit = state1.fruit
+        score = _state[2]
+        return GameState2(snake, fruit, score)
+
+score = 12
+state = GameState2(snake, fruit, score)
+
+state.snake, state.fruit, state.score
+
+state.save()
+
+_state
+
+state2 = GameState2.load()
+
+state2.snake
+
+state2.fruit
+
+state2.score
+
+Accesseurs, Variables privées, etc.
+
+import copy
+
+class Snake:
+    def __init__(self, geometry, direction):
+        self._geometry = geometry
+        self._direction = direction
+    def get_geometry(self):
+        print(&quot;GET&quot;)
+        return copy.copy(self._geometry)
+    def set_geometry(self, geometry):
+        print(&quot;SET&quot;)
+        # TODO: ajout validation de geometry
+        self._geometry = copy.copy(geometry)
+    geometry = property(get_geometry, set_geometry)    
+        
+    def get_score(self):
+        return len(self)
+    score = property(get_score) # read-only, virtual property
+    
+        
+    def __iter__(self):
+        return iter(self.geometry)
+    def __len__(self):
+        return len(self.geometry)
+    def __getitem__(self, index):
+        return self.geometry[index]
+    def __eq__(self, other):
+        return (isinstance(other, Snake) and self.geometry == other.geometry and self.direction == other.direction)
+    
+class GameState:
+    def __init__(self, snake, fruit):
+        self.snake = snake
+        self.fruit = fruit
+
+geometry = [(10, 15), (11, 15), (12, 15)]
+direction = (0, 1)
+snake = Snake(geometry, direction)
+
+snake._geometry # ça marche mais _ indique que par convention, seules les méthodes Snake devraient accéder à cet attribut
+# attribut privé
+
+snake.get_geometry()
+
+geometry = snake.get_geometry()
+
+geometry[0] = None # pas de corruption de la variable snake._geometry grace à la copie !!!
+
+snake.get_geometry()
+
+snake.set_geometry([(0, 0), (0, 1)])
+
+snake.get_geometry()
+
+snake.geometry = [(3, 3)]
+
+snake.geometry
+
+snake.score
+
+snake.score = 999
+
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+/tmp/ipykernel_34619/2459733161.py in &lt;module&gt;
+----&gt; 1 snake.score = 999
+
+AttributeError: can&#39;t set attribute
+
+help(copy)</code></pre>
+</body>
+</html>

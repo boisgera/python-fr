@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Sébastien Boisgérault" />
+  <title>Itération &amp; compréhensions</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+  <!--
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet">
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let h3 = document.createElement("h3");
+          h3.innerHTML = "Table des matières";
+          let toc = document.getElementById("TOC");
+          toc.prepend(h3);
+      });    
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let elts = document.querySelectorAll('body > :not(header):not(nav)');
+          let headers = [...elts].filter(elt =>  
+              ["H1", "H2", "H3", "H4", "H5", "H6"].includes(elt.tagName)
+          )
+          for (let header of headers) {
+              let anchor = document.createElement("a");
+              anchor.setAttribute("href", `#${header.id}`);
+              anchor.setAttribute("style", "text-decoration: None;");
+              anchor.innerHTML = header.outerHTML;
+              header.replaceWith(anchor);
+          }
+      });    
+  </script>
+  <script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+  <script>
+
+  function copyAttributes(source, target) {
+    return Array.from(source.attributes).forEach(attribute => {
+      target.setAttribute(
+        attribute.nodeName,
+        attribute.nodeValue,
+      );
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", (event) => {
+      let details = document.querySelectorAll("section.details")
+      details.forEach((elt) => {
+          let details = document.createElement("details");
+          details.innerHTML = elt.innerHTML;
+          copyAttributes(elt, details)
+          elt.replaceWith(details);
+          let header = details.querySelector("h1, h2, h3, h4")
+          let summary = document.createElement("summary")
+          summary.appendChild(header.cloneNode(true))
+          header.replaceWith(summary)
+      })
+  })
+
+  </script>
+  <script>
+      // TODO: replace with clickable 📖, store inside (invis) the content ?
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let button = document.createElement("button");
+              let clone = elt.cloneNode(true);
+              clone.style.setProperty("display", "none");
+              button.appendChild(clone);
+              elt.replaceWith(button);
+
+              button.style.setProperty("height", "4.5em");
+              button.style.setProperty("width", "100%");
+
+              // button.style.setProperty("overflow", "hidden");
+
+              button.style.setProperty("position", "relative");
+              button.style.setProperty("border", "none");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              
+              /*
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              */
+
+              let icon = document.createElement("img");
+              button.appendChild(icon);
+              // button.style.setProperty("border", "none");
+              // button.style.setProperty("background", "none");
+              // button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              // button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  button.replaceWith(elt)
+
+              });
+
+
+              button.addEventListener('mouseover', (event) => {
+                  button.style.setProperty("cursor", "pointer");
+              });
+              
+              button.addEventListener('mouseout', (event) => {
+                  button.style.setProperty("cursor", "auto");
+              });
+
+      /*
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let wrapper = document.createElement("div");
+              let clone = elt.cloneNode(true);
+              wrapper.appendChild(clone);
+              elt.replaceWith(wrapper);
+
+              wrapper.style.setProperty("height", "4.5em");
+              wrapper.style.setProperty("overflow", "hidden");
+              wrapper.style.setProperty("position", "relative");
+              wrapper.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+
+              let button = document.createElement("div");
+              wrapper.appendChild(button);
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              
+              let icon = document.createElement("img");
+              let button = document.createElement("button");
+              button.appendChild(icon);
+              button.style.setProperty("border", "none");
+              button.style.setProperty("background", "none");
+              button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  wrapper.replaceWith(elt)
+
+              });
+
+
+  */
+          }
+      });    
+  </script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Itération &amp; compréhensions</h1>
+<p class="author">👤 <a
+href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
+Boisgérault</a></p>
+<p class="affiliation">🏦 MINES ParisTech, Université PSL</p>
+<p class="license">⚖️ <a
+href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#iteration">Iteration</a></li>
+<li><a href="#iterables">Iterables</a></li>
+<li><a href="#compréhension">Compréhension</a>
+<ul>
+<li><a href="#generator-expressions">generator expressions</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="iteration">Iteration</h1>
+<pre class="python"><code>for i in [1, 2, 3]:
+    print(i)
+
+it = iter([1, 2, 3]) # it is an iterator
+it
+
+next(it)
+
+next(it)
+
+next(it)
+
+next(it)
+
+---------------------------------------------------------------------------
+StopIteration                             Traceback (most recent call last)
+/tmp/ipykernel_13823/600241529.py in &lt;module&gt;
+----&gt; 1 next(it)
+
+StopIteration: 
+
+it = iter([1, 2, 3]) # iterable: can produce iterators with iter(iterable)
+it # iterator: next(it) makes sense
+
+l = [1, 2, 3]
+
+it1 = iter(l)
+print(next(it1))
+print(next(it1))
+
+it2 = iter(l)
+print(next(it2))
+print(next(it2))
+
+l = [1, 2, 3]
+
+it1 = iter(l)
+it2 = iter(it1) # not very useful ...
+
+print(it1 is it2)
+
+print(next(it1))
+print(next(it1))
+
+print(next(it2))
+print(next(it2))
+
+---------------------------------------------------------------------------
+StopIteration                             Traceback (most recent call last)
+/tmp/ipykernel_13823/3453743032.py in &lt;module&gt;
+     10 
+     11 print(next(it2))
+---&gt; 12 print(next(it2))
+
+StopIteration: 
+
+l = list(range(100))
+for i in l:
+    print(i)
+    l.pop(0) # modification during iteration =&gt; undefined
+
+l = list(range(100))
+for i in l[:]: # safer to iterate on a copy of the list
+    print(i)
+    l.pop(0)</code></pre>
+<h1 id="iterables">Iterables</h1>
+<pre><code>lists
+
+tuples
+
+dicts
+
+    dict keys
+
+    dict values
+
+    dict items
+
+sets
+
+strings
+
+files
+
+range(100)
+
+enumerate(...)</code></pre>
+<pre class="python"><code>
+d = {&quot;a&quot;: 1, &quot;b&quot;: 2}
+
+d.keys()
+
+iter(d.keys())
+
+for c in &quot;Hello world!&quot;:
+    print(c)
+
+enumerate([6, 7, 8])
+
+for i, number in enumerate([6, 7, 8]):
+    print(i, number)
+
+iter(enumerate([6, 7, 8]))
+
+l1 = [1, 2, 3]
+l2 = [4, 8, 16]
+for item in zip(l1, l2): # simultaneous iteration on l1 and l2
+    print(item)
+
+help(list)
+
+list([1, 2, 3])
+
+list({1: &quot;a&quot;, 2: &quot;b&quot;, 3: &quot;c&quot;})
+
+list(&quot;abc&quot;)
+
+help(max)
+
+max(1, 2, 3)
+
+max([1, 2, 3])
+
+max(&quot;Hello world!&quot;)</code></pre>
+<h1 id="compréhension">Compréhension</h1>
+<pre class="python"><code>l = [1, 2, 3]
+squares_l = []
+for i in l:
+    square = i * i
+    squares_l.append(square)
+squares_l
+
+[i*i for i in l]
+
+l = range(10)
+[i*i for i in l if i*i &gt; 20] # &quot;filter in&quot; elements
+
+type([i*i for i in l if i*i &gt; 20])
+
+{i*i for i in l if i*i &gt; 20}
+
+{i: str(i) for i in range(100)}</code></pre>
+<h2 id="generator-expressions">generator expressions</h2>
+<pre class="python"><code>max([x*x for x in range(10)])
+
+max(x*x for x in range(10)) # does not allocate a list of 10 elements
+
+max((x*x for x in range(10))) # does not allocate a list of 10 elements
+
+x*x for x in range(10)
+
+  File &quot;/tmp/ipykernel_13823/2347081421.py&quot;, line 1
+    x*x for x in range(10)
+        ^
+SyntaxError: invalid syntax
+
+(x*x for x in range(10))</code></pre>
+</body>
+</html>
