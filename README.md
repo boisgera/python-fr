@@ -1,1 +1,1 @@
-# python-fr
+# Python (fr)

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Sébastien Boisgérault, MINES ParisTech" />
+  <title>Interfaces</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <!--
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet">
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let h3 = document.createElement("h3");
+          h3.innerHTML = "Table des matières";
+          let toc = document.getElementById("TOC");
+          toc.prepend(h3);
+      });    
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let elts = document.querySelectorAll('body > :not(header):not(nav)');
+          let headers = [...elts].filter(elt =>  
+              ["H1", "H2", "H3", "H4", "H5", "H6"].includes(elt.tagName)
+          )
+          for (let header of headers) {
+              let anchor = document.createElement("a");
+              anchor.setAttribute("href", `#${header.id}`);
+              anchor.setAttribute("style", "text-decoration: None;");
+              anchor.innerHTML = header.outerHTML;
+              header.replaceWith(anchor);
+          }
+      });    
+  </script>
+  <script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+  <script>
+      // TODO: replace with clickable 📖, store inside (invis) the content ?
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let button = document.createElement("button");
+              let clone = elt.cloneNode(true);
+              clone.style.setProperty("display", "none");
+              button.appendChild(clone);
+              elt.replaceWith(button);
+
+              button.style.setProperty("height", "4.5em");
+              button.style.setProperty("width", "100%");
+
+              // button.style.setProperty("overflow", "hidden");
+
+              button.style.setProperty("position", "relative");
+              button.style.setProperty("border", "none");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              
+              /*
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              */
+
+              let icon = document.createElement("img");
+              button.appendChild(icon);
+              // button.style.setProperty("border", "none");
+              // button.style.setProperty("background", "none");
+              // button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              // button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  button.replaceWith(elt)
+
+              });
+
+
+              button.addEventListener('mouseover', (event) => {
+                  button.style.setProperty("cursor", "pointer");
+              });
+              
+              button.addEventListener('mouseout', (event) => {
+                  button.style.setProperty("cursor", "auto");
+              });
+
+      /*
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let wrapper = document.createElement("div");
+              let clone = elt.cloneNode(true);
+              wrapper.appendChild(clone);
+              elt.replaceWith(wrapper);
+
+              wrapper.style.setProperty("height", "4.5em");
+              wrapper.style.setProperty("overflow", "hidden");
+              wrapper.style.setProperty("position", "relative");
+              wrapper.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+
+              let button = document.createElement("div");
+              wrapper.appendChild(button);
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              
+              let icon = document.createElement("img");
+              let button = document.createElement("button");
+              button.appendChild(icon);
+              button.style.setProperty("border", "none");
+              button.style.setProperty("background", "none");
+              button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  wrapper.replaceWith(elt)
+
+              });
+
+
+  */
+          }
+      });    
+  </script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Interfaces</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien Boisgérault</a>, MINES ParisTech</p>
+<p class="date">Licence : <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#dans-le-terminal">🖥️ Dans le terminal</a>
+<ul>
+<li><a href="#ligne-de-commande">Ligne de commande</a></li>
+<li><a href="#sparklines">Sparklines</a></li>
+<li><a href="#gestion-des-arguments">Gestion des arguments</a></li>
+</ul></li>
+<li><a href="#sur-le-web">🌍 Sur le Web</a>
+<ul>
+<li><a href="#fastapi">FastAPI</a></li>
+<li><a href="#conception-de-lapi-web">Conception de l’API Web</a></li>
+<li><a href="#exploitation-de-lapi-web">Exploitation de l’API Web</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>ℹ️ Il est question dans ce document d’<strong>interfaces de programmation applicative</strong> (🇺🇸 : <strong>Application Programming Interface</strong> ou <strong>API</strong><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>) variées : des interfaces Python bien sûr, mais aussi des interfaces en ligne de commande et des interfaces Web.</p>
+<p>Ce projet fait suite à l’étude du 😷 <a href="https://boisgera.github.io/python-advanced-companion/tps/fonctions/">modèle épidémiologique SIR</a>.</p>
+<h2 id="dans-le-terminal">🖥️ Dans le terminal</h2>
+<h3 id="ligne-de-commande">Ligne de commande</h3>
+<p>Où l’on conçoit une interface en ligne de commande (🇺🇸 : <strong>Command-Line Interface (CLI)</strong>) pour obtenir les résultats de simulation de notre modèle épidémiologique.</p>
+<h4 id="ligne-de-commande-1">🚀 Ligne de commande</h4>
+<p>Développez un programme Python <code>SIR.py</code> qui affiche l’évolution jour par jour et pendant un an de la population de personnes infectées :</p>
+<pre class="bash"><code>$ python SIR.py
+1.0
+1.0723973837364937
+1.1497875982707628
+...
+0.3091773334306973
+0.312319093274788
+0.3155338502766228</code></pre>
+<h4 id="solution">✨ Solution</h4>
+<div class="collapse">
+<pre class="python"><code># Third-Party Librairies
+import numpy as np
+from scipy.integrate import solve_ivp
+
+WEEK = 7
+YEAR = 365
+
+N = 100
+beta = 1 / (WEEK)
+gamma = 1 / (2 * WEEK)
+omega = 1 / YEAR
+
+S0, I0 = 99.0, 1.0
+R0 = N - S0 - I0
+T_SPAN = (0.0, YEAR)
+
+def dSIR(t, SIR):
+    S, I, R = SIR
+    dS = omega * R - beta * I * S / N
+    dI = beta * I * S / N - gamma * I
+    dR = gamma * I - omega * R  
+    return (dS, dI, dR)
+
+if __name__ == &quot;__main__&quot;:
+    results = solve_ivp(
+        dSIR, 
+        t_span=T_SPAN, 
+        y0=(S0, I0, R0), 
+        dense_output=True
+    )
+    sol = results[&quot;sol&quot;]
+    t = np.arange(0, YEAR)
+    S, I, R = sol(t)
+    for I_ in I:
+        print(I_)</code></pre>
+</div>
+<h3 id="sparklines">Sparklines</h3>
+<p>On souhaite offrir en option un affichage “graphique” permettant d’interpréter plus facilement les résultats de la simulation. Nous allons pour ce faire utiliser des ✨ <a href="https://en.wikipedia.org/wiki/Sparkline">sparklines</a> et dans cette optique, exploiter le projet <a href="https://github.com/boisgera/spark.py">spark</a>.</p>
+<h4 id="clone-install-test">🚀 Clone, Install, Test</h4>
+<ul>
+<li><p>Cloner le dépôt github du projet spark sur votre machine.</p></li>
+<li><p>Installer spark dans votre environnement en exécutant la commande</p>
+<pre><code>python setup.py install</code></pre>
+<p>ou</p>
+<pre><code>pip install .</code></pre>
+<p>dans le répertoire racine de ce projet.</p></li>
+<li><p>Tester les interfaces en ligne de commande et Python de cet outil.</p></li>
+</ul>
+<h4 id="forkez-le-projet">🚀 “Forkez” le projet</h4>
+<p>Spark serait plus facile à utiliser s’il acceptait directement des données sous forme de nombres flottants et pas uniquement des entiers.</p>
+<ul>
+<li><p>Forkez le projet sur GitHub.</p></li>
+<li><p>Ajoutez-lui cette fonctionnalité.</p></li>
+<li><p>Mettez à jour les fichiers <code>README.md</code> et <code>setup.py</code> en conséquence.</p></li>
+<li><p>Puis déployez cette nouvelle version de spark dans votre environnement.</p></li>
+</ul>
+<h4 id="solution-1">Solution</h4>
+<div class="collapse">
+<p>Le fichier <code>spark.py</code> modifié :</p>
+<pre class="python"><code># -*- coding: utf-8 -*-
+
+&quot;&quot;&quot;
+Spark
+================================================================================
+
+A port of @holman&#39;s [spark] project for Python 3.
+
+[spark]: https://github.com/holman/spark
+&quot;&quot;&quot;
+
+import sys
+
+ticks = &quot; ▁▂▃▄▅▆▇█&quot;
+
+
+def spark_string(floats, fit_min=False):
+    &quot;&quot;&quot;Returns a spark string from given iterable of floats.
+    
+    Keyword Arguments:
+    fit_min: Matches the range of the sparkline to the input integers
+             rather than the default of zero. Useful for large numbers with
+             relatively small differences between the positions
+    &quot;&quot;&quot;
+    min_range = min(floats) if fit_min else 0
+    step_range = max(floats) - min_range
+    step = (step_range / float(len(ticks) - 1)) or 1
+    return &quot;&quot;.join(ticks[int(round((f - min_range) / step))] for f in floats)
+
+
+def spark_print(floats, stream=None, fit_min=False):
+    &quot;&quot;&quot;Prints spark to given stream.&quot;&quot;&quot;
+    if stream is None:
+        stream = sys.stdout
+    stream.write(spark_string(floats, fit_min=fit_min) + &quot;\n&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    if len(sys.argv) &gt; 1:
+        sparks = [float(arg) for arg in sys.argv[1:]]
+        spark_print(sparks)
+        print
+    else:
+        usage = print(
+            &quot;&quot;&quot;Spark: ▁▂▃▅▂▇ in your shell
+
+Usage:
+  python -m spark [spaces separated values]
+
+Examples:&quot;&quot;&quot;
+        )
+
+        print(&quot;  $ python -m spark 1 5 22 13 53&quot;)
+
+        spark_print([1, 5, 22, 13, 53])
+
+        print(&quot;  $ python -m spark 0 30 55 80 33 150&quot;)
+
+        spark_print([0, 30, 55, 80, 33, 150])
+
+        print(&quot;  $ python -m spark 0.0 0.25 0.5 0.75 1.0&quot;)
+
+        spark_print([0.0, 0.25, 0.50, 0.75, 1.0])
+</code></pre>
+<p>Le fichier <code>setup.py</code> associé (avec la version mise à jour) :</p>
+<pre class="python"><code># File setup.py
+from distutils.core import setup
+
+setup(
+    name=&quot;spark&quot;,
+    version=&quot;1.1&quot;,
+    description=&quot;Sparklines with Python 3&quot;,
+    author=&quot;Sébastien Boisgérault&quot;,
+    author_email=&quot;Sebastien.Boisgerault@mines-paristech.fr&quot;,
+    url=&quot;https://github.com/boisgera/spark.py&quot;,
+    py_modules=[&quot;spark&quot;],
+)
+</code></pre>
+<p>et finalement le contenu du <code>README.md</code> faisant état de la nouvelle fonctionnalité :</p>
+<blockquote>
+<h1 id="spark">Spark</h1>
+<h3 id="sparklines-with-python-3">Sparklines with Python 3</h3>
+<p>See? Here’s a graph of your productivity gains after using spark: ▁▂▃▅▇</p>
+<h2 id="install">Install</h2>
+<p>The original <a href="https://github.com/holman/spark">spark</a>, <a href="https://github.com/holman/spark/blob/master/LICENSE.md">by Zach Holman</a> is a <a href="https://github.com/holman/spark/blob/master/spark">shell script</a> (to be dropped in a directory that’s in your <code>$PATH</code>).</p>
+<p>This Python 3 port can be installed with:</p>
+<pre><code>$ python setup.py install</code></pre>
+<h2 id="usage">Usage</h2>
+<h3 id="command-line-interface">Command-line interface</h3>
+<pre><code>$ python -m spark.py 0.01 29.5 55 80.0 33 150
+ ▂▃▄▂█</code></pre>
+<h3 id="python-interface">Python interface</h3>
+<pre><code>&gt;&gt;&gt; from spark import spark_print
+&gt;&gt;&gt; spark_print([0.01, 29.5, 55, 80.0, 33, 150])
+ ▂▃▄▂█</code></pre>
+</blockquote>
+</div>
+<h4 id="intégration">🚀 Intégration</h4>
+<p>Faites en sorte que notre application affiche des sparklines représente l’évolution du niveau d’infection lorsque l’option <code>--sparklines</code> est sélectionnée :</p>
+<pre class="bash"><code>$ python SIR.py --sparklines
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇▇██████████████████▇▇▇▇▇▇▇▇▇▆▆▆▆▆▆▆▅▅▅▅▅▅▅▄▄▄▄▄▄▄▄▄▃▃▃▃▃▃▃▃▃▃▃▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁</code></pre>
+<h4 id="solution-2">✨ Solution</h4>
+<div class="collapse">
+<pre class="python"><code># Python Standard Library
+import sys
+
+# Third-Party Librairies
+import spark
+...
+
+...
+
+if __name__ == &quot;__main__&quot;:
+    results = solve_ivp(
+        dSIR, 
+        t_span=T_SPAN, 
+        y0=(S0, I0, R0), 
+        dense_output=True
+    )
+    sol = results[&quot;sol&quot;]
+    t = np.arange(0, YEAR)
+    S, I, R = sol(t)
+
+    if &quot;--sparklines&quot; in sys.argv[1:]:
+        spark.spark_print(I)
+    else:
+        for I_ in I:
+            print(I_)</code></pre>
+</div>
+<h3 id="gestion-des-arguments">Gestion des arguments</h3>
+<h4 id="plus-doptions">🚀 Plus d’options</h4>
+<ul>
+<li><p>Etudier les fonctionnalités proposées par la bibliothèque <a href="https://typer.tiangolo.com/">typer</a>. On pourra se contenter de lire l’<a href="https://typer.tiangolo.com/#the-absolute-minimum">exemple minimal</a> de d’introduction et la section consacrée aux <a href="https://typer.tiangolo.com/tutorial/options/help/">options avec aide</a>.</p></li>
+<li><p>Réimplementez la fonctionnalité des sparklines en utilisant <code>typer</code> plutôt que <code>sys.argv</code>. Vérifiez au passage que <code>typer</code> vous donne “gratuitement” le support pour l’option <code>--help</code>.</p></li>
+<li><p>Profitez de cette migration vers <code>typer</code> pour permettre à l’utilisateur de changer la valeur du taux de contagion :</p>
+<pre class="bash"><code>$ python SIR.py --sparklines --beta=0.8
+▁▂▃▅▆▇███▇▇▇▆▆▅▅▅▄▄▄▄▃▃▃▃▃▂▂▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁</code></pre>
+<pre class="bash"><code>$ python SIR.py --sparklines --beta=0.05
+███▇▇▇▇▇▇▇▆▆▆▆▆▆▆▅▅▅▅▅▅▅▅▅▄▄▄▄▄▄▄▄▄▄▄▄▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁</code></pre></li>
+</ul>
+<h4 id="solution-3">✨ Solution</h4>
+<div class="collapse">
+<p>Initialement pour migrer vers <code>typer</code> :</p>
+<pre class="python"><code>...
+
+# Third-Party Librairies
+import typer
+...
+
+...
+
+def main(
+  sparklines: bool = typer.Option(False, help=&quot;Output sparklines&quot;)
+):
+    results = solve_ivp(
+        dSIR, 
+        t_span=T_SPAN, 
+        y0=(S0, I0, R0), 
+        dense_output=True
+    )
+    sol = results[&quot;sol&quot;]
+    t = np.arange(0, YEAR)
+    S, I, R = sol(t)
+
+    if sparklines:
+        spark.spark_print(I)
+    else:
+        for I_ in I:
+            typer.echo(I_)
+
+if __name__ == &quot;__main__&quot;:
+    typer.run(main)</code></pre>
+<p>puis pour supporter l’option <code>--beta</code> :</p>
+<pre class="python"><code>...
+
+BETA = beta = 1 / (WEEK)
+
+...
+
+def main(
+    sparklines: bool = typer.Option(False, help=&quot;Output sparklines&quot;),
+    beta: float = typer.Option(BETA, help=&quot;Contagion rate&quot;)
+):
+    globals()[&quot;beta&quot;] = beta
+    results = solve_ivp(dSIR, t_span=t_span, y0=(S0, I0, R0), dense_output=True)
+    sol = results[&quot;sol&quot;]
+    t = np.arange(0, 1 * YEAR)
+    S, I, R = sol(t)
+
+    if sparklines:
+        spark.spark_print(I)
+    else:
+        for I_ in I:
+            typer.echo(I_)
+
+
+if __name__ == &quot;__main__&quot;:
+    typer.run(main)</code></pre>
+</div>
+<h2 id="sur-le-web">🌍 Sur le Web</h2>
+<p>Comme alternative à la ligne de commande et pour donner accès à notre service de simulation depuis l’autre bout du globe, on peut l’exposer à travers une API Web, hébergée par un serveur Web. Ce serveur enverra les résultats sous forme de données JSON en réponse aux requêtes <a href="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP</a> qui lui sont faites.</p>
+<h3 id="fastapi">FastAPI</h3>
+<h4 id="découvrir-fastapi">🚀 Découvrir FastAPI</h4>
+<p>Découvrez, installez puis testez la bibliothèque Python <a href="https://fastapi.tiangolo.com/">FastAPI</a>, permettant une création rapide d’API Web. Vous pourrez vous limiter aux sections suivantes du tutoriel / guide utilisateur :</p>
+<ul>
+<li><p>📖 <a href="https://fastapi.tiangolo.com/tutorial/">Introduction</a></p></li>
+<li><p>📖 <a href="https://fastapi.tiangolo.com/tutorial/first-steps/">Premiers pas</a></p></li>
+<li><p>📖 <a href="https://fastapi.tiangolo.com/tutorial/query-params/">Paramètres de requêtes</a></p></li>
+</ul>
+<h3 id="conception-de-lapi-web">Conception de l’API Web</h3>
+<h4 id="création-de-lapi-web">🚀 Création de l’API Web</h4>
+<p>Créez une interface Web renvoyant (à sa racine) la liste des valeurs de la population de personnes infectées jour par jour au cours de la première année. Faites en sorte que l’interface accepte le paramètre de requête optionel <code>beta</code> permettant de simuler les évolutions associées à différents taux de contagion.</p>
+<h4 id="solution-4">✨ Solution</h4>
+<div class="collapse">
+<pre class="python"><code>...
+
+# Third-Party
+from fastapi import FastAPI
+from typing import Optional
+...
+
+...
+
+app = FastAPI()
+
+@app.get(&quot;/&quot;)
+async def root(beta: Optional[float] = BETA):
+    globals()[&quot;beta&quot;] = beta
+    results = solve_ivp(
+      dSIR, 
+      t_span=(0, YEAR), 
+      y0=(S0, I0, R0), 
+      dense_output=True
+    )
+    sol = results[&quot;sol&quot;]
+    t = np.arange(0, YEAR)
+    S, I, R = sol(t)
+    return list(I)</code></pre>
+</div>
+<h4 id="test-de-lapi-web">🚀 Test de l’API Web</h4>
+<p>Après avoir lancé le service, ouvrez un navigateur web à l’adresse <a href="http://127.0.0.1:8000/" class="uri">http://127.0.0.1:8000/</a>.</p>
+<p>Vérifiez que vous pouvez lire la documentation de l’API à <a href="http://127.0.0.1:8000/docs" class="uri">http://127.0.0.1:8000/docs</a>.</p>
+<p>Puis, requérez les données associées à de nouvelles valeurs du taux de contagion :</p>
+<ul>
+<li><p><span class="math inline">\(\beta=0.8\)</span> : <a href="http://127.0.0.1:8000?beta=0.8" class="uri">http://127.0.0.1:8000?beta=0.8</a></p></li>
+<li><p><span class="math inline">\(\beta=0.05\)</span> : <a href="http://127.0.0.1:8000?beta=0.05" class="uri">http://127.0.0.1:8000?beta=0.05</a></p></li>
+</ul>
+<h3 id="exploitation-de-lapi-web">Exploitation de l’API Web</h3>
+<h4 id="utilisation-de-requests">🚀 Utilisation de <code>requests</code></h4>
+<p>La bibliothèque Python <a href="https://docs.python-requests.org/">requests</a> permet de faire des requêtes à un serveur Web et d’obtenir ses réponses avec du code Python. Exploitez cette bibliothèque pour récupérer les données de simulation fournies par le serveur depuis le confort douillet de votre interpréteur Python, sans ouvrir de navigateur Web !</p>
+<h4 id="solution-5">✨ Solution</h4>
+<div class="collapse">
+<p>Les données associées à la valeur par défaut de <span class="math inline">\(\beta\)</span> sont fournies par :</p>
+<pre class="python"><code>&gt;&gt;&gt; import requests
+&gt;&gt;&gt; r = requests.get(&quot;http://127.0.0.1:8000&quot;)
+&gt;&gt;&gt; r.json()
+[1.0, 1.0723973837364937, 1.1497875982707628, 1.232471793968265, ..., 0.3091773334306973, 0.312319093274788, 0.3155338502766228]</code></pre>
+<p>On obtient les données associés à d’autres valeurs de <span class="math inline">\(\beta\)</span> de la façon suivante :</p>
+<pre class="python"><code>&gt;&gt;&gt; r = requests.get(
+...     &quot;http://127.0.0.1:8000&quot;, 
+...     params={&quot;beta&quot;: 0.8}
+... )
+&gt;&gt;&gt; r.json()
+[1.0, 2.04725791572934, 4.135056370632144, 8.139634672723165, ..., 3.3730866986615555, 3.371500978216086, 3.3699478398428373]</code></pre>
+</div>
+<section class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>L’acronyme <strong>IPA</strong> désigne 🍺 <a href="https://en.wikipedia.org/wiki/India_pale_ale">tout autre chose</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>
