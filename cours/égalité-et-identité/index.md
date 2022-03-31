@@ -6,35 +6,181 @@ affiliation: "MINES ParisTech, Université PSL"
 license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 ---
 
-### Comparaison
+# Egalité
 
-Les objets Python peuvent être comparés au moyen des opérateurs `==` (égal)
-et `!=` (différents).
+**TODO:** `!=`
+
+L'expression `x == y` détermine si les objets `x` et `y` sont égaux :
 
 ``` python
 >>> 0 == 0
 True
 >>> 0 == 1
 False
->>> "A" == "A"
+```
+
+
+``` python
+>>> "Hello!" == "Hello!"
 True
->>> "A" == "B"
+>>> "Hello" == "World"
 False
+```
+
+``` python
 >>> [1, 2, 3] == [1, 2, 3]
 True
 >>> [1, 2, 3] == [4, 5, 6]
 False
 ```
 
-### Egalité et identité
+Les tests d'égalité en Python dépendent du type des objets comparés :
+il n'y a pas d'interprétation totalement universelle de `==` ; il faut
+se reporter à la documentation des types concernés. 
+Vous pourrez d'ailleurs décider quel sens donner aux égalités des
+types que vous serez amenés à définir.
 
-L'**égalité** de `x` et `y` est testée par l'opérateur `==` :
+#### 🤔 Comment interpréter `x == y` si les types de `x` et `y` sont différents ? {.details}
+
+Si le type de `y` est un sous-type du type de `x`, il détermine en priorité 
+quel sens donner à `==` ; dans le cas contraire c'est le type de `x` auquel 
+est donné la priorité.
+
+Source: [📖  Méthodes de comparaison riches](https://docs.python.org/fr/3/reference/datamodel.html#object.__eq__)
+
+## Nombres
+
+Le test d'égalité de nombres se passe essentiellement sans grande surprise
+si l'on laisse de coté certains propriétés des [nombres à virgule flottante spéciaux](#IEEE754).
+
+Notons simplement que les test d'égalité entre nombres sont suffisamment permissifs
+pour permettre de comparer des nombres dont le type est différent :
 
 ``` python
-x == y
+>>> 1 == True
+True
+>>> 1 == 1.0
+True
+>>> 1 == 1j
+True
 ```
 
-Leur **identité** est testée avec le mot-clé `is` :
+#### Egalité des nombres à virgule flottante {#IEEE754 .details}
+
+Le nombres à virgule flottante (`float`) de Python sont de précision finie.
+Par conséquent des erreurs d'arrondi dans les calculs peuvent faire échouer
+les tests d'égalité. Ainsi, on a par exemple :
+
+``` python
+>>> 0.1 + 0.2 == 0.3
+False
+```
+
+car l'addition a introduit une (petite) erreur dans le calcul :
+
+``` python
+>>> 0.1 + 0.2
+0.30000000000000004
+```
+
+Le standard IEEE 754 régit la représentation et le calcul des nombres
+flottants. Il introduit des nombres spéciaux ; il y a ainsi deux zéros 
+distincts ($0^+$ et $0^-$) mais considérés égaux :
+
+``` python
+>>> +0.0
+0.0
+>>> -0.0
+-0.0
+>>> +0.0 == -0.0
+True
+```
+
+Plus surprenant, le "non-nombre" `nan` (🇺🇸: **not a number**) est une valeur spéciale 
+... qui n'est pas égale à elle-même ! (Tous les "non-nombres" sont réputés différents.)
+
+``` python
+>>> from math import nan
+>>> nan == nan
+False
+```
+
+Il faudra utiliser la fonction `isnan` pour savoir si une valeur est un 
+non-nombre.
+
+``` python
+>>> from math import isnan
+>>> isnan(nan)
+True
+```
+
+Source: [📖 Standard IEEE 754](https://fr.wikipedia.org/wiki/IEEE_754)
+
+## Collections 
+
+Deux collections -- listes, n-uplets, dictionnaires, ensembles, etc. --
+déléguent le test d'égalité aux éléments qui les composent -- récursivement
+si ceux-ci sont également des collections. Ainsi :
+
+``` python
+>>> [] == [0]
+False
+>>> [0] == [0]
+True
+>>> [0] == [1]
+False
+>>> [0] == [0, 0]
+False
+>>> [0] == [0.0]
+True
+>>> [[0]] == [[0.0]]
+True
+```
+
+Pour les dictionnaires : 
+
+``` python
+>>> {"a": 1, "b": 2} == {"a": 1, "b": 2}
+True
+```
+
+et
+
+``` python
+>>> {"a": 1, "b": 2} == {"a": 1.0, "b": 2.0}
+True
+```
+
+
+L'ordre des couples clés-valeurs n'a pas d'importance
+
+``` python
+>>> {"a": 1, "b": 2} == {"b": 2, "a": 1}
+True
+```
+
+mais il suffit qu'une clé ou qu'une valeur diffère dans les deux collections
+comparées pour invalider l'égalité :
+
+``` python
+>>> {"a": 1, "b": 2} == {"a": 1, "b": 2, "c": 3}
+False
+>>> {"a": 1, "b": 2} == {"a": 2, "b": 1}
+False
+```
+
+
+## Chaînes de caractères
+
+
+    >>> "e\u0301"
+    'é'
+    >>> "é" == "é"
+
+# Identité
+
+L'expression `x is y` détermine si l'objet `x` **est** l'objet `y`,
+à la même **identité**
 
 ``` python
 x is y
@@ -69,7 +215,7 @@ alors qu'il sera considéré égal à l'original. Par contre, si deux objets
 sont identiques (au sens de : ont la même identité, sont un seul est unique
 objet), alors ils sont nécessairement égaux.
 
-####
+### Egalité et identité
 
 A titre d'exemple, considérons les trois listes `a`, `b` et `c` :
 
