@@ -11,15 +11,30 @@ license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 Par défaut, un programme informatique exécute les instructions dans l'ordre
 qu'on lui fournit, ligne après ligne, puis s'arrếte une fois la dernière 
 instruction exécutée. 
-Des instructions spéciales, de **branchement** (🇺🇸 **branching**), 
-permettent de modifier ce flux d'exécution par défaut. 
-En Python ces constructions sont :
+
+``` python
+# file: main.py
+print("Hey!")
+print("Ho!)
+print("Let's go!)
+```
+
+``` bash
+$ python main.py
+Hey!
+Ho!
+Let's go!
+```
+
+Toutefois, des constructions de **branchement** (🇺🇸 **branching**), 
+permettent de contrôler ce flux d'exécution si nécessaire. 
+En Python appartiennent à cette catégorie :
 
  1. L'**exécution conditionnelle** (🇺🇸 **conditional execution**)
 
  2. Les **boucles** (🇺🇸 **loops**)
 
- 3. L'**appel de fonctions** (🇺🇸 **function call**)
+ 3. Les **appels de fonction** (🇺🇸 **function calls**)
 
  4. Les **exceptions** (🇺🇸 **exceptions**)
 
