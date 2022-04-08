@@ -6,11 +6,22 @@ affiliation: "MINES ParisTech, Université PSL"
 license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 ---
 
-# Intro
+# Introduction
 
-# Script
+Par défaut, un programme informatique exécute les instructions dans l'ordre
+qu'on lui fournit, ligne après ligne, puis s'arrếte une fois la dernière 
+instruction exécutée. 
+Des instructions spéciales, de **branchement** (🇺🇸 **branching**), 
+permettent de modifier ce flux d'exécution par défaut. 
+En Python ces constructions sont :
 
-Déroulement linéaire du programme, ligne par ligne ...
+ 1. L'**exécution conditionnelle** (🇺🇸 **conditional execution**)
+
+ 2. Les **boucles** (🇺🇸 **loops**)
+
+ 3. L'**appel de fonctions** (🇺🇸 **function call**)
+
+ 4. Les **exceptions** (🇺🇸 **exceptions**)
 
 # What if?
 
