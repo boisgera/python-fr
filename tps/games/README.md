@@ -1,6 +1,6 @@
 # Le snake
 
-Projet original par [@ushu](https://github.com/ushu).
+🙏 Projet original par [@ushu](https://github.com/ushu).
 
 Le but de ce TP est de réaliser un petit jeu en Python.
 L'objectif est de vous apprendre à concevoir et réaliser un programme complet,
@@ -47,6 +47,59 @@ Pour tester votre installation, vous pouvez lancer le programme d'exemple comme 
 (snake) $ python -m pygame.examples.aliens
 ```
 
+Premiers pas avec PyGame
+--------------------------------------------------------------------------------
+
+(factor out ? Indep doc? *Maybe*, given that the set of learning objectives
+is autonomous)
+
+Prérequis :
+
+  - `dir` / `help` / usage doc en ligne
+
+
+Objectifs :
+
+  - import de module (bases)
+
+  - sous-modules (principes et énumération)
+
+  - concepts propres à pygame :
+  
+      - initialisation
+
+      - modules & classes : display, time, Surface
+
+      - display: création de "surface" (window / screen), taille
+
+      - flux d'exécution et disparition de la surface !
+
+      - time & delay
+
+      - tracé sur une surface. N'apparaît pas !!!
+
+      - display: update
+
+
+``` python
+import pygame
+pygame.init()
+
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 255, 0)
+
+SCREEN_SIZE = (400, 300)
+
+screen = pygame.display.set_mode(SCREEN_SIZE)
+
+screen.fill(GREEN)
+
+pygame.display.update()
+
+pygame.time.delay(3000)
+```
+
 Code de démarrage
 --------------------------------------------------------------------------------
 
@@ -57,6 +110,7 @@ Un premier code très simple est le suivant, écrivez-le dans un fichier `snake.
 # et on a du mal à sortir du programme
 
 import pygame as pg
+
 from random import randint
 
 # on initialise pygame et on crée une fenêtre de 400x300 pixels
