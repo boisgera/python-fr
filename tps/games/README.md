@@ -1,17 +1,22 @@
 # Le snake
 
+Projet original par [@ushu](https://github.com/ushu).
+
 Le but de ce TP est de réaliser un petit jeu en Python.
-L'objectif est de vous apprendre à concevoir et réaliser un programme complet, et non de réaliser le nouveau best-seller.
+L'objectif est de vous apprendre à concevoir et réaliser un programme complet,
+et non de réaliser le nouveau best-seller.
 
-Gardez ainsi en tête que votre objectif est de réaliser un **programme qui marche** et pas un programme parfait.
+Gardez ainsi en tête que votre objectif est de réaliser un **programme qui marche**
+et pas un programme parfait.
 
-## Prérequis
+Prérequis
+--------------------------------------------------------------------------------
 
-_Ce qui suit suppose que vous avez installé Python avec `conda` et que vous avez un terminal `bash` fonctionnel sur votre ordinateur._
+ℹ️ Ce qui suit suppose que vous avez installé Python avec `conda`
+et que vous avez un terminal `bash` fonctionnel sur votre ordinateur.
 
-Commencez par créer et activer un environnement dédié au TP:
+Commencez par créer et activer un environnement dédié au TP :
 
-<!-- #region -->
 ```bash
 # on commence par créer un environnement "snake"
 (base) $ conda create -n snake python=3.9
@@ -20,43 +25,32 @@ Commencez par créer et activer un environnement dédié au TP:
 # votre terminal doit indiquer le nom d'environnement:
 (snake) $
 ```
-<!-- #endregion -->
 
-**NOTE** Si vous ne voyez pas, comme montré ici, le `(snake)` affiché dans le prompt de bash pour vous rappeler en permanence dans quel environnement on se trouve, il vous faut taper ceci avant de relancer un terminal
+**NOTE.** Si vous ne voyez pas, comme montré ici,
+le `(snake)` affiché dans le prompt de bash pour vous rappeler en permanence
+dans quel environnement on se trouve, il vous faut taper ceci avant de relancer
+un terminal
 
-<!-- #region -->
 ```bash
 $ conda init bash
 ```
-<!-- #endregion -->
 
-Installez ensuite la dernière version du module `pygame` avec `pip`:
+Installez ensuite la dernière version du module `pygame` avec `pip` :
 
-<!-- #region -->
 ```bash
 (snake) $ pip install pygame
 ```
-<!-- #endregion -->
 
 Pour tester votre installation, vous pouvez lancer le programme d'exemple comme suit:
 
-<!-- #region -->
 ```bash
 (snake) $ python -m pygame.examples.aliens
 ```
-<!-- #endregion -->
 
-soyez patient lors du premier lancement, la librairie initialise des tas de choses...
-
-
-## Code de démarrage
+Code de démarrage
+--------------------------------------------------------------------------------
 
 Un premier code très simple est le suivant, écrivez-le dans un fichier `snake.py` et lancez-le avec la commande `python` :
-
-**ATTENTION** je vous recommande de **ne pas essayer d'exécuter ce code depuis un notebook** :
-
-* ni depuis nbhosting, ça ne marchera pas du tout, car `pygame` n'y est pas installé;
-* ni depuis votre ordinateur personnel, car vous allez rencontrer des problèmes mystérieux de kernel qui meurt, si vous essayez.
 
 ```python
 # v0 : on repeint l'écran à une période de 1 seconde
@@ -95,26 +89,26 @@ Vous pouvez désormais exécuter le programme avec:
 
 **Attention** : vous verrez que vous ne pouvez pas _fermer_ la fenêtre normalement, pour quitter votre programme vous devez saisir **CONTROL+C** dans le terminal.
 
-
-## Rappels vs-code
+Rappels vs-code
+--------------------------------------------------------------------------------
 
 **Rappel #1** : il est **fortement recommandé** d'installer l'extension de vs-code pour Python
 
 **Rappel #2** : on a créé un environnement virtuel;  
-du coup il est opportun d'indiquer à vs-code qu'il faut utiliser `snake` - plutôt que `base`   
+du coup il est opportun d'indiquer à vs-code qu'il faut utiliser `snake` - plutôt que `base`  
 pour cela cliquer dans la bannière du bas la zone qui indique le Python courant
 
 **Rappel #3** : pour lancer le programme directement depuis vs-code :
 
 - ouvrir la palette
-  * `⇧ ⌘ P` Shift-Command-P (mac)
-  * `⇧ ⌃ P` Shift-Control-P (windows)
-- chercher la fonction *Toggle Integrated Terminal*
+  - `⇧ ⌘ P` Shift-Command-P (mac)
+  - `⇧ ⌃ P` Shift-Control-P (windows)
+- chercher la fonction _Toggle Integrated Terminal_
   - mémoriser le raccourci clavier
   - qui est Control-backtick sur Mac (le backtick c'est `)
 
-
-## Un petit détail
+Un petit détail
+--------------------------------------------------------------------------------
 
 Il faut savoir que c'est l'appel à `pg.display.update()` qui produit réellement l'affichage.
 
@@ -122,8 +116,8 @@ En fait, tous les autres calculs se produisent en mémoire (c'est très rapide),
 
 Du coup même si ce `display` reste dans l'ordre de grandeur de la milliseconde, il faut s'efforcer, pour une bonne fluidité du jeu, de n'appeler `update()` que le minimum, pour nous ici **une fois par itération de la boucle**.
 
-
-## Continuons
+Continuons
+--------------------------------------------------------------------------------
 
 Afin d'avoir un comportement plus "normal", nous devons instruire Pygame en lui disant comment réagir aux clicks sur le clavier ou sur la fenêtre:
 
@@ -166,7 +160,8 @@ while running:
 pg.quit()
 ```
 
-## Le damier
+Le damier
+--------------------------------------------------------------------------------
 
 Nous allons commencer par construire notre plateau de jeu ainsi:
 
@@ -191,7 +186,8 @@ color = (255, 0, 0) # couleur rouge
 pg.draw.rect(screen, color, rect)
 ```
 
-## Un serpent fixe
+Un serpent fixe
+--------------------------------------------------------------------------------
 
 L'étape suivante est de dessiner le serpent. Le serpent est simplement une suite de blocks de couleurs.
 On veut dessiner le serpent aux coordonnées suivantes:
@@ -210,11 +206,12 @@ pour obtenir un schéma comme suit; disons pour fixer les idées que dans ce cas
 
 ![](media/serpent.png)
 
-
-## Un serpent qui bouge
+Un serpent qui bouge
+--------------------------------------------------------------------------------
 
 Ensuite, nous allons faire bouger le serpent.
 C'est en fait très simple:
+
 - nous créons un vecteur de "direction"
   ```python
   direction = (1, 0)
@@ -223,30 +220,34 @@ C'est en fait très simple:
 
 Une fois que le serpent bouge, ajouter les commandes pour se déplacer dans les 4 directions, en cliquant sur les flèches (par exemple le code renvoyé par la flêche vers le haut est `pg.K_UP`)
 
-Aussi on peut commencer à envisager d'accélérer un peu le jeu à ce stade... 
+Aussi on peut commencer à envisager d'accélérer un peu le jeu à ce stade...
 
 **BONUS** faites en sorte que le serpent ne puisse pas faire "demi tour"
 
-  ![](media/serpent-bouge.gif)
+![](media/serpent-bouge.gif)
 
-
-## Le fruit
+Le fruit
+--------------------------------------------------------------------------------
 
 Il faut maintenant faire manger notre serpent.
 On va procéder comme suit:
 
-- on a toujours la position du serpent dans une variable `snake` :
-- on génère un "fruit", dans une position aléatoire
-  ```python
-  # exemple de fruit en position 10, 10 sur le plateau
-  fruit = (10, 10)
-  ```
-- quand la tête du serpent mange le fruit, on place un nouveau fruit à une position aléatoire et on allonge le serpent d'une case
+  - on a toujours la position du serpent dans une variable `snake` :
 
-![](media/manger.gif)
+  - on génère un "fruit", dans une position aléatoire
+    ```python
+    # exemple de fruit en position 10, 10 sur le plateau
+    fruit = (10, 10)
+    ```
 
+  - quand la tête du serpent mange le fruit, 
+    on place un nouveau fruit à une position aléatoire 
+    et on allonge le serpent d'une case
 
-## Épilogue
+    ![](media/manger.gif)
+
+Épilogue
+--------------------------------------------------------------------------------
 
 Il nous reste deux petits changements pour avoir un serpent complètement fonctionnel:
 
@@ -259,35 +260,3 @@ Il nous reste deux petits changements pour avoir un serpent complètement foncti
   ```
 
 ![](media/score.png)
-
-***
-***
-Fin de la partie obligatoire
-***
-***
-
-Pour les rapides, je vous invite à aborder les sujets suivants :
-
-
-## Asynchronisme
-
-À ce stade nous avons un jeu à une seule vitesse; la boucle principale est entièrement cadencée par le `clock.tick(n)`, et la vitesse du serpent est entièrement fixée par ce moyen-là.
-
-Mais en fait on triche complètement; que se passerait-il si on avait par exemple deux objets à animer à des vitesses différentes ?
-
-Modifiez votre code pour pouvoir paramétrer deux fréquences séparément :
-
-* la fréquence de rafraichissement de l'écran
-* la fréquence de déplacement du serpent (en case / seconde)
-
-
-## Variables globales
-
-De manière générale, les variables globales sont considérées comme néfastes à la réutilisabilité du code; retouchez votre code pour minimiser le nombre de variables globales.
-
-
-## Ligne de commande
-
-On aimerait pouvoir passer sur la ligne de commande les paramètres du jeu; par exemple, le nombre de cases du tableau en hauteur et largeur, la taille d'une case en pixels, ...
-
-Indice: cherchez le module `argparse` dans la documentation Python.
