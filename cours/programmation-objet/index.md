@@ -1,35 +1,34 @@
 ---
-title: Itération & compréhensions
+title: Programmation Orientée Objet
 author: 
-  - "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@mines-paristech.fr)" 
-affiliation: "MINES ParisTech, Université PSL"
+- "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@minesparis.psl.eu), MINES Paris, Université PSL"
 license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
+date: auto
 ---
 
-# Objets & classes
+# Découvert et Usage des Objets
 
 
 ## Everything is an object!
 
-``` python
-isinstance(1, int)
-
-isinstance(1, object)
-
-isinstance(True, object)
-
-isinstance("jkjskjdks", object)
-
-isinstance([1, 2, 3], object)
-
-def f(x):
-    pass
-
-isinstance(f, object)
-
-import sys
-
-isinstance(sys, object)
+```python
+>>> isinstance(1, object)
+True
+>>> isinstance(True, object)
+True
+>>> isinstance("jkjskjdks", object)
+True
+>>> isinstance([1, 2, 3], object)
+True
+>>> 
+>>> def f(x):
+...     pass
+...
+>>> isinstance(f, object)
+True 
+>>> import sys
+>>> isinstance(sys, object)
+True
 ```
 
 ## Complex Numbers
@@ -59,6 +58,8 @@ w = 1j
 
 w * z
 ```
+
+# Création de Classes
 
 ## Complex numbers without objects
 
@@ -279,7 +280,7 @@ Complex(1.0, 2.0)
 Complex(1.0)
 ```
 
-# Objectification
+# Objectification (Examples)
 
 ```
 class Snake:

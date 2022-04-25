@@ -5,15 +5,31 @@ dependencies:
   - python=3.9
   - pip
   - setuptools
+  # Dev Tools
   - black
+  # CLI
+  - plumbum
+  - tqdm
+  - typer
+  # Scientific Stack
   - numpy
+  - autograd
+  - scipy
   - matplotlib
   - pillow
+  - ffmpeg
+  - sympy
+  # Jupyter Notebooks
   - jupyter
   - nbconvert
   - jupytext
-  - pandoc
+  # Document Processing 
+  - beautifulsoup4
+  - pandoc=2.18
+
   - pip:
+    # Pygame
     - pygame
-    - pandoc==2.1
+    # Document Processing
+    - pandoc==2.2
 
