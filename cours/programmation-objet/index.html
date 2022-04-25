@@ -97,6 +97,7 @@
           }
       });    
   </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
@@ -121,8 +122,8 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/49a2a88">
-          #49a2a88
+<a href="https://github.com/boisgera/python-fr/commit/f07d074">
+          #f07d074
         </a>
 </p>
 </header>
@@ -133,14 +134,19 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#usage-des-objets" id="toc-usage-des-objets">Usage des
-objets</a></li>
+objets</a>
+<ul>
 <li><a href="#des-objets-partout" id="toc-des-objets-partout">Des objets
 partout !</a></li>
-<li><a href="#création-de-classes" id="toc-création-de-classes">Création
-de Classes</a>
+<li><a href="#des-nombres-pas-si-complexes" id="toc-des-nombres-pas-si-complexes">Des nombres pas si
+complexes</a></li>
+</ul></li>
+<li><a href="#conception-de-types" id="toc-conception-de-types">Conception de types</a>
 <ul>
-<li><a href="#complex-numbers-without-objects" id="toc-complex-numbers-without-objects">Complex numbers without
-objects</a></li>
+<li><a href="#constructeur-attributs" id="toc-constructeur-attributs">Constructeur &amp; Attributs</a></li>
+<li><a href="#méthodes-1" id="toc-méthodes-1">Méthodes</a></li>
+<li><a href="#méthodes-magiques-1" id="toc-méthodes-magiques-1">Méthodes
+magiques</a></li>
 </ul></li>
 <li><a href="#objectification-examples" id="toc-objectification-examples">Objectification (Examples)</a></li>
 </ul>
@@ -148,7 +154,7 @@ objects</a></li>
 
 
 <h1 id="usage-des-objets">Usage des objets</h1>
-<h1 id="des-objets-partout">Des objets partout !</h1>
+<h2 id="des-objets-partout">Des objets partout !</h2>
 <p>Avant de découvrir comment utiliser les objets, il est bon de se
 convaincre que cette compétence sera très utile en Python, car :</p>
 <blockquote>
@@ -181,7 +187,7 @@ True</code></pre>
 <h4 id="alors-42-serait-un-objet-pas-un-entier">🤔 Alors <code>42</code>
 serait un objet, pas un entier?</h4>
 </summary>
-<p>Mais si ! Les deux sont possibles simultanément ! Nous avons déjà
+<p>Mais si car les deux sont possibles simultanément ! Nous avons déjà
 constaté que <code>42</code> était bien un objet :</p>
 <pre class="python"><code>&gt;&gt;&gt; isinstance(42, object)
 True</code></pre>
@@ -206,243 +212,247 @@ True
 True
 &gt;&gt;&gt; import sys; isinstance(sys, object)
 True</code></pre>
-<h3 id="nombres-complexes">Nombres complexes</h3>
-<pre class="python"><code>z = 1.0 - 2.0j
-
-z
-
-z = complex(1.0, -2.0) # construction / initialisation d'un complexe / instanciation du type complex
-z
-
-z.real # accès aux attributs (ic "real")
-
-z.real = 3.14 # ici "real" accessible en lecture seule
-
----------------------------------------------------------------------------
-AttributeError                            Traceback (most recent call last)
-/tmp/ipykernel_73815/1104530040.py in &lt;module&gt;
-----&gt; 1 z.real = 3.14 # ici "real" accessible en lecture seule
-
-AttributeError: readonly attribute
-
-z.conjugate() # appel de méthode
-
-w = 1j
-
-w * z</code></pre>
-<h1 id="création-de-classes">Création de Classes</h1>
-<h2 id="complex-numbers-without-objects">Complex numbers without
-objects</h2>
-<pre class="python"><code>z = (1.0, -2.0)
-
-def complex_get_real(z):
-    return z[0]
-
-complex_get_real(z)
-
-def complex_conjugate(z):
-    x, y = z
-    return (x, -y)
-
-complex_conjugate(z)
-
-def complex_multiply(w, z):
-    ...
+<h2 id="des-nombres-pas-si-complexes">Des nombres pas si complexes</h2>
+<p>Le type <code>complex</code> représente en Python les nombres
+complexes. Il fournit un bon example des interactions qu’on peut avoir
+avec des objets.</p>
+<h3 id="construction">Construction</h3>
+<p>Pour créer le nombre complexe <span class="math inline">\(z = 1/2 +
+(3/2)i\)</span>, on peut utiliser la notation litérale pour les nombres
+complexes :</p>
+<pre class="python"><code>&gt;&gt;&gt; z = 0.5 + 1.5j</code></pre>
+<p>Il est bon de connaître cette syntaxe car c’est celle que Python
+utilisera pour représenter les nombres complexes:</p>
+<pre class="python"><code>&gt;&gt;&gt; z
+(0.5+1.5j)</code></pre>
+<p>Néanmoins tous les objets ne sont pas dotés d’une telle notation.
+Mais il existe une méthode alternative pour tous les objets : on peut
+appeler le type de l’objet que l’on souhaite instancier (comme s’il
+était une fonction) en lui passant les arguments nécessaires, ici partie
+réelle et imaginaire du nombre à construire. Le type de l’objet sert
+donc de <strong>constructeur</strong>.</p>
+<pre class="python"><code>&gt;&gt;&gt; z = complex(0.5, 1.5)
+&gt;&gt;&gt; z == 0.5+1.5j
+True</code></pre>
+<h3 id="attributs">Attributs</h3>
+<p>Un objet est une structure de données. Les données qu’il contient
+peuvent être rendus accessible sous forme d’<strong>attributs</strong>.
+Tous nombres complexes possèdent ainsi les attributs <code>real</code>
+et <code>imag</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; z.real
+0.5
+&gt;&gt;&gt; z.imag
+1.5</code></pre>
+<p>La syntaxe pour changer la valeur de l’attribut <code>real</code> du
+nombre <code>z</code> devrait être <code>z.real = ...</code>. Ici
+toutefois un tel assignement échoue parce que les nombres complexes sont
+(volontairement) immuables.</p>
+<pre class="python"><code>&gt;&gt;&gt; z.real = -0.5
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: readonly attribute</code></pre>
+<h3 id="méthodes">Méthodes</h3>
+<p>Un nombre complexe possède un attribut <code>conjugate</code> dont la
+nature est un peu particulière, une <strong>méthode</strong> :</p>
+<pre class="python"><code>&gt;&gt;&gt; z.conjugate #doctest: +ELLIPSIS
+&lt;built-in method conjugate of complex object at 0x...&gt;</code></pre>
+<p>Les méthodes, qui se comportent comme les fonctions, sont appelables
+:</p>
+<pre><code>&gt;&gt;&gt; callable(z.conjugate)
+True</code></pre>
+<p>Cette méthode est <strong>liée</strong> au nombre complexe
+<code>z</code> : elle peut utiliser <code>z</code> et les données qu’il
+contient pour produire un résultat, sans qu’il soit nécessaire de lui
+passer explicitement <code>z</code> comme argument. Ici,
+<code>z.conjugate()</code> renvoie le nombre complexe conjugé de
+<code>z</code>:</p>
+<pre class="python"><code>&gt;&gt;&gt; z.conjugate()
+(0.5-1.5j)</code></pre>
+<p>La méthode <code>conjugate</code> est également disponible comme
+attribut du type <code>complex</code>:</p>
+<pre class="python"><code>&gt;&gt;&gt; complex.conjugate
+&lt;method 'conjugate' of 'complex' objects&gt;</code></pre>
+<p>Elle n’est alors par liée à une instance particulière de nombre
+complexe ; il faudra donc lui fournir explicitement le nombre complexe à
+conjuguer en argument :</p>
+<pre class="python"><code>&gt;&gt;&gt; complex.conjugate(z)
+(0.5-1.5j)</code></pre>
+<h3 id="méthodes-magiques">Méthodes magiques</h3>
+<p>Sont <strong>magiques</strong> les méthodes d’un objet dont le nom
+commence et finit par un double soulignement <code>"__"</code>. Ces
+méthodes magiques sont rarement appelées directement par le programmeur,
+mais indirectement par Python lui-même.</p>
+<p>Les méthodes magiques du type <code>complex</code> permettent par
+exemple de faire des calculs avec des nombres complexes avec une syntaxe
+concise : s’il est possible de calculer</p>
+<pre class="python"><code>&gt;&gt;&gt; 1j + 1j * 1j
+(-1+1j)</code></pre>
+<p>c’est que le type complex comporte les méthodes magiques
+<code>__add__</code> et <code>__mul__</code>, appelées en cas d’addition
+et de multiplication respectivement. Le calcul ci-dessus est donc
+équivalent à :</p>
+<pre class="python"><code>&gt;&gt;&gt; complex.__add__(1j, complex.__mul__(1j, 1j))
+(-1+1j)</code></pre>
+<p>ou bien, en utilisant la version liée de ces méthodes :</p>
+<pre class="python"><code>&gt;&gt;&gt; 1j.__add__(1j.__mul__(1j))
+(-1+1j)</code></pre>
+<p>Dans tous les cas, la notation initiale – où l’on laisse le soin à
+Python d’appeler lui-même les méthodes magiques – est sensiblement plus
+lisible !</p>
+<h1 id="conception-de-types">Conception de types</h1>
+<p>Notre objectif dans cette section va être de créer un type
+<code>Complex</code> qui va être une version simplifié du type intégré
+<code>complex</code>. Nous allons pour cela définir une nouvelle
+<strong>classe</strong>; pour créer une classe minimale, sans
+fonctionnalité spécifique, le code ci-dessous suffit :</p>
+<pre class="python"><code>class Complex:
     pass</code></pre>
-<p>Our own complex class</p>
-<pre class="python"><code>import builtins
-complex = builtins.complex
-
-class Complex:
-    pass
-
-complex = Complex() # instance of Complex (default constructor only)
-
-Complex(1.0, -2.0)
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_73815/2989908829.py in &lt;module&gt;
-----&gt; 1 Complex(1.0, -2.0)
-
-TypeError: Complex() takes no arguments
-
-class Complex:
-    def init(complex, real, imag):
-        complex.real = real
-        complex.imag = imag
-
-complex = Complex()
-Complex.init(complex, 1.0, -2.0)
-
-complex.real
-
-complex.imag
-
-class Complex:
-    def __init__(complex, real, imag):
-        complex.real = real
-        complex.imag = imag
-
-z = Complex(1.0, -2.0)
-
-z.real
-
-z.imag
-
-class Complex:
-    def __init__(complex, real, imag):
-        complex.real = real
-        complex.imag = imag
-    def conjugate_inplace(complex): # mutable version of conjugate
-        complex.imag = -complex.imag
-
-z = Complex(1.0, -2.0)
-Complex.conjugate_inplace(z)
-z.real, z.imag
-
-z = Complex(1.0, -2.0)
-z.conjugate_inplace() # méthode liée ("bound method")
-z.real, z.imag
-
-class Complex:
-    def __init__(complex, real, imag):
-        complex.real = real
-        complex.imag = imag
-    def conjugate(complex):
-        return Complex(complex.real, -complex.imag)
-
-z = Complex(1.0, -2.0)
-w = z.conjugate()
-w.real, w.imag
-
-complex(1.0, 2.0) # eq to print(repr(complex(1.0, 2.0)))
-
-Complex(1.0, 2.0)
-
-print(repr(complex(1.0, 2.0))) # repr uses the dunder method __repr__ if it exist!
-
-w = Complex(1.0, 2.0)
-isinstance(w, Complex)
-
-isinstance(w, object)
-
-issubclass(Complex, object)
-
-dir(Complex)
-
-Complex.__repr__
-
-object.__repr__
-
-print(object.__repr__(w))
-
-w
-
-class Complex:
-    def __init__(complex, real, imag):
-        complex.real = real
-        complex.imag = imag
-    def conjugate(complex):
-        return Complex(complex.real, -complex.imag)
-    def __repr__(complex):
-        return f"({complex.real}+{complex.imag}j)" # doesn't alway work (e.g. when complex.imag &lt; 0)
-
-w = Complex(1.0, 2.0)
-
-w
-
-class Complex: # usual convention: denote "self" the current instance
+<p>A ce stade, il est certe possible d’instancier un “nombre
+complexe”</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex()</code></pre>
+<p>ayant le bon type</p>
+<pre class="python"><code>&gt;&gt;&gt; type(z) is Complex
+True
+&gt;&gt;&gt; isinstance(z, Complex)
+True</code></pre>
+<p>mais il n’est doté d’aucun attribut ou méthode caractéristique des
+nombres complexes</p>
+<pre class="python"><code>&gt;&gt;&gt; z.real
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: 'Complex' object has no attribute 'real'
+&gt;&gt;&gt; z.conjugate()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: 'Complex' object has no attribute 'conjugate'
+&gt;&gt;&gt; z + z
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: unsupported operand type(s) for +: 'Complex' and 'Complex'</code></pre>
+<h2 id="constructeur-attributs">Constructeur &amp; Attributs</h2>
+<p>Pour gérer l’ajout des attributs <code>real</code> et
+<code>imag</code>, on pourrait définir une fonction</p>
+<pre class="python"><code>def Complex_init(z, real, imag):
+    z.real = real
+    z.imag = imag</code></pre>
+<p>qui nous permettrait de prendre un nombre complexe vide et d’y
+ajouter les attributs souhaités :</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex()
+&gt;&gt;&gt; Complex_init(z, 0.5, 1.5)
+&gt;&gt;&gt; z.real
+0.5
+&gt;&gt;&gt; z.imag
+1.5</code></pre>
+<p>Possible oui, mais pas pratique ! En définissant directement la
+fonction précédente dans la classe <code>Complex</code>, et en la
+nommant <code>__init__</code>, on définit une méthode magique qui est le
+constructeur associé à la classe <code>Complex</code> et on s’évite cet
+usage maladroit.</p>
+<p>En adoptant la définition suivante de <code>Complex</code></p>
+<pre class="python"><code>class Complex:
+    def __init__(z, real, imag):
+        z.real = real
+        z.imag = imag</code></pre>
+<p>on peut s’épargner la création d’un objet sans attributs, pris
+automatiquement en charge quand on appelle le constructeur de nombres
+complexes</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex(0.5, 1.5)
+&gt;&gt;&gt; z.real
+0.5
+&gt;&gt;&gt; z.imag
+1.5</code></pre>
+<p>L’usage quand une telle méthode est définie est d’appeler
+<code>self</code> le premier argument de la méthode, qui désignera
+toujours une instance de la classe considérée</p>
+<pre class="python"><code>class Complex:
+    def __init__(self, real, imag):
+        self.real = real
+        self.imag = imag</code></pre>
+<p>C’est uniquement une convention, qui ne change rien au comportement
+de la classe que nous avions définie.</p>
+<h2 id="méthodes-1">Méthodes</h2>
+<p>L’ajout de méthodes à une classe suit le même schéma que le
+constructeur. Ainsi pour avoir une méthode <code>conjugate</code> qui
+retourne le conjugée d’une instance de nombre complexe, on peut
+faire</p>
+<pre class="python"><code>class Complex:
+    def __init__(self, real, imag):
+        self.real = real
+        self.imag = imag
+    def conjugate(self):
+        return Complex(self.real, -self.imag)</code></pre>
+<p>Avec</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex(0.5, 1.5)</code></pre>
+<p>on a alors</p>
+<pre class="python"><code>&gt;&gt;&gt; w = Complex.conjugate(z)
+&gt;&gt;&gt; w.real
+0.5
+&gt;&gt;&gt; w.imag
+1.5</code></pre>
+<p>ou bien, puisque Python prend en charge automatiquement la création
+de méthodes liées aux instances</p>
+<pre class="python"><code>&gt;&gt;&gt; w = z.conjugate()
+&gt;&gt;&gt; w.real
+0.5
+&gt;&gt;&gt; w.imag
+1.5</code></pre>
+<h2 id="méthodes-magiques-1">Méthodes magiques</h2>
+<p>Il est un peu frustrant de ne pas voir les nombres complexes
+s’afficher proprement dans le terminal à ce stade :</p>
+<pre class="python"><code>&gt;&gt;&gt; Complex(0.5, 1.5) # doctest: +ELLIPSIS
+&lt;__main__.Complex object at 0x...&gt;</code></pre>
+<p>C’est un problème que nous pouvons résoudre en définissant une
+méthode magique <code>__repr__</code>, chargée de construire une
+représentation adaptée des instances sous forme de chaîne de
+caractères.</p>
+<pre class="python"><code>class Complex:
     def __init__(self, real, imag):
         self.real = real
         self.imag = imag
     def conjugate(self):
         return Complex(self.real, -self.imag)
     def __repr__(self):
-        return f"({self.real}+{self.imag}j)" # doesn't alway work (e.g. when complex.imag &lt; 0)
-
-w = Complex(1.0, 2.0)
-w
-
-class Complex: # usual convention: denote "self" the current instance
+        # ⚠️ weird output when self.imag &lt; 0
+        return f"({self.real}+{self.imag}j")</code></pre>
+<p>On a alors une représentation compatible avec la notation litérale
+des nombres complexes intégrés</p>
+<pre class="python"><code>&gt;&gt;&gt; Complex(0.5, 1.5)
+(0.5+1.5j)</code></pre>
+<p>Le support des opérations arithmétiques est similaire. Pour disposer
+de l’addition par exemple, on peut faire :</p>
+<pre class="python"><code>class Complex:
     def __init__(self, real, imag):
         self.real = real
         self.imag = imag
     def conjugate(self):
         return Complex(self.real, -self.imag)
     def __repr__(self):
-        return f"({self.real}+{self.imag}j)" # doesn't alway work (e.g. when complex.imag &lt; 0)
-    def add(self, other):
-        return Complex(self.real + other.real, self.imag + other.imag)
-
-w = Complex(1.0, 2.0)
-z = Complex(0.0, 1.0)
-
-Complex.add(w, z) # usage d'une méthode non-liée (à une instance)
-
-w.add(z) # usage d'une méthode liée (à l'instance w)
-
-w + z
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_73815/2317218533.py in &lt;module&gt;
-----&gt; 1 w + z
-
-TypeError: unsupported operand type(s) for +: 'Complex' and 'Complex'
-
-class Complex: # usual convention: denote "self" the current instance
+        # ⚠️ weird output when self.imag &lt; 0
+        return f"({self.real}+{self.imag}j")
+    def __add__(w, z):
+        return Complex(w.real+z.real, w.imag+z.imag)</code></pre>
+<p>et alors</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex(0.5, 1.5)
+&gt;&gt;&gt; z + z.conjugate()
+(1+0j)</code></pre>
+<p>A noter que pour ce type de méthodes, qui accepte deux instances de
+la classe en argument, l’usage est d’utiliser les noms <code>self</code>
+et <code>other</code> et donc de préférer la définition suivante
+(équivalente) :</p>
+<pre class="python"><code>class Complex:
     def __init__(self, real, imag):
         self.real = real
         self.imag = imag
     def conjugate(self):
         return Complex(self.real, -self.imag)
     def __repr__(self):
-        return f"({self.real}+{self.imag}j)" # doesn't alway work (e.g. when complex.imag &lt; 0)
+        # ⚠️ weird output when self.imag &lt; 0
+        return f"({self.real}+{self.imag}j")
     def __add__(self, other):
-        return Complex(self.real + other.real, self.imag + other.imag)
-
-w = Complex(1.0, 2.0)
-z = Complex(0.0, 1.0)
-
-Complex.__add__(w, z)
-
-w.__add__(z)
-
-w + z
-
-w.real
-
-w.real = -1.0 # nos instances de nombres complexes sont modifiables :(
-
-w.real = "tagad tsoin tsoin" # et ces modifications peuvent le rendre invalide :( :( :(
-
-w
-
-complex(1.0)
-
-Complex(1.0)
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_73815/74783907.py in &lt;module&gt;
-----&gt; 1 Complex(1.0)
-
-TypeError: __init__() missing 1 required positional argument: 'imag'
-
-class Complex: # usual convention: denote "self" the current instance
-    def __init__(self, real, imag=0.0):
-        self.real = real
-        self.imag = imag
-    def conjugate(self):
-        return Complex(self.real, -self.imag)
-    def __repr__(self):
-        return f"({self.real}+{self.imag}j)" # doesn't alway work (e.g. when complex.imag &lt; 0)
-    def add(self, other):
-        return Complex(self.real + other.real, self.imag + other.imag)
-
-Complex(1.0, 2.0)
-Complex(1.0)</code></pre>
+        return Complex(
+            self.real + other.real, 
+            self.imag + other.imag
+        )</code></pre>
 <h1 id="objectification-examples">Objectification (Examples)</h1>
 <pre><code>class Snake:
     def __init__(self, geometry, direction):
