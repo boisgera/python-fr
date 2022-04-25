@@ -17,6 +17,7 @@ cette compétence sera très utile en Python, car :
 
 Techniquement : "est une **instance** du type `object`".
 
+
 <details><summary>
 #### Instance ?
 </summary>
@@ -24,7 +25,12 @@ Un terme à interpréter dans sa version anglo-saxonne où il peut signifier
 "an individual illustrative of a category". On pourra se représenter 
 un **type** comme une collection d'éléments : ses instances.
 
+--------------------------------------------------------------------------------
+
 </details>
+
+
+
 
 Entiers, booléens, chaînes de caractère, listes, sont donc
 des objets :
@@ -67,6 +73,8 @@ mais comme  entier est un sous-type d'objet
 True
 ```
 tous les entiers sont aussi des objets.
+
+--------------------------------------------------------------------------------
 
 </details>
 
