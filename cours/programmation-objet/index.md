@@ -6,32 +6,84 @@ license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 date: auto
 ---
 
-# Découvert et Usage des Objets
+# Usage des objets
 
+# Des objets partout !
 
-## Everything is an object!
+Avant de découvrir comment utiliser les objets, il est bon de se convaincre que 
+cette compétence sera très utile en Python, car :
+
+> Tout ce qui peut être désigné par une variable est un objet !
+
+Techniquement : "est une **instance** du type `object`".
+
+<details><summary>
+#### Instance ?
+</summary>
+Un terme à interpréter dans sa version anglo-saxonne où il peut signifier
+"an individual illustrative of a category". On pourra se représenter 
+un **type** comme une collection d'éléments : ses instances.
+
+</details>
+
+Entiers, booléens, chaînes de caractère, listes, sont donc
+des objets :
 
 ```python
->>> isinstance(1, object)
+>>> isinstance(42, object)
 True
 >>> isinstance(True, object)
 True
->>> isinstance("jkjskjdks", object)
+>>> isinstance("Hello!", object)
 True
 >>> isinstance([1, 2, 3], object)
 True
->>> 
->>> def f(x):
-...     pass
-...
->>> isinstance(f, object)
+```
+
+<details><summary>
+#### 🤔 Alors `42` serait un objet, pas un entier? 
+</summary>
+
+Mais si ! Les deux sont possibles simultanément ! Nous avons déjà constaté que
+`42` était bien un objet :
+```python
+>>> isinstance(42, object)
+True
+```
+Vérifions que c'est également un entier :
+```python
+>>> isinstance(42, int)
+True
+```
+Donc les deux propriétés ne sont pas contradictoires.
+Plus précisément, le type de `42` est entier, pas objet :
+```python
+>>> type(42) == int
+True
+```
+mais comme  entier est un sous-type d'objet
+```python
+>>> issubclass(int, object)
+True
+```
+tous les entiers sont aussi des objets.
+
+</details>
+
+
+Bien que cela soit peut-être moins intuitif, des fonctions, des types ou des 
+modules sont aussi des objets :
+
+```python
+>>> isinstance(print, object)
 True 
->>> import sys
->>> isinstance(sys, object)
+>>> isinstance(int, object)
+True
+>>> import sys; isinstance(sys, object)
 True
 ```
 
-## Complex Numbers
+### Nombres complexes
 
 ``` python
 z = 1.0 - 2.0j
