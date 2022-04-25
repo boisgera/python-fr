@@ -459,7 +459,7 @@ class Complex:
         )
 ```
 
-
+## 🚧 TODO: attributs privés, propriétés 🚧
 
 # Objectification (Examples)
 
