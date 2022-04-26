@@ -621,7 +621,7 @@ class Complex:
 ```
 
 on récupère l'usage simplifié de l'accès aux parties réelles et imaginaires,
-mais sans avoir perdu la sécurité offert de vérification du type des 
+mais sans avoir perdu la sécurité de la vérification du type des 
 attributs `real` et `imag`.
 
 ```python
