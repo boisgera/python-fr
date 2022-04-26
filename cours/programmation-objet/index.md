@@ -451,7 +451,7 @@ class Complex:
         return Complex(self.real, -self.imag)
     def __repr__(self):
         # ⚠️ weird output when self.imag < 0
-        return f"({self.real}+{self.imag}j")
+        return f"({self.real}+{self.imag}j)"
     def __add__(self, other):
         return Complex(
             self.real + other.real, 
@@ -459,7 +459,186 @@ class Complex:
         )
 ```
 
-## 🚧 TODO: attributs privés, propriétés 🚧
+## Attributs privés
+
+Tous les attributs d'un objet n'ont pas nécessairement vocation à être
+**publics** ; on peut vouloir des données **privées**, à usage interne,
+uniquement exploitable par les méthodes propres à un objet.
+La convention en Python est de préfixer le nom de tels attributs par un
+unique caractère de soulignement.
+
+Il est possible ensuite de contrôler au cas par cas la façon dont on
+autorise le monde extérieur à interager avec ces données. Par exemple,
+nous pouvons faire en sorte que notre nombre complexe s'assure que
+ses parties réelles et imaginaires soient des nombres flottants.
+A ce stade aucune sécurité de ce type n'est présente ; il est donc
+très facile (y compris par accident) de créer des "nombres complexes" 
+invalides qui seront sans doute la source de bugs futurs ...
+
+```python
+>>> Complex("Hello", "world!")
+(Hello+world!j)
+```
+
+Mais nous pouvons heureusement remplacer les attributs publics `real` et `imag`
+par des attributs privés `_real` et `_imag` et exposer de façon contrôlée ces
+valeurs en lecture et/ou en écriture par le biais de méthodes dédiées :
+des **accesseurs** (**getters** et/ou **setters**).
+
+Par exemple, nous pouvons faire en sorte que lorsque l'on souhaite fixer la
+valeur de la partie réelle ou imaginaire, on s'assure au préalable d'avoir
+bien affaire à un nombre flottant, où l'on génère immédiatemment une erreur
+circonstanciée. Nous pouvons même adapter le constructeur pour qu'il bénéficie 
+de cette sécurité supplémentaire. Bien sûr comme nous avons rendus privés les
+parties réelles et imaginaires, il nous faudra fournir des fonctions
+d'accès en lecture pour que les utilisateurs externes des nombres complexes
+puissent les exploiter. En interne, il faudra adapter les méthodes pour 
+qu'elles exploient les attributs privés ou les accesseurs, plutôt que les
+attributs publics qui ont été supprimés.
+
+```python
+class Complex:
+    def __init__(self, real, imag):
+        self.set_real(real)
+        self.set_imag(imag)
+    def get_real(self):
+        return self._real
+    def set_real(self, real):
+        if isinstance(real, float):
+            self._real = real
+        else:
+            raise TypeError(f"{real!r} is not a float")
+    def get_imag(self):
+        return self._imag
+    def set_imag(self, imag):
+        if isinstance(imag, float):
+            self._imag = imag
+        else:
+            raise TypeError(f"{imag!r} is not a float")
+    def conjugate(self):
+        return Complex(self._real, -self._imag)
+    def __repr__(self):
+        # ⚠️ weird output when self.imag < 0
+        return f"({self._real}+{self._imag}j)"
+    def __add__(self, other):
+        return Complex(
+            self._real + other._real, 
+            self._imag + other._imag
+        )
+```
+
+Les nombres complexes se comportent alors conformément à nos attentes.
+
+```python
+>>> z = Complex(0.5, 1.5)
+>>> z
+(0.5+1.5j)
+>>> z.get_real()
+0.5
+>>> z.set_real(-0.5)
+>>> z
+(-0.5+1.5j)
+>>> z.set_real("Hello")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 11, in set_real
+TypeError: 'Hello' is not a float
+```
+
+<details><summary>
+#### Accès à l'attribut privé ou accesseur ?
+</summary>
+
+Vous noterez que dans une méthode de la classes `Complex`, on a parfaitement
+le droit de faire appel aux attributs privés
+
+```python
+def conjugate(self):
+    return Complex(self._real, -self._imag)
+```
+
+Dans ce cas précis, cela n'était toutefois pas indispensable ; l'interface
+publique des nombres complexes était suffisamment riche et nous aurions pu
+utiliser les getters pour implémenter la même fonctionnalité.
+
+```python
+def conjugate(self):
+    return Complex(self.get_real(), -self.get_imag())
+```
+
+Il est probable que cela aurait été préférable. Certes l'appel à `conjugate`
+est un peu moins performant dans le second cas (un appel de fonction de plus
+est nécessaire), mais cela n'est probablement pas critique. Mais en contrepartie,
+si nous utilisons les accesseurs et que nous décidons ultérieurement de changer
+l'implémentation interne de la classe -- par exemple de remplacer les attributs
+`_real` et `_imag` par un nombre complexe intégré `_complex` -- 
+en préservant son interface publique, il ne sera pas nécessaire de changer
+l'implémentation de ces méthodes.
+
+</details>
+
+## Propriétés
+
+On pourra regretter la lourdeur syntaxique des accesseurs par rapport à l'accès
+à des attributs publiques. Heureusement il existe un mécanisme qui offre la
+même interface syntaxique que l'accès à des attributs, mais la même sécurité
+que le passage par des accesseurs : les **propriétés**. Ce sont des attributs
+"virtuels" que l'on définit par leur getter et/ou leur setter. Ainsi,
+si l'on rajoute les propriétés `real` et `imag` à notre implémentation
+de la classe `Complex`,
+
+```python
+class Complex:
+    def __init__(self, real, imag):
+        self.set_real(real)
+        self.set_imag(imag)
+    def get_real(self):
+        return self._real
+    def set_real(self, real):
+        if isinstance(real, float):
+            self._real = real
+        else:
+            raise TypeError(f"{real!r} is not a float")
+    real = property(get_real, set_real)
+    def get_imag(self):
+        return self._imag
+    def set_imag(self, imag):
+        if isinstance(imag, float):
+            self._imag = imag
+        else:
+            raise TypeError(f"{imag!r} is not a float")
+    imag = property(get_imag, set_imag)
+    def conjugate(self):
+        return Complex(self._real, -self._imag)
+    def __repr__(self):
+        # ⚠️ weird output when self.imag < 0
+        return f"({self._real}+{self._imag}j)"
+    def __add__(self, other):
+        return Complex(
+            self._real + other._real, 
+            self._imag + other._imag
+        )
+```
+
+on récupère l'usage simplifié de l'accès aux parties réelles et imaginaires,
+mais sans avoir perdu la sécurité offert de vérification du type des 
+attributs `real` et `imag`.
+
+```python
+>>> z = Complex(0.5, 1.5)
+>>> z
+(0.5+1.5j)
+>>> z.real
+0.5
+>>> z.real = -0.5
+>>> z
+(-0.5+1.5j)
+>>> z.real = "Hello"
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 11, in set_real
+TypeError: 'Hello' is not a float
+```
 
 # Objectification (Examples)
 
