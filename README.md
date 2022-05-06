@@ -18,4 +18,4 @@
 
  - 📖 [Fonctions](https://boisgera.github.fr/python-fr/cours/fonctions/index.html)
 
- - 📖 [Bibliotèques](https://boisgera.github.fr/python-fr/cours/bibliothèque/index.html)
+ - 📖 [Bibliothèques](https://boisgera.github.fr/python-fr/cours/bibliothèque/index.html)
