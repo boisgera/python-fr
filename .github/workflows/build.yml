@@ -21,7 +21,7 @@ jobs:
           environment-file: environment.yml
 
       - name: Documents build
-        run: ./build
+        run: ./build.py
 
       - name: Deployment Setup
         run: rm .gitignore
