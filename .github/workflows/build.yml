@@ -24,7 +24,7 @@ jobs:
         run: ./build.py
 
       - name: Deployment Setup
-        run: rm .gitignore
+        run: find . -name .gitignore -exec rm -rf {}
 
       - name: Deployment
         uses: JamesIves/github-pages-deploy-action@3.7.1
