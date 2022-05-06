@@ -26,6 +26,9 @@ jobs:
       - name: Deployment Setup
         run: find . -name .gitignore -exec rm -rf {} \;
 
+      - name: Observer
+        run: find . -name .gitignore
+
       - name: Deployment
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
