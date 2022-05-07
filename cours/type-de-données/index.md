@@ -10,21 +10,24 @@ license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 
 variables, affichage `repr`, `dir`, `type`, `isinstance`, `help`
 
-# La valeur qui n'existait pas
+# Absence de valeur
 
 Python fournit une valeur `None` qui signale ... l'absence de valeur!
-D'ailleurs, l'interpréteur Python ne veut pas nous l'afficher.
+D'ailleurs, l'interpréteur Python ne veut pas nous l'afficher quand
+on fournit cette valeur sur l'invite de commandes : 
 
 ```python
 >>> None
 ```
+
+Passer par une variable ne change rien.
 
 ```python
 >>> a = None
 >>> a
 ```
 
-Il faut lui "forcer la main" :
+Par contre on peut expliciter afficher `None`, par exemple avec la fonction `print` :
 
 ```python
 >>> print(a)
@@ -48,6 +51,27 @@ False
 >>> x = None
 >>> x is None
 True
+```
+
+Attention, une variable affectée à `None` et une variable indéfinie (qui n'est
+liée à aucune valeur) c'est subtilement différent. Si la variable `y` n'a pas
+encore été introduite (ou a été effacée avec `del y`),
+ l'évaluation de l'expression `y is None` provoque une erreur
+
+```python
+>>> y is None
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'y' is not defined
+```
+
+comme d'ailleurs toute expression qui utilise `y`:
+
+```python
+>>> y
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'y' is not defined
 ```
 
 Dans un contexte booléen, `None` est évalué comme `False`, mais le test
