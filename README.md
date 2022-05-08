@@ -19,3 +19,8 @@
  - 📖 [Fonctions](https://boisgera.github.io/python-fr/cours/fonctions/index.html)
 
  - 📖 [Bibliothèques](https://boisgera.github.io/python-fr/cours/bibliothèque/index.html)
+
+
+ -------------------------------------------------------------------------------
+
+  - 📖 [Le serpent](https://boisgera.github.io/python-fr/tps/games/index.html)
