@@ -177,6 +177,14 @@ background: #f1f3f5;
 padding: 1em;
 }
     
+table:not(fuckcss) {
+  margin: 1em auto;
+  display: block;
+  max-width: 100%;
+  width: min-content;
+  white-space: nowrap;
+}
+
 details h1, details h2, details h3{
   display: inline;
 }
