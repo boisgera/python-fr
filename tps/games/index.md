@@ -45,9 +45,7 @@ Vous devriez alors avoir une nouvelle invite de commmande :
 <summary>
 #### Dépannage 🛠️
 </summary>
-**NOTE.** Si vous ne voyez pas
-l'invite de commande `(snake) $` (qui vous rappelle quel environnement est actif), 
-alors
+Si vous ne voyez pas l'invite de commande `(snake) $` alors
 
 1. exécutez la commande
 
