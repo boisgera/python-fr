@@ -59,8 +59,7 @@ Si vous ne voyez pas l'invite de commande `(snake) $` alors
 
 </details>
 
-Installez ensuite la dernière version du module `pygame` avec `pip` dans ce
-environnement :
+Installez ensuite le module `pygame` avec `pip` dans cet environnement :
 
 ```bash
 (snake) $ pip install pygame
