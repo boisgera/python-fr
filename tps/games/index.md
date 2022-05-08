@@ -66,7 +66,7 @@ environnement :
 (snake) $ pip install pygame
 ```
 
-Pour tester votre installation, vous pouvez lancer le programme d'exemple comme suit :
+Pour tester votre installation, lancez le programme d'exemple :
 
 ```bash
 (snake) $ python -m pygame.examples.aliens
