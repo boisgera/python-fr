@@ -471,7 +471,7 @@ plus nécessaire.
 ```python
 >>> ()
 ()
->>> (1)
+>>> (1) # ⚠️ not a tuple!
 1
 >>> (1,)
 (1,)
