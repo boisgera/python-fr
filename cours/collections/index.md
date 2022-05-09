@@ -412,16 +412,6 @@ Cela devient beaucoup plus évident si l'on décompose ces étapes :
 0.005
 ```
 
-```python
->>> result = f()
->>> 
->>> result
-('ok', 3.14)
->>> 
->>> type(result)
-<class 'tuple'>
-```
-
 Quant à l'affectation `a, b = b, c`, elle passe aussi implicitement par la
 création d'une paire : elle équivaut à
 
