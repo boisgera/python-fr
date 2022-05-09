@@ -432,7 +432,7 @@ création d'une paire : elle équivaut à
 
 Si nous avons pu oublier qu'un tuple était crée, c'est qu'un tuple peut le
 plus souvent être défini par une notation très légère, avec une suite d'objets
-séparés par des virgules. Mais la notation universellement valide tuples les
+séparés par des virgules. Mais la notation universellement valide des tuples
 met entre parenthèse cette suite. Au lieu du code initial, nous aurions très
 bien pu écrire
 
