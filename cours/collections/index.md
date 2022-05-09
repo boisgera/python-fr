@@ -428,8 +428,8 @@ TypeError: 'tuple' object does not support item assignment
 
 # Ensembles
 
-Un ensemble peut être défini par une suite de litéraux séparés par des virgules 
-et entourées par des accolades
+Un ensemble peut être défini par une suite d'objets séparés par des virgules 
+et entourée par des accolades
 
 ```python
 >>> {1, 2, 3, 4}
