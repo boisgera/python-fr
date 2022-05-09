@@ -4,11 +4,8 @@ author:
   - "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@mines-paristech.fr)" 
 affiliation: "MINES ParisTech, Université PSL"
 license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
+date: today
 ---
-
-# Kit de survie
-
-variables, affichage `repr`, `dir`, `type`, `isinstance`, `help`
 
 # Absence de valeur
 
@@ -94,7 +91,9 @@ x is false-ish
 x is false-ish
 ```
 
-## Fonctions sans valeur de retour
+## Usages
+
+### Fonctions sans valeur de retour
 
 Comme les fonctions mathématiques, les fonctions Python ont des
 arguments et renvoient des valeurs
@@ -175,7 +174,7 @@ def think():
     return None
 ```
 
-## Fonction avec valeur de retour optionnelle
+### Fonction avec valeur de retour optionnelle
 
 Les dictionnaires Python génère une erreur lorsque l'on essaie d'accéder 
 à la valeur d'une clé qui n'existe pas.
@@ -216,7 +215,7 @@ on pourra faire :
 2
 ```
 
-## Fonction et absence d'argument
+### Fonction et absence d'argument
 
 La valeur `None` est souvent utilisée comme valeur par défaut
 associé à l'argument d'une fonction. Ne pas affecter (explicitement) de
@@ -263,7 +262,7 @@ une valeur : `inf` (c'est-à-dire $+\infty$).
 
 [^warnings]: Il est probable que cet avertissement ne s'affiche que la première
 fois que vous effectuez la division par zéro, mais plus ensuite. Les fonctions
-du module warnings permettent de controller ce comportement.
+du module `warnings` permettent de controller ce comportement.
 
 Ce comportement est toutefois configurable : 
 en appelant la fonction `seterr` de NumPy sans argument, vous pouvez lire
@@ -297,7 +296,7 @@ inf
 ```
 
 Si ce résultat vous convient, mais que vous souhaitez une erreur en cas de
-**dépassement** (🇺🇸 **overflow**) (sous-entendu: du plus grand nombre flottant fini),
+**dépassement** (🇺🇸 **overflow**) (sous-entendu : du plus grand nombre flottant fini),
 vous pouvez invoquer `seterr` en conséquence :
 
 ```python
@@ -336,519 +335,178 @@ modifier la configuration. Cette stratégie permet de lire la configuration
 sans la changer, de changer la réaction en présence d'une division par 
 zéro sans changer celle en cas d'overflow, etc.
 
-# TODO. Vrai ou faux
-
-`True` et `False`
 
 # Types numériques
 
-``` python
+## Booléens
 
+On peut considérer que les booléens `True` et `False` sont de valeurs numériques.
+Ils se combinent au moyen d'opérateurs logiques et sont principalement exploités 
+dans des tests qui contrôlent le flux d'exécution des programmes.
 
-bool, int, float, complex (etc.)
-
-b = True
-
-c = False
-
-2**1000 # entiers non bornés !
-
-1 + 3 * 2
-
-2**10
-
-17 % 12
-
-17 / 12
-
-17 // 12
-
-a = 42
-
-bin(a)
-
-hex(a)
-
-0b101010
-
-0x2a
-
-0x2a == 42
-
-type(0x2a)
-
-3.14
-
-from math import sin
-
-sin(3.14)
-
-int("300")
-
-int(3.14)
-
-int(3.94)
-
-round(3.14)
-
-round(3.94)
-
-import math
-
-math.floor(3.94)
-
-0.1 + 0.2
-
-f"{0.1:.1000}"
-
-f"{0.2:.1000}"
-
-f"{0.3:.1000}"
-
-1j # complex number
-
-1j * 1j
-
-z = 0.7 + 0.3j
-
-for attribute in dir(z):
-    if not attribute.startswith("_"):
-        print(attribute)
-
-z.real
-
-z.imag
-
-z.conjugate
-
-z.conjugate()
-
-
+```python
+>>> not False
+True
+>>> not True
+False
 ```
 
-**TODO.** Splitter collections en un nouveau document? 
-Et strings en un troisième?
-
-# Collections
-
-## Listes
-
-``` python
-Listes
-
-Liste de références / adresses / pointeurs (vers les données).
-
-Taille variable, contenu modifiable.
-
-Liste d'objets (potentiellement) hétérogènes.
-
-l = [1.0, 1.0 + 0.1j, 2, 3]
-
-l[1]
-
-l[1] = 42
-
-del l[1]
-
-l
-
-l.append(12)
-
-l
-
-l.extend([9, 10, 11, 12])
-
-l
-
-help(l)
-
-dir(l)
-
-help(l.index)
-
-l
-
-help(l.pop)
-
-l[-1]
-
-l.pop()
-
-l
-
-l.pop(0)
-
-l
-
-help(l.remove)
-
-l
-
-l.remove(9)
-
-l
-
-l.index(10)
-
-l.count(63)
-
-l = [1, 2]
-r = l.extend([3, 4])
-
-r == None
-
-l
-
-l1 = [1, 2]
-l2 = [3, 4]
-l3 = l1 + l2
-
-l1
-
-l2 
-
-l3
-
-3 * [7, 1]
-
-len(l)
-
-for i in l:
-    print(i)
-
-for i in range(5):
-    print(i)
-
-range(5)
-
-list(range(5))
+```python
+>>> False or False
+False
+>>> False or True
+True
+>>> True or False
+True
+>>> True or True
+True
 ```
 
-
-## Dictionnaires
-
-``` python
-d = {"a":1, "b":2, "c":3}
-
-d
-
-d["a"] # lecture
-
-d["d"] = 4 # écriture
-
-d
-
-del d["a"] # effacement
-
-d
-
-d["a"]
-
----------------------------------------------------------------------------
-KeyError                                  Traceback (most recent call last)
-/tmp/ipykernel_17241/3859482410.py in <module>
-----> 1 d["a"]
-
-KeyError: 'a'
-
-d.get("b", 0)
-
-d.get("a", 0)
-
-for x in d:
-    print(x, ":", d[x])
-
-"a" in d
-
-"b" in d
-
-list(d)
-
-for x in d.keys():
-    print(x)
-
-for x in d.values():
-    print(x)
-
-for x in d.items():
-    print(x)
-
-d.update({"e": 5, "f": 6})
-
-d
-
-dir(d)
-
-d.pop("b")
-
-d
-
-help(d.setdefault)
-
-from collections import defaultdict
-
-help(defaultdict)
-
-{"kjdslkjdlsdk": 90.0}
-
-{1: 4, 1.0: 8, 1.5j: 0, True: 90.90}
-
-{(1, 2): 7, (7, 8, 9): 9}
-
-{(1, ("aa", "bb")): 90}
-
-{[2]: 90.0}
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/1412873092.py in <module>
-----> 1 {[2]: 90.0}
-
-TypeError: unhashable type: 'list'
-
-hash(1.34)
-
-hash("kjskdjsjdskj")
-
-hash(("kjdsjdks", 909090))
-
-hash([1, 2, 3])
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/2492717709.py in <module>
-----> 1 hash([1, 2, 3])
-
-TypeError: unhashable type: 'list'
-
-hash((1, [2, 3]))
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/2425333101.py in <module>
-----> 1 hash((1, [2, 3]))
-
-TypeError: unhashable type: 'list'
-
-def f():
-    pass
-import sys
-d = {1: 1.0, 2: f, 3: sys}
-d
-
+```python
+>>> False and False
+False
+>>> False and True
+False
+>>> True and False
+False
+>>> True and True
+True
 ```
 
-## N-uplets
+## Entiers
 
-De longueur fixe, non modifiables ("en surface")
+Les entiers Python sont des nombres dotés d'un signe et n'ayant pas de limite
+de taille (autre que celle fixée par la mémoire de votre ordinateur !).
+Ils supportent les opérations de calcul classiques : addition `+`, 
+multiplication `*`, puissance `**`, etc.
 
 ``` python
-def f():
-    return "ok", 3.14 # or ("ok", 3.14)
-
-status, value = f()
-
-status
-
-value
-
-result = f()
-
-result
-
-type(result)
-
-a = 1, 2
-
-b = (1, 2)
-
-a == b
-
-empty_tuple = ()
-
-type(empty_tuple)
-
-len_1_tuple = (1,)
-
-len_1_tuple
-
-(((1)))
-
-t = (1, 2)
-t[0] = 2.0
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_21535/74121951.py in <module>
-      1 t = (1, 2)
-----> 2 t[0] = 2.0
-
-TypeError: 'tuple' object does not support item assignment
-
-l = [1, 2, 3]
-t = (l, 2, 3, 3)
-t
-
-l.append(42)
-t
-
+>>> -1
+-1
+>>> 1 + 3 * 2
+7
+>>> 2**8
+256
+>>> 2**1000
+10715086071862673209484250490600018105614048117055336074437503883703510511249361224931983788156958581275946729175531468251871452856923140435984577574698574803934567774824230985421074605062371141877954182153046474983581941267398767559165543946077062914571196477686542167660429831652624386837205668069376
 ```
 
-## Ensembles
+Il est possible de calculer le reste et le quotient d'une division euclidienne
+de deux entiers.
 
-``` python
-
-
-{1, 2, 3, 4}
-
-{} # empty dict
-
-type({})
-
-set()
-
-set([1, 2, 3])
-
-set([1, 1, 2, 3, 3, 3, 4])
-
-list(set([1, 1, 2, 3, 3, 3, 4]))
-
-s = {1, 2, "djksjds", (2, 3), (2, ("jsdksjk", 90))}
-
-s = {[]}
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/1126056997.py in <module>
-----> 1 s = {[]}
-
-TypeError: unhashable type: 'list'
-
-s = {1, 2, "djksjds", (2, 3), (2, ("jsdksjk", 90))}
-
-s.add(42)
-
-s
-
-s.remove(42)
-
-s
-
-1 in s
-
-for x in s:
-    print(x)
-
-s1 = {1, 2, 3, 4, 5}
-s2 = {4, 5, 6, 7, 8}
-
-s1 | s2
-
-s1 & s2
-
-s1 - s2
-
+```python
+>>> 17 % 12
+5
+>>> 17 // 2
+8
+>>> 17 / 12
+1.4166666666666667
 ```
 
-# Texte & données binaires
+Même si leur description privilégiée est décimale, les entiers Python 
+peuvent également être représentés ou définis sous forme binaire
+ou hexadécimale :
 
-TODO: repr & eval:
-
-``` python
-l = [(1, 2), (2, 2), (3, 2)]
-
-str(l)
-
-repr(l)
-
-s = repr(l)
-
-eval(s)
-
-type(eval(s))
-
-eval(repr(s)) == s
-
+```python
+>>> bin(42)
+'0b101010'
+>>> hex(42)
+'0x2a'
+>>> 0b101010
+42
+>>> 0x2a
+42
+>>> 0b101010 == 0x2a == 42
+True
 ```
 
-## Chaînes de caractères & données binaires
+## Nombres flottants
 
-``` python
+Les nombres flottants -- ou **à virgule flottante** -- permettent de représenter
+des valeur numériques non entières, comme $e$ ou $\pi$ :
 
-
-r = 'kldskdmlskdms'
-
-"j'utilise des apostrophes"
-
-'j' + "'" + 'utilise des apostrophes'
-
-'j\'utilise des apostrophes'
-
-print("a\nb")
-
-print("a\tb")
-
-print("\\")
-
-s = "\\"
-ord(s)
-
-hex(92)
-
-print("le slash est: \x5c")
-
-hex(ord("a")) # ascii code of "a"
-
-print("la lettre a: \x61")
-
-print("smiley: \U0001f600")
-
-print("\U0001f4a9")
-
-s = "kjdslkdjslkdsljdlksdjdslkdjs -------------------- hhhhhhhh"
-
-s[0:5] + s[-5:]
-
-len(s)
-
-for c in s:
-    print(c)
-
-s = "Sébastien"
-
-s.encode("utf-8")
-
-s.encode("latin-1")
-
-s.encode("cp1252")
-
-s.encode("utf-8").decode("utf-8")
-
-s.encode("utf-8").decode("latin-1")
-
-
+```python
+>>> from math import e, pi
+>>> e
+2.718281828459045
+>>> pi
+3.141592653589793
 ```
 
-## Fichiers
+On peut convertir un nombre flottant en une approximation entière avec `int`,
+mais il ne garantit pas que l'on obtienne obtenir l'entier le plus proche.
+Pour cela il faudra utiliser la fonction `round`.
+```python
+>>> int(pi)
+3
+>>> int(e)
+2
+>>> round(pi)
+3
+>>> round(e)
+3
+```
 
-``` python
+Il est également possible d'obtenir des approximations "dirigées" à
+l'entier directement inférieur ou supérieure au nombre flottant.
+```python 
+>>> import math
+>>> math.floor(pi)
+3
+>>> math.ceil(pi)
+4
+```
 
+Une caractéristique majeure des nombres flottants est qu'il sont une 
+représentation de précision finie des nombres réels et que les calculs
+effectués avec eux induisent des erreurs :
+```python
+>>> 0.1 + 0.2
+0.30000000000000004
+>>> 0.1 + 0.2 == 0.3
+False
+>>> math.sin(pi)
+1.2246467991473532e-16
+>>> math.sin(pi) == 0.0
+False
+```
 
-file = open("texte.txt", mode="w", encoding="utf-8")
+Si nécessaire on peut obtenir la représentation réelle d'un nombre flottant, 
+ce qui n'est pas ce qui est affiché par défaut :
 
-file.write("Sébastien")
+```python
+>>> print(0.1)
+0.1
+>>> print(f"{0.1:.1000}")
+0.1000000000000000055511151231257827021181583404541015625
+>>> print(0.2)
+0.2
+>>> print(f"{0.2:.1000}")
+0.200000000000000011102230246251565404236316680908203125
+>>> print(0.3)
+0.3
+>>> print(f"{0.3:.1000}")
+'0.299999999999999988897769753748434595763683319091796875'
+>>> print(0.1+0.2)
+0.30000000000000004
+>>> print(f"{0.1+0.2:.1000}")
+0.3000000000000000444089209850062616169452667236328125
+```
 
-file.close()
+Les nombres flottants comportent également des valeurs spéciales : $\infty$ 
+(l'infini)
+et $\bot$ (nombre indéfini / 🇺🇸 **not-a-number**) :
 
-f = open("texte.txt", mode="r", encoding="utf-8")
-
-f.read()
-
-f = open("texte.txt", mode="br") # binary mode
-
-data = f.read()
-data
-
-data.decode("utf-8")
-
+```python
+>>> from math import inf, nan
+>>> inf
+inf
+>>> -inf
+-inf
+>>> inf + 1.0
+inf
+>>> inf - inf
+nan
+>>>> nan + inf
+nan
 ```
