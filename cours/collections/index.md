@@ -1,8 +1,7 @@
 ---
 title: Collections
 author:
-  - "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@mines-paristech.fr)"
-affiliation: "MINES ParisTech, Université PSL"
+  - "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@minesparis.psl.eu), MINES Paris -- PSL"
 license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 date: today
 ---
@@ -367,21 +366,53 @@ d
 
 # N-uplets
 
-De longueur fixe, non modifiables ("en surface")
+Les n-uplets sont souvent utilisés de façon implicite, pour concevoir une
+fonction renvoyant plusieurs valeurs ou pour affecter en une instruction
+unique plusieurs variables.
 
 ```python
->>> 
->>> def f():
-...     return "ok", 3.14 # or ("ok", 3.14)
+>>> def compute_pi():
+...     value = 3.14
+...     error = 0.005
+...     return value, error
 ... 
->>> status, value = f()
->>> 
->>> status
-'ok'
->>> 
+>>> value, error = compute_pi()
+>>> print(f"{value} ± {error}")
+3.14 ± 0.005
+```
+
+```python
+>>> a = 1
+>>> b = 2
+>>> c = 3
+>>> a, b = b, c
+>>> a
+2
+>>> b
+3
+``` 
+
+L'instruction `value, error = compute_pi()` produit en fait une paire 
+(un n-uplet de longueur 2) qui est instantanément **destructuré** pour
+fournir des valeurs aux variables `value` et `error`. 
+Cela devient beaucoup plus évident si l'on décompose ces étapes :
+
+```python
+>>> value_and_error = compute_pi()
+>>> value_and_error
+(3.14, 0.005)
+>>> type(value_and_error)
+<class 'tuple'>
+>>> len(value_and_error)
+2
+>>> value, error = value_and_error
 >>> value
 3.14
->>> 
+>>> error
+0.005
+```
+
+```python
 >>> result = f()
 >>> 
 >>> result
@@ -389,37 +420,106 @@ De longueur fixe, non modifiables ("en surface")
 >>> 
 >>> type(result)
 <class 'tuple'>
->>> 
->>> a = 1, 2
->>> 
->>> b = (1, 2)
->>> 
->>> a == b
-True
->>> 
->>> empty_tuple = ()
->>> 
->>> type(empty_tuple)
+```
+
+Quant à l'affectation `a, b = b, c`, elle passe aussi implicitement par la
+création d'une paire : elle équivaut à
+
+``` python
+>>> b_and_c = b, c
+>>> b_and_c
+(2, 3)
+>>> type(b_and_c)
 <class 'tuple'>
->>> 
->>> len_1_tuple = (1,)
->>> 
->>> len_1_tuple
-(1,)
->>> 
->>> (((1)))
+>>> len(b_and_c)
+2
+>>> a, b = b_and_c
+>>> a
+2
+>>> b
+3
+```
+
+Si nous avons pu oublier qu'un tuple était crée, c'est qu'un tuple peut le
+plus souvent être défini par une notation très légère, avec une suite d'objets
+séparés par des virgules. Mais la notation universellement valide tuples les
+met entre parenthèse cette suite. Au lieu du code initial, nous aurions très
+bien pu écrire
+
+
+```python
+>>> def compute_pi():
+...     value = 3.14
+...     error = 0.005
+...     return (value, error)
+... 
+>>> (value, error) = compute_pi()
+>>> print(f"{value} ± {error}")
+3.14 ± 0.005
+```
+
+```python
+>>> a = 1
+>>> b = 2
+>>> c = 3
+>>> (a, b) = (b, c)
+>>> a
+2
+>>> b
+3
+``` 
+ce qui est équivalent, mais plus explicite. Le tuple vide est d'ailleurs
+désigné par la notation `()` ; pour un n-uplet de longueur 0 contenant
+par exemple l'unique argument 1, on serait tenté d'utiliser la notation
+`(1)` mais il y aurait alors une ambiguité dans les notations car les
+parenthèses sont aussi utilisées pour indiquer des priorités entre opérations
+dans les calculs. Il faut donc se résigner à adopter une **virgule finale**
+(🇺🇸 **trailing comma**) et utiliser la notation `(1,)`. On peut conserver
+la virgule finale pour les n-uplets de longueur 2 ou plus, mais elle n'est
+plus nécessaire.
+
+```python
+>>> ()
+()
+>>> (1)
 1
->>> 
+>>> (1,)
+(1,)
+>>> 1,
+>>> (1, 2)
+(1, 2)
+>>> (1, 2,)
+(1, 2)
+>>> 1, 2
+(1, 2)
+>>> 1, 2,
+(1, 2)
+```
+
+Les n-uplets sont immuables : de longueur fixe et dont les élements ne peuvent
+être remplacés.
+
+```python
 >>> t = (1, 2)
->>> t[0] = 2.0
+>>> t[0]
+1
+>>> t[1]
+2
+>>> t[0] = 3
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 TypeError: 'tuple' object does not support item assignment
+```
+
+Néanmoins cette immuabilité est superficielle : si un n-uplet contient une
+valeur modifiable (comme une liste), il est toujours possible de modifier 
+la liste et donc de modifier **indirectement** le n-uplet.
+
+```python
 >>> l = [1, 2, 3]
 >>> t = (l, 2, 3, 3)
 >>> t
 ([1, 2, 3], 2, 3, 3)
->>> 
 >>> l.append(42)
 >>> t
 ([1, 2, 3, 42], 2, 3, 3)
@@ -465,9 +565,9 @@ set()
 ne soient introduits. Ils ont donc exploité les premiers la notation `{}` et 
 les ensembles ont dû s'en accomoder a posteriori.
 
-L'implémentation des ensembles est similaire à celle de dictionnaire 
+L'implémentation d'un ensemble est similaire à celle d'un dictionnaire 
 qui auraient les élements de l'ensemble comme clés et (par exemple) `True` 
-comme valeur unique. 
+comme valeur commune à toutes les clés. 
 
 ```python
 >>> s = {1, 2, 3, 4}
@@ -487,8 +587,8 @@ cet ordre ne rentre pas en ligne de compte dans les comparaisons
 True
 ```
 
-Cela permet aussi de comprendre pourquoi seuls les objets hashables peuvent
-être utilisés comme éléments d'un ensemble.
+Sans surprise, on peut également en déduire que seuls les objets hashables 
+peuvent être utilisés comme éléments d'un ensemble.
 
 ```python
 >>> s = {1, 2, "djksjds", (2, 3), (2, ("jsdksjk", 90))}
@@ -497,9 +597,10 @@ Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 TypeError: unhashable type: 'list'
 ```
-
-Il est possible d'ajouter des éléments à un ensemble, d'en retirer, de tester
-si un objet appartient à l'ensemble et d'itérer sur les éléments de l'ensemble.
+Les ensembles sont modifiables : il est possible d'ajouter des éléments à un ensemble
+et d'en retirer. 
+Il est également possible de tester si un objet appartient à l'ensemble et 
+d'itérer sur les éléments de l'ensemble.
 
 ```python
 >>> s = {1, 2, "djksjds", (2, 3), (2, ("jsdksjk", 90))}
