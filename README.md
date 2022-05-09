@@ -4,6 +4,8 @@
 
  - 📖 [Type de données](https://boisgera.github.io/python-fr/cours/type-de-données/index.html)
 
+ - 📖 [Collection](https://boisgera.github.io/python-fr/cours/collections/index.html)
+
  - 📖 [Evaluation dynamique](https://boisgera.github.io/python-fr/cours/évaluation-dynamique/index.html)
 
  - 📖 [Portée](https://boisgera.github.io/python-fr/cours/portée/index.html)
