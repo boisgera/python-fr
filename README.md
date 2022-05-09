@@ -4,7 +4,7 @@
 
  - 📖 [Type de données](https://boisgera.github.io/python-fr/cours/type-de-données/index.html)
 
- - 📖 [Collection](https://boisgera.github.io/python-fr/cours/collections/index.html)
+ - 📖 [Collections](https://boisgera.github.io/python-fr/cours/collections/index.html)
 
  - 📖 [Evaluation dynamique](https://boisgera.github.io/python-fr/cours/évaluation-dynamique/index.html)
 
