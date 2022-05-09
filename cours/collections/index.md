@@ -130,239 +130,225 @@ range(0, 5)
 
 # Dictionnaires
 
+Les **dictionnaires** (🇺🇸 **dictionaries**) Python sont des structures de 
+données qui associent à des clés (🇺🇸 **keys**) des valeurs (🇺🇸 **values**).
+On parle dans d'autre langages de tableaux associatifs (🇺🇸 **associative
+arrays**) ou en référence à leur implémentation, de **tables de hachage** 
+(🇺🇸 **hash tables**).
+
+
+Le dictionnaire Python représentant les associations suivantes
+
+-----------------------
+clé     $\to$   valeur
+------ ------- --------
+`"a"`   $\to$   `1`
+
+`"b"`   $\to$   `2`
+
+`"c"`   $\to$   `3`
+-----------------------
+
+peut être défini par l'instruction
+
 ```python
->>> d = {"a":1, "b":2, "c":3}
->>>
+>>> d = {"a": 1, "b": 2, "c": 3}
+```
+
+Les données d'un dictionaire peuvent être lues, écrites et effacées :
+
+```python
+>>> d["a"]
+1
 >>> d
 {'a': 1, 'b': 2, 'c': 3}
->>>
->>> d["a"] # lecture
-1
->>>
->>> d["d"] = 4 # écriture
->>>
+>>> d["d"] = 4
 >>> d
 {'a': 1, 'b': 2, 'c': 3, 'd': 4}
->>>
->>> del d["a"] # effacement
->>>
+>>> del d["a"]
 >>> d
 {'b': 2, 'c': 3, 'd': 4}
->>>
+```
+
+Accéder à une clé manquante avec la notation `[]` génère une erreur
+
+```python
 >>> d["a"]
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 KeyError: 'a'
+```
+
+mais la méthode `get` des dictionnaires permet de renvoyer la valeur 
+associée à la clé demandée si la clé est présente et `None` dans
+le cas contraire.
+
+```python
+>>> d.get("b")
+2
+>>> d.get("a")
+```
+
+On peut également spécifier une autre valeur de repli que `None` si besoin :
+
+```python
 >>> d.get("b", 0)
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> 
+2
 >>> d.get("a", 0)
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> 
->>> for x in d:
-...     print(x, ":", d[x])
-... 
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
+0
+```
+
+Pour les dictionnaires, les tests d'appartenance et l'itération ne concernent
+que les clés et pas les valeurs :
+
+```python
 >>> "a" in d
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> 
+False
 >>> "b" in d
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> 
+True
+>>> for k in d:
+...     print(k)
+... 
+b
+c
+d
 >>> list(d)
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> 
->>> for x in d.keys():
-...     print(x)
+['b', 'c', 'd']
+```
+
+Cela n'est toutefois que le comportement par défaut : les méthodes `keys`,
+`values` et `items` permettent de choisir plus précisément sur quels objets
+du dictionnaire on souhaite itérer.
+
+```python
+>>> for k in d.keys():
+...     print(k)
 ... 
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> for x in d.values():
-...     print(x)
+b
+c
+d
+>>> list(d.keys())
+['b', 'c', 'd']
+```
+
+```python
+>>> for v in d.values():
+...     print(v)
 ... 
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> for x in d.items():
-...     print(x)
+2
+3
+4
+>>> list(d.values())
+[2, 3, 4]
+```
+
+```python
+>>> for k, v in d.items():
+...     print(k, v)
 ... 
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
+b 2
+c 3
+d 4
+>>> list(d.items())
+[('b', 2), ('c', 3), ('d', 4)]
+```
+
+Il existe des méthodes d'importance moindre qui sont parfois utiles.
+Par exemple `update` permet d'ajouter / modifier plusieurs associations
+clés-valeurs à un dictionnaire ou `pop` qui permet de lire la valeur associée
+à une clé avant de la retirer du dictionnaire.
+
+```python
+>>> d
+{'b': 2, 'c': 3, 'd': 4}
 >>> d.update({"e": 5, "f": 6})
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> 
 >>> d
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> 
->>> dir(d)
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> 
+{'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6}
 >>> d.pop("b")
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> 
+2
 >>> d
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'd' is not defined
->>> {"kjdslkjdlsdk": 90.0}
-{'kjdslkjdlsdk': 90.0}
->>> 
->>> {1: 4, 1.0: 8, 1.5j: 0, True: 90.90}
-{1: 90.9, 1.5j: 0}
->>> 
+{'c': 3, 'd': 4, 'e': 5, 'f': 6}
+```
+
+La palme de la complexité revient à l'infâme méthode `setdefault`
+dont la description est la suivante :
+
+> `setdefault(d, key, default=None)`
+>
+> Insert `key` in the dictionary `d` with a value of `default` if key is not in `d`.
+>
+> Return the value for key if key is in the dictionary, else default.
+
+
+Plus important : les clés ne sont pas nécessairement des chaînes de caractères
+ou les valeurs des nombres :
+
+```python
+>>> import math
+>>> {math.pi: 90.0}
+{3.141592653589793: 90.0}
+>>> {1: 4.0, 2.0: 8, False: "yep"}
+{1: 4.0, 2.0: 8, False: 'yep'}
 >>> {(1, 2): 7, (7, 8, 9): 9}
 {(1, 2): 7, (7, 8, 9): 9}
->>> 
 >>> {(1, ("aa", "bb")): 90}
 {(1, ('aa', 'bb')): 90}
->>> 
+```
+
+Il n'y a en fait aucune restriction sur le type des valeurs que vous pouvez
+stocker dans un dictionnaire. Par contre, les clés doivent être **hachable**
+(🇺🇸 **hashable**), ce qui n'est par exemple pas le cas des listes :
+
+```python
 >>> {[2]: 90.0}
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 TypeError: unhashable type: 'list'
-
->>> hash(1.34)
-783986623132656129
->>> 
->>> hash("kjskdjsjdskj")
--2340630600562179480
->>> 
->>> hash(("kjdsjdks", 909090))
-9110669353542020956
->>> 
->>> hash([1, 2, 3])
+>>> hash([2])
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
+TypeError: unhashable type: 'list'
 ```
+
+C'est le cas de la plupart des types atomiques immuables de Python
 
 ```python
-d = {"a":1, "b":2, "c":3}
-
-d
-
-d["a"] # lecture
-
-d["d"] = 4 # écriture
-
-d
-
-del d["a"] # effacement
-
-d
-
-d["a"]
-
----------------------------------------------------------------------------
-KeyError                                  Traceback (most recent call last)
-/tmp/ipykernel_17241/3859482410.py in <module>
-----> 1 d["a"]
-
-KeyError: 'a'
-
-d.get("b", 0)
-
-d.get("a", 0)
-
-for x in d:
-    print(x, ":", d[x])
-
-"a" in d
-
-"b" in d
-
-list(d)
-
-for x in d.keys():
-    print(x)
-
-for x in d.values():
-    print(x)
-
-for x in d.items():
-    print(x)
-
-d.update({"e": 5, "f": 6})
-
-d
-
-dir(d)
-
-d.pop("b")
-
-d
-
-
-
-{"kjdslkjdlsdk": 90.0}
-
-{1: 4, 1.0: 8, 1.5j: 0, True: 90.90}
-
-{(1, 2): 7, (7, 8, 9): 9}
-
-{(1, ("aa", "bb")): 90}
-
-{[2]: 90.0}
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/1412873092.py in <module>
-----> 1 {[2]: 90.0}
-
-TypeError: unhashable type: 'list'
-
-hash(1.34)
-
-hash("kjskdjsjdskj")
-
-hash(("kjdsjdks", 909090))
-
-hash([1, 2, 3])
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/2492717709.py in <module>
-----> 1 hash([1, 2, 3])
-
-TypeError: unhashable type: 'list'
-
-hash((1, [2, 3]))
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/2425333101.py in <module>
-----> 1 hash((1, [2, 3]))
-
-TypeError: unhashable type: 'list'
-
-def f():
-    pass
-import sys
-d = {1: 1.0, 2: f, 3: sys}
-d
-
+>>> hash(None)
+5891579141320
+>>> hash(False)
+0
+>>> hash(42)
+42
+>>> hash(math.pi)
+326490430436040707
+>>> hash("Hello!")
+3339764772054024462
 ```
+
+ainsi que des [N-uplets] eux-mêmes composés d'objets hashables
+
+```python
+>>> hash((None, False, 42, math.pi, "Hello!"))
+>>> hash((0, (1, (2, (3, ())))))
+>>> hash((1, 2, [3]))
+>>> hash((1, 2, [3]))
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: unhashable type: 'list'
+```
+
+<details>
+<summary>
+**Pourquoi cette restriction ? 🤔**
+</summary>
+Pour des raisons de performance ! En effet les tables de hachage 
+permettent (sous certains hypothèses) d'accéder aux valeurs en un temps qui 
+ne dépend pas du nombre d'éléments dans la structure, cf. par exemple
+[l'article Wikipédia qui y est consacré](https://fr.wikipedia.org/wiki/Table_de_hachage). 
+A l'inverse, l'implémentation des tableaux associatifs dans une structure plus simple, 
+comme la liste de liste `[["a", 1], ["b": 2], ["c": 3]]` conduirait à une augmentation 
+linéaire en fonction du nombre d'élements dans la structure.
+</details>
 
 # N-uplets
 
