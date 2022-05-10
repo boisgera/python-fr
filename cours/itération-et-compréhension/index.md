@@ -1,186 +1,274 @@
 ---
-title: Itération & compréhensions
+title: Itération & compréhension
 author: 
   - "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@mines-paristech.fr)" 
 affiliation: "MINES ParisTech, Université PSL"
 license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
+date: aujourd'hui
 ---
 
-# Iteration
+# Itération
+
+On appelle **itération** (🇺🇸 **iteration**) le processus qui consiste à 
+obtenir les éléments d'une collection les uns après les autres. 
+C'est par example ce qui est à l'oeuvre dans une boucle for 
 
 ``` python
 for i in [1, 2, 3]:
     print(i)
+```
 
-it = iter([1, 2, 3]) # it is an iterator
-it
+ou dans les expressions
 
-next(it)
+```python
+>>> s = set([1, 2, 3])
+```
 
-next(it)
+et 
 
-next(it)
+```python
+>>> m = max([0, 1, -1, 2, -2])
+```
 
-next(it)
+Le point de départ est toujours un objet **itérable** (🇺🇸 **iterable**),
+c'est-à-dire capable de produire à la demande des **itérateurs** (🇺🇸 **iterators**),
+qui génèrent les élements désirés.
 
----------------------------------------------------------------------------
-StopIteration                             Traceback (most recent call last)
-/tmp/ipykernel_13823/600241529.py in <module>
-----> 1 next(it)
+Le protocole qui permet d'exploiter itérables et itérateurs exploite les 
+fonctions `iter` et `next` selon le schéma suivant :
 
-StopIteration: 
+```python
+>>> iterable = [1, 2, 3]
+>>> iterator = iter(iterable)
+>>> next(iterator)
+1
+>>> next(iterator)
+2
+>>> next(iterator)
+3
+>>> next(iterator)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+StopIteration
+```
 
-it = iter([1, 2, 3]) # iterable: can produce iterators with iter(iterable)
-it # iterator: next(it) makes sense
+Notez que l'itérateur ci-dessus "épuise" progressivement l'itérable dont il
+est issu, jusqu'à générer une erreur ; il n'est alors plus utilisable pour
+parcourir la liste. Mais il est bien sûr d'en produire un nouveau avec la
+fonction `iter` et l'itérable de départ.
 
+La boucle for envisagée plus haut exploite ce protocole. 
+Elle est en fait équivalente au code suivant :
+
+```python
+iterator = iter([1, 2, 3])
+while True:
+    try:
+        i = next(iterator)
+        print(i)
+    except StopIteration:
+        break
+```
+
+⚠️ Ne pas modifier une collection pendant son itération ! Le résultat serait
+indéfini.
+
+Au lieu d'itérer la liste `l` dont on retire progressivement les 
+éléments
+
+```python
 l = [1, 2, 3]
-
-it1 = iter(l)
-print(next(it1))
-print(next(it1))
-
-it2 = iter(l)
-print(next(it2))
-print(next(it2))
-
-l = [1, 2, 3]
-
-it1 = iter(l)
-it2 = iter(it1) # not very useful ...
-
-print(it1 is it2)
-
-print(next(it1))
-print(next(it1))
-
-print(next(it2))
-print(next(it2))
-
----------------------------------------------------------------------------
-StopIteration                             Traceback (most recent call last)
-/tmp/ipykernel_13823/3453743032.py in <module>
-     10 
-     11 print(next(it2))
----> 12 print(next(it2))
-
-StopIteration: 
-
-l = list(range(100))
 for i in l:
     print(i)
-    l.pop(0) # modification during iteration => undefined
-
-l = list(range(100))
-for i in l[:]: # safer to iterate on a copy of the list
-    print(i)
-    l.pop(0)
+    l.remove(i)
 ```
 
-# Iterables
+on préférera en itérer une copie
 
-    lists
-
-    tuples
-
-    dicts
-
-        dict keys
-
-        dict values
-
-        dict items
-
-    sets
-
-    strings
-
-    files
-
-    range(100)
-
-    enumerate(...)
-
-``` python
-
-d = {"a": 1, "b": 2}
-
-d.keys()
-
-iter(d.keys())
-
-for c in "Hello world!":
-    print(c)
-
-enumerate([6, 7, 8])
-
-for i, number in enumerate([6, 7, 8]):
-    print(i, number)
-
-iter(enumerate([6, 7, 8]))
-
-l1 = [1, 2, 3]
-l2 = [4, 8, 16]
-for item in zip(l1, l2): # simultaneous iteration on l1 and l2
-    print(item)
-
-help(list)
-
-list([1, 2, 3])
-
-list({1: "a", 2: "b", 3: "c"})
-
-list("abc")
-
-help(max)
-
-max(1, 2, 3)
-
-max([1, 2, 3])
-
-max("Hello world!")
-```
-
-# Compréhension
-
-``` python
+```python
 l = [1, 2, 3]
-squares_l = []
-for i in l:
-    square = i * i
-    squares_l.append(square)
-squares_l
-
-[i*i for i in l]
-
-l = range(10)
-[i*i for i in l if i*i > 20] # "filter in" elements
-
-type([i*i for i in l if i*i > 20])
-
-{i*i for i in l if i*i > 20}
-
-{i: str(i) for i in range(100)}
+for i in l.copy():
+    print(i)
+    l.remove(i)
 ```
 
+# Itérables classiques
 
-## generator expressions
+Sont itérables en particulier :
 
-``` python
-max([x*x for x in range(10)])
+  - les listes
 
-max(x*x for x in range(10)) # does not allocate a list of 10 elements
+  - les ensembles
 
-max((x*x for x in range(10))) # does not allocate a list of 10 elements
+  - les dictionnaires  
 
-x*x for x in range(10)
+  - les chaînes de caractères
 
-  File "/tmp/ipykernel_13823/2347081421.py", line 1
+  - les fichiers
+
+  - etc.
+
+Il existe également des fonctions produisant des itérables, en particulier
+
+  - `range`
+  
+  - `enumerate`
+
+  - `zip`
+
+Démonstration !
+
+```python
+>>> range(10)
+range(0, 10)
+>>> for i in range(10):
+...     print(i)
+... 
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+```
+
+```python
+>>> enumerate([6, 7, 8]) # doctest: +ELLIPSIS
+<enumerate object at 0x...>
+>>> for i, number in enumerate([6, 7, 8]):
+...     print(i, number)
+... 
+0 6
+1 7
+2 8
+```
+
+```python
+>>> l1 = [1, 2, 3]
+>>> l2 = [4, 8, 16]
+>>> for item in zip(l1, l2):
+...     print(item)
+... 
+(1, 4)
+(2, 8)
+(3, 16)
+```
+
+# Compréhensions
+
+Les **listes en compréhension** ou pour faire court les **compréhensions**
+(🇺🇸 **list comprehensions / comprehensions**) sont une alternative
+plus compacte aux boucles pour construire des listes.
+
+Par exemple, pour construire la liste des carrés des entiers de la liste :
+
+```python
+integers = [1, 2, 3]
+```
+on peut soit utiliser une boucle for :
+
+```python
+>>> squares = []
+>>> for i in integers:
+...     square = i * i
+...     squares.append(square)
+...
+>>> squares
+[1, 4, 9]
+```
+
+soit utiliser la compréhension
+
+```python
+>>> [i*i for i in integers]
+>>>
+[1, 4, 9]
+```
+
+Il est également possible de sélectionner les éléments que l'on conserve :
+
+```python
+>>> def is_even(i):
+...     return i % 2 == 0
+...
+>>> integers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+>>> [i for i in integers if is_even(i)]
+[0, 2, 4, 6, 8]
+```
+
+Les ensembles et les dictionnaires ont également leur compréhensions :
+
+```python
+>>> {i*i for i in [0, 1, 2, 3] if i != 0}
+{1, 4, 9}
+>>> {i: i*i for i in [0, 1, 2, 3] if i != 0}
+{1: 1, 2: 4, 3: 9}
+```
+
+# Expressions génératrices
+
+Le calcul
+
+```python
+>>> max([i*i for i in range(10)])
+81
+```
+
+a nécessité d'allouer la liste `[x*x for x in range(10)]` alors même que
+`range(10)` est un itérable paresseux, qui ne produit de valeurs qu'au fur
+et à mesure, sans nécessiter une telle allocation de mémoire.
+
+On pourrait calculer le maximum nous-même en étant plus économe
+
+```python
+>>> square_max = -1
+>>> for i in range(10):
+...     square = i*i
+...     if square > square_max:
+...         square_max = square
+>>> square_max
+81  
+```
+
+mais la construction suivante, qui utilise une **expression génératrice**
+(🇺🇸 **generation expression**) est très similaire à notre code initial
+mais n'a pas l'inconvénient de celui-ci
+
+```python
+>>> max((x*x for x in range(10)))
+81
+```
+
+L'expression `(x*x for x in range(10))`
+est un itérable qui produit ses valeurs au fur et à mesure. Dans le contexte
+d'utilisation ci-dessus, on peut même faire l'économie des parenthèses
+décrivant l'expression et se contenter d'écrire
+
+```python
+>>> max(x*x for x in range(10))
+81
+```
+
+Cela n'est toutefois pas vrai dans tous les contextes ; on a ainsi
+ 
+```python
+>>> x*x for x in range(10)
+  File "<stdin>", line 1
     x*x for x in range(10)
         ^
 SyntaxError: invalid syntax
-
-(x*x for x in range(10))
 ```
 
- 
+mais 
+
+```python
+>>> (x*x for x in range(10)) # doctest: +ELLIPSIS
+<generator object <genexpr> at 0x...>
+```
+
+
 
