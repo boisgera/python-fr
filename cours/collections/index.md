@@ -8,101 +8,126 @@ date: today
 
 # Listes
 
-Listes
-
-Liste de références / adresses / pointeurs (vers les données).
-
-Taille variable, contenu modifiable.
-
-Liste d'objets (potentiellement) hétérogènes.
+Les listes Python sont des collections ordonnées d'objets de type arbitraire.
+Elles sont (potentiellement) hétérogènes : il n'est pas nécessaire que le type
+de tous les éléments d'une liste soit le même
 
 ```python
->>> l = [1.0, 1.0 + 0.1j, 2, 3]
->>>
+>>> l = [1.0, True, 2, 3]
+```
+
+Les listes sont modifiables ; leurs éléments peuvent être lus et écrits avec
+l'opération `l[index]` ; l'indice du premier élément est `0`.
+```python
 >>> l[1]
-(1+0.1j)
->>>
+True
+>>> l
+[1.0, True, 2, 3]
 >>> l[1] = 42
->>>
+[1.0, 42, 2, 3]
+```
+
+La longueur d'une liste est variable ; on peut en retirer des éléments et
+en ajouter, à une position arbitraire dans la liste.
+```python
+>>> len(l)
+3
 >>> del l[1]
->>>
+>>> len(l)
+2
 >>> l
 [1.0, 2, 3]
->>>
 >>> l.append(12)
->>>
 >>> l
 [1.0, 2, 3, 12]
 >>>
 >>> l.extend([9, 10, 11, 12])
->>>
 >>> l
 [1.0, 2, 3, 12, 9, 10, 11, 12]
->>>
->>>
->>> dir(l)
-['__add__', '__class__', '__contains__', '__delattr__', '__delitem__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__gt__', '__hash__', '__iadd__', '__imul__', '__init__', '__init_subclass__', '__iter__', '__le__', '__len__', '__lt__', '__mul__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__reversed__', '__rmul__', '__setattr__', '__setitem__', '__sizeof__', '__str__', '__subclasshook__', 'append', 'clear', 'copy', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort']
->>>
->>>
+>>> l.insert(True, 0)
 >>> l
-[1.0, 2, 3, 12, 9, 10, 11, 12]
->>>
->>>
+[True, 1.0, 2, 3, 12, 9, 10, 11, 12]
+```
+Un indice négatif `i` sera interpété comme l'indice `len(l) + i`. 
+En particulier, le dernier élement d'une liste peut être désigné par l'indice `-1`.
+
+```python
 >>> l[-1]
 12
->>>
+```
+
+Il est possible de **dépiler** (🇺🇸 **pop**) un élément d'une liste, c'est-à-dire
+de l'enlever de la liste et de récupérer sa valeur. Par défaut, c'est le dernier
+élément de la liste qui est dépilé, mais cela est configurable.
+
+```python
 >>> l.pop()
 12
->>>
 >>> l
 [1.0, 2, 3, 12, 9, 10, 11]
->>>
 >>> l.pop(0)
 1.0
->>>
 >>> l
 [2, 3, 12, 9, 10, 11]
->>>
->>>
+```
+
+Il est possible de localiser, compter et enlever les éléments d'une liste
+possédant une valeur donnée.
+
+```python
 >>> l
 [2, 3, 12, 9, 10, 11]
->>>
 >>> l.remove(9)
->>>
 >>> l
 [2, 3, 12, 10, 11]
->>>
 >>> l.index(10)
 3
->>>
 >>> l.count(63)
 0
->>>
->>> l = [1, 2]
->>> r = l.extend([3, 4])
->>>
->>> r == None
-True
->>>
+```
+
+On peut créer une liste résulant de la concaténation de deux listes.
+
+```python
 >>> l
 [1, 2, 3, 4]
->>>
 >>> l1 = [1, 2]
 >>> l2 = [3, 4]
 >>> l3 = l1 + l2
->>>
 >>> l1
 [1, 2]
->>>
 >>> l2
 [3, 4]
->>>
 >>> l3
 [1, 2, 3, 4]
+```
+
+L'opération `extend` réalise la même opération, à ceci près qu'elle modifie
+la liste à étendre plutôt que de créer une nouvelle liste.
+
+```python
+>>> l3 = l1.extend(l2)
+>>> l1
+[1, 2, 3, 4]
+>>> l2
+[3, 4]
+>>> l3 is None
+True
+```
+
+La mutiplication d'une liste par un entier `n` est également définie : elle
+produit `n` copies de la liste initiale qui sont concaténées.
+
+```python
 >>>
 >>> 3 * [7, 1]
 [7, 1, 7, 1, 7, 1]
->>>
+```
+
+La boucle `for` permet d'itérer sur tous les éléments d'une liste.
+
+```python
+>>> l = [1, 2, 3, 4]
 >>> len(l)
 4
 >>>
@@ -113,6 +138,15 @@ True
 2
 3
 4
+```
+
+Une séquence d' entiers entre `0` et `n-1` est produite par `range(n)`.
+Ce n'est toutefois pas une liste classique, mais une liste paresseuse, dont les valeurs
+sont produites à la demande, ce qui permet d'économiser de la mémoire.
+On peut néanmoins la convertir sans difficulté en une liste classique si
+le besoin s'en fait sentir.
+
+```python
 >>> for i in range(5):
 ...     print(i)
 ...
@@ -126,6 +160,23 @@ range(0, 5)
 >>>
 >>> list(range(5))
 [0, 1, 2, 3, 4]
+```
+
+⚠️ Attention aux listes partageant des objets modifiables ... par exemple des listes !
+Ce sont les références aux objets qui sont stockés dans les listes, pas
+les objets eux-mêmes ; en modifiant un élément d'une liste, on modifie
+donc également toute liste dont il est élément.
+
+```python
+>>> l = [[1, 2], [3, 4]]
+>>> elt = l[0]
+>>> elt
+[1, 2]
+>>> elt.append(42)
+>>> elt
+[1, 2, 42]
+>>> l
+[[1, 3, 42], [3, 4]]
 ```
 
 # Dictionnaires
