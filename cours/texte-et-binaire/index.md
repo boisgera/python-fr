@@ -1,5 +1,5 @@
 ---
-title: Collections
+title: Texte et binaire
 author: 
   - "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@mines-paristech.fr)" 
 affiliation: "MINES ParisTech, Université PSL"
@@ -7,405 +7,187 @@ license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 date: today
 ---
 
-# Listes
 
-``` python
-Listes
+## Chaînes de caractères
 
-Liste de références / adresses / pointeurs (vers les données).
-
-Taille variable, contenu modifiable.
-
-Liste d'objets (potentiellement) hétérogènes.
-
-l = [1.0, 1.0 + 0.1j, 2, 3]
-
-l[1]
-
-l[1] = 42
-
-del l[1]
-
-l
-
-l.append(12)
-
-l
-
-l.extend([9, 10, 11, 12])
-
-l
-
-help(l)
-
-dir(l)
-
-help(l.index)
-
-l
-
-help(l.pop)
-
-l[-1]
-
-l.pop()
-
-l
-
-l.pop(0)
-
-l
-
-help(l.remove)
-
-l
-
-l.remove(9)
-
-l
-
-l.index(10)
-
-l.count(63)
-
-l = [1, 2]
-r = l.extend([3, 4])
-
-r == None
-
-l
-
-l1 = [1, 2]
-l2 = [3, 4]
-l3 = l1 + l2
-
-l1
-
-l2 
-
-l3
-
-3 * [7, 1]
-
-len(l)
-
-for i in l:
-    print(i)
-
-for i in range(5):
-    print(i)
-
-range(5)
-
-list(range(5))
-```
-
-
-# Dictionnaires
-
-``` python
-d = {"a":1, "b":2, "c":3}
-
-d
-
-d["a"] # lecture
-
-d["d"] = 4 # écriture
-
-d
-
-del d["a"] # effacement
-
-d
-
-d["a"]
-
----------------------------------------------------------------------------
-KeyError                                  Traceback (most recent call last)
-/tmp/ipykernel_17241/3859482410.py in <module>
-----> 1 d["a"]
-
-KeyError: 'a'
-
-d.get("b", 0)
-
-d.get("a", 0)
-
-for x in d:
-    print(x, ":", d[x])
-
-"a" in d
-
-"b" in d
-
-list(d)
-
-for x in d.keys():
-    print(x)
-
-for x in d.values():
-    print(x)
-
-for x in d.items():
-    print(x)
-
-d.update({"e": 5, "f": 6})
-
-d
-
-dir(d)
-
-d.pop("b")
-
-d
-
-help(d.setdefault)
-
-from collections import defaultdict
-
-help(defaultdict)
-
-{"kjdslkjdlsdk": 90.0}
-
-{1: 4, 1.0: 8, 1.5j: 0, True: 90.90}
-
-{(1, 2): 7, (7, 8, 9): 9}
-
-{(1, ("aa", "bb")): 90}
-
-{[2]: 90.0}
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/1412873092.py in <module>
-----> 1 {[2]: 90.0}
-
-TypeError: unhashable type: 'list'
-
-hash(1.34)
-
-hash("kjskdjsjdskj")
-
-hash(("kjdsjdks", 909090))
-
-hash([1, 2, 3])
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/2492717709.py in <module>
-----> 1 hash([1, 2, 3])
-
-TypeError: unhashable type: 'list'
-
-hash((1, [2, 3]))
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/2425333101.py in <module>
-----> 1 hash((1, [2, 3]))
-
-TypeError: unhashable type: 'list'
-
-def f():
-    pass
-import sys
-d = {1: 1.0, 2: f, 3: sys}
-d
-
-```
-
-## N-uplets
-
-De longueur fixe, non modifiables ("en surface")
-
-``` python
-def f():
-    return "ok", 3.14 # or ("ok", 3.14)
-
-status, value = f()
-
-status
-
-value
-
-result = f()
-
-result
-
-type(result)
-
-a = 1, 2
-
-b = (1, 2)
-
-a == b
-
-empty_tuple = ()
-
-type(empty_tuple)
-
-len_1_tuple = (1,)
-
-len_1_tuple
-
-(((1)))
-
-t = (1, 2)
-t[0] = 2.0
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_21535/74121951.py in <module>
-      1 t = (1, 2)
-----> 2 t[0] = 2.0
-
-TypeError: 'tuple' object does not support item assignment
-
-l = [1, 2, 3]
-t = (l, 2, 3, 3)
-t
-
-l.append(42)
-t
-
-```
-
-## Ensembles
-
-``` python
-
-
-{1, 2, 3, 4}
-
-{} # empty dict
-
-type({})
-
-set()
-
-set([1, 2, 3])
-
-set([1, 1, 2, 3, 3, 3, 4])
-
-list(set([1, 1, 2, 3, 3, 3, 4]))
-
-s = {1, 2, "djksjds", (2, 3), (2, ("jsdksjk", 90))}
-
-s = {[]}
-
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-/tmp/ipykernel_17241/1126056997.py in <module>
-----> 1 s = {[]}
-
-TypeError: unhashable type: 'list'
-
-s = {1, 2, "djksjds", (2, 3), (2, ("jsdksjk", 90))}
-
-s.add(42)
-
-s
-
-s.remove(42)
-
-s
-
-1 in s
-
-for x in s:
-    print(x)
-
-s1 = {1, 2, 3, 4, 5}
-s2 = {4, 5, 6, 7, 8}
-
-s1 | s2
-
-s1 & s2
-
-s1 - s2
-
-```
-
-# Texte & données binaires
-
-TODO: repr & eval:
-
-``` python
-l = [(1, 2), (2, 2), (3, 2)]
-
-str(l)
-
-repr(l)
-
-s = repr(l)
-
-eval(s)
-
-type(eval(s))
-
-eval(repr(s)) == s
-
-```
-
-## Chaînes de caractères & données binaires
-
-``` python
-
-
-r = 'kldskdmlskdms'
-
+```python
+>>> r = 'kldskdmlskdms'
+>>> 
+>>> "j'utilise des apostrophes"
 "j'utilise des apostrophes"
-
-'j' + "'" + 'utilise des apostrophes'
-
-'j\'utilise des apostrophes'
-
-print("a\nb")
-
-print("a\tb")
-
-print("\\")
-
-s = "\\"
-ord(s)
-
-hex(92)
-
-print("le slash est: \x5c")
-
-hex(ord("a")) # ascii code of "a"
-
-print("la lettre a: \x61")
-
-print("smiley: \U0001f600")
-
-print("\U0001f4a9")
-
-s = "kjdslkdjslkdsljdlksdjdslkdjs -------------------- hhhhhhhh"
-
-s[0:5] + s[-5:]
-
-len(s)
-
-for c in s:
-    print(c)
-
-s = "Sébastien"
-
-s.encode("utf-8")
-
-s.encode("latin-1")
-
-s.encode("cp1252")
-
-s.encode("utf-8").decode("utf-8")
-
-s.encode("utf-8").decode("latin-1")
-
-
+>>> 
+>>> 'j' + "'" + 'utilise des apostrophes'
+"j'utilise des apostrophes"
+>>> 
+>>> 'j\'utilise des apostrophes'
+"j'utilise des apostrophes"
+>>> 
+>>> print("a\nb")
+a
+b
+>>> 
+>>> print("a\tb")
+a	b
+>>> 
+>>> print("\\")
+\
+>>> 
+>>> s = "\\"
+>>> ord(s)
+92
+>>> 
+>>> hex(92)
+'0x5c'
+>>> 
+>>> print("le slash est: \x5c")
+le slash est: \
+>>> 
+>>> hex(ord("a")) # ascii code of "a"
+'0x61'
+>>> 
+>>> print("la lettre a: \x61")
+la lettre a: a
+>>> 
+>>> print("smiley: \U0001f600")
+smiley: 😀
+>>> 
+>>> print("\U0001f4a9")
+💩
+>>> 
+>>> s = "kjdslkdjslkdsljdlksdjdslkdjs -------------------- hhhhhhhh"
+>>> 
+>>> s[0:5] + s[-5:]
+'kjdslhhhhh'
+>>> 
+>>> len(s)
+58
+>>> 
+>>> for c in s:
+...     print(c)
+... 
+k
+j
+d
+s
+l
+k
+d
+j
+s
+l
+k
+d
+s
+l
+j
+d
+l
+k
+s
+d
+j
+d
+s
+l
+k
+d
+j
+s
+ 
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+ 
+h
+h
+h
+h
+h
+h
+h
+h
+>>> s = "Sébastien"
 ```
 
-## Fichiers
+# Données binaires
+
+`bytes` & stuff ...
+
+# Encodage de texte
+
+Pour être stocké dans un fichier ou transmis sur le réseau, une chaîne de
+caractères doit être convertie en données binaires. Il existe plusieurs
+méthodes pour opérer cette conversion, qu'on appelle un **encodage**
+(🇺🇸 **encoding**).
+L'encodage UTF-8 est un bon choix par défaut (notamment, parce qu'il est 
+compatible avec le vénérable encodage ASCII mais qu'il sait gérer tous les
+caractères Unicode).
+
+```python
+>>> "Hello world! 👋".encode("utf-8")
+b'Hello world! \xf0\x9f\x91\x8b'
+```
+
+Il existe d'autres encodages, comme UTF-16, qui produisent des binaires
+différents.
+
+```python
+>>> "Hello world! 👋".encode("utf-16")
+b'\xff\xfeH\x00e\x00l\x00l\x00o\x00 \x00w\x00o\x00r\x00l\x00d\x00!\x00 \x00=\xd8K\xdc'
+```
+
+L'opération inverse est le **décodage** (**decoding** 🇺🇸) des données binaires 
+en chaînes de caractères
+
+```python
+>>> b'Hello world! \xf0\x9f\x91\x8b'.decode("utf-8")
+'Hello world! 👋'
+```
+Vous noterez qu'il faut savoir quel encodage a été utilisé pour décoder
+correcter les données binaires. Si l'on se trompe, le résultat peut être
+déplaisant ...
+
+```python
+>>> "Sébastien".encode("utf-8").decode("cp1252")
+'SÃ©bastien'
+```
+
+Tous les encodages ne permettent pas de décrire tous les caractères du standard
+Unicode (mais UTF-8, UTF-16 et UTF-16 le permettent).
+
+```python
+>>> "Sébastien".encode("ascii")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+UnicodeEncodeError: 'ascii' codec can't encode character '\xe9' in position 1: ordinal not in range(128)
+>>> "Sébastien".encode("cp1252")
+b'S\xe9bastien'
+>>> "Hello world! 👋".encode("cp1252")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/home/boisgera/miniconda3/envs/python-fr/lib/python3.9/encodings/cp1252.py", line 12, in encode
+    return codecs.charmap_encode(input,errors,encoding_table)
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f44b' in position 13: character maps to <undefined>
+```
+
+# Fichiers
 
 ``` python
 
