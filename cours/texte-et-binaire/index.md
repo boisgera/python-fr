@@ -10,120 +10,153 @@ date: today
 
 ## Chaînes de caractères
 
+Les chaînes de caractères Python sont définies comme des caractères [Unicode]
+délimités par les caractères `'` ou `"`.
+
+[Unicode]: https://fr.wikipedia.org/wiki/Unicode
+
 ```python
->>> r = 'kldskdmlskdms'
->>> 
->>> "j'utilise des apostrophes"
-"j'utilise des apostrophes"
->>> 
->>> 'j' + "'" + 'utilise des apostrophes'
-"j'utilise des apostrophes"
->>> 
->>> 'j\'utilise des apostrophes'
-"j'utilise des apostrophes"
->>> 
+>>> s = "Hello world! 👋"
+>>> s
+'Hello world! 👋'
+```
+
+Le choix de la 🇺🇸 **simple quote** ou de la 🇺🇸 **double quote** est la plupart
+du temps indifférent. Préférez la double quote quand votre texte comporte
+des simples quotes (ou apostrophes) et réciproquement :
+
+```python
+>>> 'Je n'ai pas compris!'
+  File "<stdin>", line 1
+    'Je n'ai pas compris!'
+          ^
+SyntaxError: invalid syntax
+>>> "J'ai compris!"
+"J'ai compris!"
+
+```
+
+Les caractères précédés d'un slash (`\`) sont interprétés comme des
+**séquences d'échappement** (🇺🇸 **escape sequences**) et non pas litéralement.
+Ainsi `"\n"` est un retour à la ligne, `"\t"` une tabulation
+
+```python
 >>> print("a\nb")
 a
 b
->>> 
 >>> print("a\tb")
 a	b
->>> 
+```
+
+`\\` un slash (et oui !), `\'`  une simple quote et `\"` une double quote,
+
+```python
 >>> print("\\")
 \
->>> 
->>> s = "\\"
->>> ord(s)
-92
->>> 
->>> hex(92)
-'0x5c'
->>> 
->>> print("le slash est: \x5c")
-le slash est: \
->>> 
->>> hex(ord("a")) # ascii code of "a"
+>>> print('J\'ai compris!')
+J'ai compris!
+```
+
+etc.
+
+Les caractères Unicode sont caractérisés par un 🇺🇸 [**code point**](https://en.wikipedia.org/wiki/Code_point), un entier le plus souvent représenté sous la forme "U+????????" où les `?` sont
+des caractères hécadécimaux ; ce qui se traduit en Python par
+`\U????????`. Par exemple :
+
+```python
+>>> ord("a")
+97
+>>> hex(97)
 '0x61'
+>>> "\U00000061"
+'a'
+```
+
+Lorsqu'il suffit de quatre ou deux caractères hexadécimaux pour décrire le 
+code point, on peut utiliser les syntaxes `\u????` ou `\x??` qui sont plus
+compactes
+
+```python
+>>> "\u0061"
+'a'
+>>> "\x61"
+'a'
+```
+
+Les émojis par exemple nécessitent la syntaxe la plus longue :
+
+```
+>>> "smiley: \U0001f600"
+'smiley: 😀'
 >>> 
->>> print("la lettre a: \x61")
-la lettre a: a
->>> 
->>> print("smiley: \U0001f600")
-smiley: 😀
->>> 
->>> print("\U0001f4a9")
-💩
->>> 
->>> s = "kjdslkdjslkdsljdlksdjdslkdjs -------------------- hhhhhhhh"
->>> 
->>> s[0:5] + s[-5:]
-'kjdslhhhhh'
->>> 
+>>> "pile of poo: \U0001f4a9"
+'pile of poo: 💩'
+```
+
+
+Le chaînes de caractères se comportement également comme des collections
+(immuables) de caractères ... même s'il n'existe pas de type "caractère"! 
+(Un "caractère" est en fait représenté comme une chaîne de caractères
+de longueur 1.)
+
+```python
+>>> s = "Hello world! 👋"
 >>> len(s)
-58
->>> 
+14
+>>> s[0]
+'H'
+>>> s[-1]
+'👋'
+>>> s[0:5]
+'Hello'
+>>> s[:5] + s[5:]
+'Hello world! 👋'
 >>> for c in s:
-...     print(c)
+...     print(c) 
 ... 
-k
-j
-d
-s
+H
+e
 l
-k
-d
-j
-s
 l
-k
-d
-s
-l
-j
-d
-l
-k
-s
-d
-j
-d
-s
-l
-k
-d
-j
-s
+o
  
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
+w
+o
+r
+l
+d
+!
  
-h
-h
-h
-h
-h
-h
-h
-h
->>> s = "Sébastien"
+👋
+>>> list(s)
+['H', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', '!', ' ', '👋']
+```
+
+Les **f-strings** permettent d'insérer au sein de chaînes de caractères
+des chaînes de caractères stockées dans des variables
+
+```python
+>>> target = "world"
+>>> emoji = "👋"
+>>> f"Hello {target} {emoji}"
+'Hello world 👋'
+```
+
+ou bien des données qui peuvent être représentées comme des chaînes de 
+caractères, ou bien même des expressions qui s'évaluent en de tels objets
+
+```python
+>>> f"1+1 = {1+1}"
+'1+1 = 2'
+```
+
+```python
+>>> ok = True
+>>> f"Annie are you ok? {'yep' if ok else 'nope'}."
+'Annie are you ok? yep.'
+>>> ok = False
+>>> f"Annie are you ok? {'yep' if ok else 'nope'}."
+'Annie are you ok? nope.'
 ```
 
 # Données binaires
