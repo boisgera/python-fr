@@ -128,7 +128,62 @@ h
 
 # Données binaires
 
-`bytes` & stuff ...
+les **octets** Python (🇺🇸 **bytes**) sont des suites de valeurs entières
+comprises entre 0 et 255 qui représentent des données binaires arbitraires.
+Elle sont le plus fréquemment représentées sous une forme analogue aux
+chaînes de caractères, mais préfixées par un `b` :
+
+```python
+>>> b"Hello world!"
+b'Hello world!'
+```
+
+Néanmoins, seul les caractères ASCII sont autorisés
+
+```python
+>>> b"Hello world! 👋"
+  File "<stdin>", line 1
+SyntaxError: bytes can only contain ASCII literal characters.
+```
+
+Pour décrire des octets qui ne correspondent pas à des caractères ASCII, 
+on peut utiliser la **syntaxe d'échappement** (🇺🇸 **escape sequence**)
+`\x??` ou les `?` représentent un caractère hexadécimal.
+
+```python
+>>> b"Hello world! \xf0\x9f\x91\x8b"
+b'Hello world! \xf0\x9f\x91\x8b'
+```
+
+Il est aussi possible d'utiliser la syntaxe d'échappement à la place des
+caractères ASCII
+
+```python
+>>> b"\x48\x65\x6C\x6c\x6f\x20\x77\x6f\x72\x6c\x64\x21\x20\xf0\x9f\x91\x8b"
+b'Hello world! \xf0\x9f\x91\x8b'
+```
+
+Les octets peuvent aussi être manipulés comme des listes (mais immuables !)
+d'entiers compris entre 0 et 255 
+
+```python
+>>> data = b"Hello world! \xf0\x9f\x91\x8b"
+>>> data[0]
+72
+>>> data[0] = 100
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'bytes' object does not support item assignment
+>>> list(data)
+[72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33, 32, 240, 159, 145, 139]
+```
+
+D'ailleurs on peut les créer à partir d'une telle liste
+
+```python
+>>> bytes([72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33, 32, 240, 159, 145, 139])
+b'Hello world! \xf0\x9f\x91\x8b'
+```
 
 # Encodage de texte
 
@@ -153,7 +208,7 @@ différents.
 b'\xff\xfeH\x00e\x00l\x00l\x00o\x00 \x00w\x00o\x00r\x00l\x00d\x00!\x00 \x00=\xd8K\xdc'
 ```
 
-L'opération inverse est le **décodage** (**decoding** 🇺🇸) des données binaires 
+L'opération inverse est le **décodage** (🇺🇸 **decoding**) des données binaires 
 en chaînes de caractères
 
 ```python
@@ -189,24 +244,107 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f44b' in posit
 
 # Fichiers
 
+Pour ouvrir un fichier afin d'y écrire du texte, vous pouvez utiliser le
+mode `"w"` (pour "write")
+
 ``` python
+>>> file = open("texte.txt", mode="w")
+>>> file.write("Hello world! 👋")
+```
 
+mais cela n'est pas nécessairement une bonne idée, car Python va alors
+décider par lui-même de l'encodage utilisé pour convertir votre texte en
+données binaires. Il va pour cela utiliser l'encodage déclaré par votre
+environnement (et encore, si tout va bien ...). Sur ma machine, il s'agit 
+d'UTF-8, et que ce choix me convient
 
-file = open("texte.txt", mode="w", encoding="utf-8")
+```python
+>>> import locale
+>>> locale.getpreferredencoding(False)
+'UTF-8'
+```
 
-file.write("Sébastien")
+mais rien ne dit que ce soit la même chose sur votre machine. Si nous devons
+ensuite partager les fichiers texte, il faut être en mesure de savoir comment
+ils sont encodés, ou mieux encore, de choisir quel encodage est utilisé. 
+Le plus sage consiste à spécifier systématiquement et explicitement quel 
+encodage vous souhaitez utiliser.
 
-file.close()
+``` python
+>>> file = open("texte.txt", mode="w", encoding="utf-8")
+>>> file.write("Hello world! 👋")
+```
 
-f = open("texte.txt", mode="r", encoding="utf-8")
+C'est aussi une bonne habitude de fermer le fichier après usage[^fermeture]
 
-f.read()
+[^fermeture]: Il est possible que l'écriture dans le fichier soit temporisée
+et n'ait lieu qu'à la fermeture du fichier. Il est aussi possible que 
+l'ouverture du fichier "bloque" aux autres processus l'accès au même fichier,
+etc.
 
-f = open("texte.txt", mode="br") # binary mode
+``` python
+>>> file = open("texte.txt", mode="w", encoding="utf-8")
+>>> file.write("Hello world! 👋")
+>>> file.close()
+```
 
-data = f.read()
-data
+Pour autant, si vous insérez du code Python entre l'ouverture et la fermeture
+du fichier et que ce code peut échouer (par exemple, s'il n'y a plus de place
+sur votre disque dur pour écrire `"Hello world! 👋"`), 
+l'instruction de fermeture du fichier ne sera jamais exécutée. 
+Une version plus robuste consisterait à fermer le fichier dans tous les cas
+(erreur ou non), ce qui peut être fait de la façon suivante :
 
-data.decode("utf-8")
+```python
+>>> file = open("texte.txt", mode="w", encoding="utf-8")
+>>> try:
+...     file.write("Hello world! 👋")
+... finally:
+...     file.close()
+...
+```
 
+... mais c'est un peu lourd ! Heureusement pour nous, il existe une construction
+plus compacte qui offre les mêmes garanties :
+
+```python
+>>> with open("texte.txt", mode="w", encoding="utf-8") as file:
+...     file.write("Hello world! 👋")
+...
+```
+
+L'écriture dans un fichier, se fait de façon analogue avec le mode `"r"`
+(pour "read").
+
+```python
+>>> with open("texte.txt", mode="r", encoding="utf-8") as file:
+...     print(file.read())
+...
+Hello world! 👋
+```
+
+Enfin, sachez que le mode `"r"` est interprété comme `"rt"` (et `"w"` comme `"wt"`),
+ou `"t"` signifie "texte" : la fonction `open` sait alors qu'elle doit lire ou
+écrire du texte. On peut donc être tout à fait explicite en écrivant :
+```python
+>>> with open("texte.txt", mode="rt", encoding="utf-8") as file:
+...     print(file.read())
+...
+Hello world! 👋
+```
+
+Mais, si vous voulez accéder à des données qui ne sont pas du 
+**texte en clair** (🇺🇸 **plain text**) comme une image ou un document PDF, 
+ou bien du texte que vous décoderez vous-même, utiliser le mode
+"binaire" `"b"` (en lecture comme en écriture) :
+
+```python
+>>> with open("texte.txt", mode="rb") as file:
+...     data = file.read()
+...     print(f"{type(data) = }")
+...     text = data.decode("utf-8")
+...     print(text)
+...
+type(data) = <class 'bytes'>
+Hello world! 👋
 ```
