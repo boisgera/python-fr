@@ -27,4 +27,4 @@
 
  -------------------------------------------------------------------------------
 
-  - 📖 [Le serpent](https://boisgera.github.io/python-fr/tps/games/index.html)
+  - 📖 [Le serpent 1](https://boisgera.github.io/python-fr/tps/snake-1/index.html)
