@@ -1,6 +1,22 @@
 Python 🇫🇷
 ================================================================================
 
+🐍 Le jeu du serpent
+--------------------------------------------------------------------------------
+
+  - 📖 [Le serpent](https://boisgera.github.io/python-fr/tps/snake-1/index.html)
+
+  - 📖 [Le retour du serpent](https://boisgera.github.io/python-fr/tps/snake-2/index.html)
+
+  - 📖 Le retour du retour du serpent *(à paraître)*
+
+
+📉 Modèles épidémologiques
+--------------------------------------------------------------------------------
+
+  - 📖 Le modèle SIR *(à paraître)*
+
+
 🧭 Orientation
 --------------------------------------------------------------------------------
 
@@ -25,20 +41,3 @@ Python 🇫🇷
   - 📖 [Programmation objet 1](https://boisgera.github.io/python-fr/cours/programmation-objet/index.html)
 
   - 📖 Programmation objet 2 *(à paraître)*
-
-
-🐍 Le jeu du serpent
---------------------------------------------------------------------------------
-
-  - 📖 [Le serpent](https://boisgera.github.io/python-fr/tps/snake-1/index.html)
-
-  - 📖 [Le retour du serpent](https://boisgera.github.io/python-fr/tps/snake-2/index.html)
-
-  - 📖 Le retour du retour du serpent *(à paraître)*
-
-
-📉 Modèles épidémologiques
---------------------------------------------------------------------------------
-
-  - 📖 Le modèle SIR *(à paraître)*
-
