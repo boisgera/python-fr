@@ -27,4 +27,7 @@
 
  -------------------------------------------------------------------------------
 
-  - 📖 [Le serpent 1](https://boisgera.github.io/python-fr/tps/snake-1/index.html)
+  - 📖 [Le serpent](https://boisgera.github.io/python-fr/tps/snake-1/index.html)
+
+
+  - 📖 [Le retour du serpent](https://boisgera.github.io/python-fr/tps/snake-2/index.html)
