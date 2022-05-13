@@ -57,10 +57,11 @@ def load_state():
 # Helper Functions
 # ------------------------------------------------------------------------------
 def init():
-    global clock, screen
+    global clock
     pygame.init()
     screen = pygame.display.set_mode([CELL_SIZE*WIDTH, CELL_SIZE*HEIGHT])
     clock = pygame.time.Clock()
+    return screen
 
 def draw(screen):
     screen.fill(COLORS["background"])
@@ -113,7 +114,7 @@ def handle_events(events):
             elif event.key == pygame.K_RIGHT:
                 direction = RIGHT
 
-def wait_for_next_frame():
+def wait_for_next_frame(clock):
     clock.tick(FPS)
 
 # Main Loop
@@ -123,11 +124,11 @@ try:
 except FileNotFoundError:
     pass
 
-init()
+screen, clock = init()
 while True:
     events = pygame.event.get()
     handle_events(events)
     move_snake()
     draw(screen)
     pygame.display.update()
-    wait_for_next_frame()
+    wait_for_next_frame(clock)

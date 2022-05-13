@@ -57,10 +57,10 @@ def load_state():
 # Helper Functions
 # ------------------------------------------------------------------------------
 def init():
-    global clock, screen
     pygame.init()
     screen = pygame.display.set_mode([CELL_SIZE*WIDTH, CELL_SIZE*HEIGHT])
     clock = pygame.time.Clock()
+    return screen, clock
 
 def draw(screen):
     screen.fill(COLORS["background"])
@@ -102,7 +102,7 @@ def move_snake():
 
 # Event Management
 # ------------------------------------------------------------------------------
-KEY_MAP = {
+KEY_BINDINGS = {
     "q": sys.exit,
     "up": set_direction(UP),
     "down": set_direction(DOWN),
@@ -112,18 +112,18 @@ KEY_MAP = {
     "l": load_state,
 }
 
-KEYCODE_MAP = {pygame.key.key_code(k): v for k, v in KEY_MAP.items()}
+KEY_EVENT_HANDLER = {pygame.key.key_code(k): v for k, v in KEY_BINDINGS.items()}
 
 def handle_events(events):
     for event in events:
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.KEYDOWN:
-            event_handler = KEYCODE_MAP.get(event.key)
+            event_handler = KEY_EVENT_HANDLER.get(event.key)
             if event_handler:
                 event_handler()
 
-def wait_for_next_frame():
+def wait_for_next_frame(clock):
     clock.tick(FPS)
 
 # Main Loop
@@ -133,11 +133,11 @@ try:
 except FileNotFoundError:
     pass
 
-init()
+screen, clock = init()
 while True:
     events = pygame.event.get()
     handle_events(events)
     move_snake()
     draw(screen)
     pygame.display.update()
-    wait_for_next_frame()
+    wait_for_next_frame(clock)
