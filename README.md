@@ -1,4 +1,8 @@
-# Python (🇫🇷)
+Python 🇫🇷
+================================================================================
+
+🧭 Orientation
+--------------------------------------------------------------------------------
 
  - 📖 [Flux d'exécution](https://boisgera.github.io/python-fr/cours/flux-d-exécution/index.html)
 
@@ -25,9 +29,16 @@
  - 📖 [Bibliothèques](https://boisgera.github.io/python-fr/cours/bibliothèque/index.html)
 
 
- -------------------------------------------------------------------------------
+🐍 Le jeu du serpent
+--------------------------------------------------------------------------------
 
   - 📖 [Le serpent](https://boisgera.github.io/python-fr/tps/snake-1/index.html)
 
-
   - 📖 [Le retour du serpent](https://boisgera.github.io/python-fr/tps/snake-2/index.html)
+
+  - 📖 Le retour du retour du serpent *(à paraître)*
+
+📉 Modèles épidémologiques
+--------------------------------------------------------------------------------
+
+  - 📖 Le modèle SIR *(à paraître)*
