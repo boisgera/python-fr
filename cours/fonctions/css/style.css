@@ -1,37 +1,10 @@
 html {
     line-height: 1.5;
-    font-family: "Source Sans Pro", sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 20px;
     color: #1a1a1a;
     background-color: #fdfdfd;
   }
-code:not(fuckcss){
-    font-family: "Fira Code", monospace;
-    font-size: 90%;
-}
-
-pre:not(fuckcss) {
-  background: #f1f3f5;
-  padding: 1em;
-}
-
-figure:not(fuckcss) {
-  width: 100%;
-  display: inline-block;
-  margin: 1em 0em 1em 0em;
-}
-
-img {
-  max-width: 100%;
-  display: block; 
-  margin: auto;
-  text-align: center;
-}
-
-figcaption {
-  text-align: center;
-}
-
   body {
     margin: 0 auto;
     max-width: 36em;
@@ -156,11 +129,51 @@ figcaption {
       #TOC a:not(:hover) {
         text-decoration: none;
       }
-      code{white-space: pre-wrap;}
+      pre code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
       span.underline{text-decoration: underline;}
       div.column{display: inline-block; vertical-align: top; width: 50%;}
       div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
       ul.task-list{list-style: none;}
       .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    
+
+details h1, details h2, details h3{
+  display: inline;
+}
+
+details summary {
+  cursor: pointer;
+  list-style: '🔒 ';
+}
+
+details[open] summary {
+  cursor: pointer;
+  list-style: '🔓 ';
+}
+
+summary::-webkit-details-marker {
+  display: none
+}
+
+
+details[open] summary ~ * {
+  animation: sweep .5s ease-in-out;
+}
+@keyframes sweep {
+  0%    {opacity: 0}
+  100%  {opacity: 1}
+}
+
+code:not(fuckcss){
+  font-family: "Fira Code", monospace;
+  font-size: 90%;
+  background: #f1f3f5;
+}
+
+
+pre:not(fuckcss) {
+background: #f1f3f5;
+padding: 1em;
+}
     

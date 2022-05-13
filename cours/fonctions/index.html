@@ -1,62 +1,39 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Fonctions</title>
-  <style type="text/css">
-      code{white-space: pre-wrap;}
-      span.smallcaps{font-variant: small-caps;}
-      span.underline{text-decoration: underline;}
-      div.line-block{white-space: pre-line;}
-      div.column{display: inline-block; vertical-align: top; width: 50%;}
-  </style>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
-  <!--
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
-  -->
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet"> 
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet">
-  <script>
-      document.addEventListener("DOMContentLoaded", (event) => {
-          let h3 = document.createElement("h3");
-          h3.innerHTML = "Table des matières";
-          let toc = document.getElementById("TOC");
-          toc.prepend(h3);
-      });    
-  </script>
-  <script>
-      document.addEventListener("DOMContentLoaded", (event) => {
-          let elts = document.querySelectorAll('body > :not(header):not(nav)');
-          let headers = [...elts].filter(elt =>  
-              ["H1", "H2", "H3", "H4", "H5", "H6"].includes(elt.tagName)
-          )
-          for (let header of headers) {
-              let anchor = document.createElement("a");
-              anchor.setAttribute("href", `#${header.id}`);
-              anchor.setAttribute("style", "text-decoration: None;");
-              anchor.innerHTML = header.outerHTML;
-              header.replaceWith(anchor);
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
           }
-      });    
-  </script>
-  <script>
-  
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault, MINES Paris, Université PSL" name="author"/>
+<title>Fonctions</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
       function filterConsole(text) {
           let lines = text.split("\n");
-  
+
           console.log(lines);
-  
+
           let pythonConsole = lines && lines[0].startsWith(">>>");
           if (!pythonConsole) {
               return text + "\n\n";
@@ -68,22 +45,22 @@
                   } else if (line.startsWith("...")){
                       newLines.push(line.slice(3));
                   }
-  
+
               }
               return newLines.join("\n") + "\n";
           }
-  
+
       }
-  
+
       document.addEventListener("DOMContentLoaded", (event) => {
           let codeBlocks = document.querySelectorAll("pre.python")
           for (let codeBlock of codeBlocks) {
-  
+
               let button = document.createElement("button")
               let icon = document.createElement("img");
               button.appendChild(icon)
               codeBlock.insertBefore(button, codeBlock.firstChild);
-  
+
               icon.setAttribute("src", "icons/copy.svg");
               icon.setAttribute("style", "opacity: 0.5;")
               button.addEventListener('click', (event) => {
@@ -91,176 +68,249 @@
                   text = filterConsole(text);
                   navigator.clipboard.writeText(text);
               });
-  
+
               codeBlock.setAttribute("style", "position: relative");
               button.setAttribute("style", 
               "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
-  
+
               codeBlock.addEventListener("mouseover", (event) => {
                   button.style.setProperty("transition", "opacity 0.1s ease-out");
                   button.style.setProperty("opacity", "1.0");
               });
-  
+
               codeBlock.addEventListener("mouseout", (event) => {
                   button.style.setProperty("transition", "opacity 0.75s ease-out");
                   button.style.setProperty("opacity", "0.0");
               });
-  
+
               button.addEventListener("mouseover", (event) => {
                   icon.style.setProperty("transition", "opacity 0.1s ease-out");
                   icon.style.setProperty("opacity", "0.75");
               })
-  
+
               button.addEventListener("mouseout", (event) => {
                   icon.style.setProperty("transition", "opacity 0.75s ease-out");
                   icon.style.setProperty("opacity", "0.5");
               })
-  
-  
+
+
           }
       });    
   </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
 </head>
 <body>
-<header>
+<header id="title-block-header">
 <h1 class="title">Fonctions</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
+Boisgérault</a>, MINES Paris, Université PSL</p>
+<p class="date">Vendredi, 13 mai 2022</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/e5ec540">
+          #e5ec540
+        </a>
+</p>
 </header>
-<nav id="TOC">
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#fonctions">Fonctions</a><ul>
-<li><a href="#généralités">Généralités</a></li>
-<li><a href="#arguments-et">Arguments : <code>*</code> et <code>**</code></a></li>
-<li><a href="#typage-statique">Typage statique</a></li>
-<li><a href="#espaces-de-noms">Espaces de noms</a></li>
-</ul></li>
-<li><a href="#invocables">Invocables</a><ul>
-<li><a href="#types">Types</a></li>
-<li><a href="#méthodes">Méthodes</a></li>
-<li><a href="#instances">Instances</a></li>
-</ul></li>
-<li><a href="#fonctions-génératrices">Fonctions génératrices</a></li>
-<li><a href="#programmation-fonctionnelle">Programmation fonctionnelle</a><ul>
-<li><a href="#lambda">Lambda</a></li>
-<li><a href="#fermetures">Fermetures</a></li>
-<li><a href="#décorateurs">Décorateurs</a></li>
-</ul></li>
+<li><a href="#fonctions" id="toc-fonctions">Fonctions</a></li>
+<li><a href="#invocables" id="toc-invocables">Invocables</a></li>
+<li><a href="#fonctions-génératrices" id="toc-fonctions-génératrices">Fonctions génératrices</a></li>
+<li><a href="#programmation-fonctionnelle" id="toc-programmation-fonctionnelle">Programmation
+fonctionnelle</a></li>
 </ul>
-</nav>
+</nav></details>
+
+
 <h2 id="fonctions">Fonctions</h2>
 <h3 id="généralités">Généralités</h3>
-<p>Les fonctions sont définies au moyen du mot-clé <code>def</code>, suivi du nom de la fonction, suivi de la liste de leurs <strong>paramètres</strong> entre parenthèses. La <strong>valeur de retour</strong> d’une fonction est précédée du mot-clé <code>return</code>.</p>
+<p>Les fonctions sont définies au moyen du mot-clé <code>def</code>,
+suivi du nom de la fonction, suivi de la liste de leurs
+<strong>paramètres</strong> entre parenthèses. La <strong>valeur de
+retour</strong> d’une fonction est précédée du mot-clé
+<code>return</code>.</p>
 <pre class="python"><code>def fibonacci(n):
-    &quot;Return a list of n Fibonnaci numbers.&quot;
+    "Return a list of n Fibonnaci numbers."
     result = []
     a, b = (0, 1)
     while len(result) &lt; n:
         result.append(a)
         a, b = b, a+b
     return result</code></pre>
-<p>Pour appeler la fonction <code>fibonacci</code> en lui passant comme paramètre l’<strong>argument</strong> <code>10</code> et récupérer le résultat :</p>
+<p>Pour appeler la fonction <code>fibonacci</code> en lui passant comme
+paramètre l’<strong>argument</strong> <code>10</code> et récupérer le
+résultat :</p>
 <pre class="python"><code>&gt;&gt;&gt; numbers = fibonacci(10)
 &gt;&gt;&gt; numbers
 [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]</code></pre>
-<p>Les paramètres d’une fonction peuvent être accompagné d’une <strong>valeur par défaut</strong>. On peut ainsi rajouter un second paramètre <code>start</code> à la fonction <code>fibonnaci</code> et lui associer la valeur par défaut <code>(0, 1)</code>.</p>
+<p>Les paramètres d’une fonction peuvent être accompagné d’une
+<strong>valeur par défaut</strong>. On peut ainsi rajouter un second
+paramètre <code>start</code> à la fonction <code>fibonnaci</code> et lui
+associer la valeur par défaut <code>(0, 1)</code>.</p>
 <pre class="python"><code>def fibonacci(n, start=(0, 1)):
-    &quot;Return a list of n Fibonnaci numbers.&quot;
+    "Return a list of n Fibonnaci numbers."
     result = []
     a, b = start
     while len(result) &lt; n:
         result.append(a)
         a, b = b, a+b
     return result</code></pre>
-<p>Si l’on ne spécifie pas la valeur du paramètre à l’invocation, sa valeur par défaut est alors utilisée. Dans le cas présent, cela signifie que si l’on ne donne pas de second argument à la fonction <code>fibonacci</code>, elle se comporte comme la première version :</p>
+<p>Si l’on ne spécifie pas la valeur du paramètre à l’invocation, sa
+valeur par défaut est alors utilisée. Dans le cas présent, cela signifie
+que si l’on ne donne pas de second argument à la fonction
+<code>fibonacci</code>, elle se comporte comme la première version :</p>
 <pre class="python"><code>&gt;&gt;&gt; numbers = fibonacci(10)
 &gt;&gt;&gt; numbers
 [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]</code></pre>
-<p>Par contre, si l’on fournit un second argument, la valeur par défaut n’est pas utilisée.</p>
+<p>Par contre, si l’on fournit un second argument, la valeur par défaut
+n’est pas utilisée.</p>
 <pre class="python"><code>&gt;&gt;&gt; numbers = fibonacci(10, (21, 34))
 &gt;&gt;&gt; numbers
 [21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]</code></pre>
-<p>Notons que les arguments peuvent en général être <strong>positionnels</strong> (🇺🇸 : <strong>positional arguments</strong>) – le paramètre auquel l’argument est affecté dépend de la position de l’argument dans la liste des arguments passés à la fonction – où <strong>nommés</strong> (🇺🇸 : <strong>keyword arguments</strong>), auquel cas l’argument est affecté au paramètre du même nom.</p>
-<p>Les arguments nommés sont souvent pratiques pour rendre le rôle de l’argument plus clair. Ainsi ici le second argument de <code>fibonnaci</code>, nommé <code>start</code>, est une paire d’entiers qui fournit les deux valeurs initiales de la suite de Fibonacci. Le rôle du code est sans doute plus évident si l’on utilise un argument nommé :</p>
+<p>Notons que les arguments peuvent en général être
+<strong>positionnels</strong> (🇺🇸 : <strong>positional
+arguments</strong>) – le paramètre auquel l’argument est affecté dépend
+de la position de l’argument dans la liste des arguments passés à la
+fonction – où <strong>nommés</strong> (🇺🇸 : <strong>keyword
+arguments</strong>), auquel cas l’argument est affecté au paramètre du
+même nom.</p>
+<p>Les arguments nommés sont souvent pratiques pour rendre le rôle de
+l’argument plus clair. Ainsi ici le second argument de
+<code>fibonnaci</code>, nommé <code>start</code>, est une paire
+d’entiers qui fournit les deux valeurs initiales de la suite de
+Fibonacci. Le rôle du code est sans doute plus évident si l’on utilise
+un argument nommé :</p>
 <pre class="python"><code>&gt;&gt;&gt; numbers = fibonacci(10, start=(21, 34))
 &gt;&gt;&gt; numbers
 [21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]</code></pre>
-<p>Notons que l’utilisation d’arguments nommés permet aussi de s’affranchir de l’ordre dans lesquels les paramètres de la fonction sont spécificiés :</p>
+<p>Notons que l’utilisation d’arguments nommés permet aussi de
+s’affranchir de l’ordre dans lesquels les paramètres de la fonction sont
+spécificiés :</p>
 <pre class="python"><code>&gt;&gt;&gt; numbers = fibonacci(start=(21, 34), n=10)
 &gt;&gt;&gt; numbers
 [21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]</code></pre>
 <h3 id="arguments-et">Arguments : <code>*</code> et <code>**</code></h3>
-<p>Il est possible de stocker des valeurs dans un n-uplet<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, puis de les utiliser comme arguments positionnels dans l’appel à une fonction. Par exemple :</p>
+<p>Il est possible de stocker des valeurs dans un n-uplet<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a>,
+puis de les utiliser comme arguments positionnels dans l’appel à une
+fonction. Par exemple :</p>
 <pre class="python"><code>&gt;&gt;&gt; args = (10, (21, 34))
 &gt;&gt;&gt; fibonacci(*args)
 [21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]</code></pre>
-<p>Un mécanisme similaire existe avec les dictionnaires et les arguments nommés :</p>
-<pre class="python"><code>&gt;&gt;&gt; kwargs = {&quot;n&quot;: 10, &quot;start&quot;: (21, 34)}
+<p>Un mécanisme similaire existe avec les dictionnaires et les arguments
+nommés :</p>
+<pre class="python"><code>&gt;&gt;&gt; kwargs = {"n": 10, "start": (21, 34)}
 &gt;&gt;&gt; fibonacci(**kwargs)
 [21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]</code></pre>
 <p>Il est possible d’hybrider les deux approches :</p>
 <pre class="python"><code>&gt;&gt;&gt; args = (10,)
-&gt;&gt;&gt; kwargs = {&quot;start&quot;: (21, 34)}
+&gt;&gt;&gt; kwargs = {"start": (21, 34)}
 &gt;&gt;&gt; fibonacci(*args, **kwargs)
 [21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]</code></pre>
-<p>Il y a également une forme de symétrie dans ce mécanisme, qui peut être utilisé pour définir une fonction admettant un nombre arbitraire d’arguments positionnels et/ou nommés. Par exemple, avec :</p>
+<p>Il y a également une forme de symétrie dans ce mécanisme, qui peut
+être utilisé pour définir une fonction admettant un nombre arbitraire
+d’arguments positionnels et/ou nommés. Par exemple, avec :</p>
 <pre class="python"><code>def f(*args, **kwargs):
-    print(f&quot;args = {args!r}&quot;)
-    print(f&quot;kwargs = {kwargs!r}&quot;)</code></pre>
+    print(f"args = {args!r}")
+    print(f"kwargs = {kwargs!r}")</code></pre>
 <p>on obtient :</p>
-<pre class="python"><code>&gt;&gt;&gt; f(1, &quot;Hello!&quot;)
-args = (1, &#39;Hello!&#39;)
+<pre class="python"><code>&gt;&gt;&gt; f(1, "Hello!")
+args = (1, 'Hello!')
 kwargs = {}
 &gt;&gt;&gt; f(fast=True, verbose=False)
 args = ()
-kwargs = {&#39;fast&#39;: True, &#39;verbose&#39;: False}</code></pre>
+kwargs = {'fast': True, 'verbose': False}</code></pre>
 <h3 id="typage-statique">Typage statique</h3>
-<p>Python est un langage typé dynamiquement ; la même variable peut désigner un entier à un moment et une chaîne de caractères à un autre. Néanmoins, il est possible – mais c’est optionnel – d’attacher statiquement à une variable une <a href="https://docs.python.org/fr/3/library/typing.html"><strong>annotation de type</strong></a> (🇺🇸 : <strong>type hint</strong>).</p>
-<p>Par exemple, si vous voulez déclarer que la fonction <code>fibonacci</code> prend comme argument un entier et une paire d’entiers et renvoie une liste d’entiers, vous pouvez la définir de la façon suivante :</p>
+<p>Python est un langage typé dynamiquement ; la même variable peut
+désigner un entier à un moment et une chaîne de caractères à un autre.
+Néanmoins, il est possible – mais c’est optionnel – d’attacher
+statiquement à une variable une <a href="https://docs.python.org/fr/3/library/typing.html"><strong>annotation
+de type</strong></a> (🇺🇸 : <strong>type hint</strong>).</p>
+<p>Par exemple, si vous voulez déclarer que la fonction
+<code>fibonacci</code> prend comme argument un entier et une paire
+d’entiers et renvoie une liste d’entiers, vous pouvez la définir de la
+façon suivante :</p>
 <pre class="python"><code>def fibonacci(
     n: int, 
     start: tuple[int, int] = (0, 1)
 ) -&gt; list[int]:
-    &quot;Return a list of n Fibonnaci numbers.&quot;
+    "Return a list of n Fibonnaci numbers."
     result : list[int] = []
     a, b = start
     while len(result) &lt; n:
         result.append(a)
         a, b = b, a+b
     return result</code></pre>
-<p>Cette information peut être utilisée pendant le développement pour détecter d’éventuelles incohérences structurelles de votre code. Ainsi, si vous complétez le code ci-dessus par :</p>
-<pre class="python"><code>fibonacci(&quot;Hello!&quot;, True)</code></pre>
-<p>l’utilisation de <a href="http://mypy-lang.org/">mypy</a> vous fournira :</p>
+<p>Cette information peut être utilisée pendant le développement pour
+détecter d’éventuelles incohérences structurelles de votre code. Ainsi,
+si vous complétez le code ci-dessus par :</p>
+<pre class="python"><code>fibonacci("Hello!", True)</code></pre>
+<p>l’utilisation de <a href="http://mypy-lang.org/">mypy</a> vous
+fournira :</p>
 <pre class="bash"><code>$ mypy fib.py
-fibonnaci.py:13: error: Argument 1 to &quot;fibonacci&quot; has incompatible type &quot;str&quot;; expected &quot;int&quot;
-fibonnaci.py:13: error: Argument 2 to &quot;fibonacci&quot; has incompatible type &quot;bool&quot;; expected &quot;Tuple[int, int]&quot;
+fibonnaci.py:13: error: Argument 1 to "fibonacci" has incompatible type "str"; expected "int"
+fibonnaci.py:13: error: Argument 2 to "fibonacci" has incompatible type "bool"; expected "Tuple[int, int]"
 Found 2 errors in 1 file (checked 1 source file)</code></pre>
 <h3 id="espaces-de-noms">Espaces de noms</h3>
-<p>La <a href="https://fr.wikipedia.org/wiki/Port%C3%A9e_(informatique)"><strong>portée</strong></a> (🇺🇸 : <strong>scope</strong>) d’une variable au sein d’un programme détermine la manière dont elle est associé à une valeur. Au niveau supérieur (d’un fichier, d’un module, de l’interpréteur Python, etc.), les variables sont <strong>globales</strong>. Le lien entre le nom de la variable et la valeur qu’elle désigne est décrit par le dictionnaire <code>globals()</code> : c’est l’<strong>espace de nom</strong> (🇺🇸 : <strong>namespace</strong>) associé aux variables globales.</p>
+<p>La <a href="https://fr.wikipedia.org/wiki/Port%C3%A9e_(informatique)"><strong>portée</strong></a>
+(🇺🇸 : <strong>scope</strong>) d’une variable au sein d’un programme
+détermine la manière dont elle est associé à une valeur. Au niveau
+supérieur (d’un fichier, d’un module, de l’interpréteur Python, etc.),
+les variables sont <strong>globales</strong>. Le lien entre le nom de la
+variable et la valeur qu’elle désigne est décrit par le dictionnaire
+<code>globals()</code> : c’est l’<strong>espace de nom</strong> (🇺🇸 :
+<strong>namespace</strong>) associé aux variables globales.</p>
 <pre class="python"><code>&gt;&gt;&gt; import math
-&gt;&gt;&gt; message = &quot;Hello world&quot;
+&gt;&gt;&gt; message = "Hello world"
 &gt;&gt;&gt; def answer():
 ...    return 42
 ...
 &gt;&gt;&gt; globs = globals()
-&gt;&gt;&gt; globs[&quot;math&quot;] is math
+&gt;&gt;&gt; globs["math"] is math
 True
-&gt;&gt;&gt; globs[&quot;message&quot;] is message
+&gt;&gt;&gt; globs["message"] is message
 True
-&gt;&gt;&gt; globs[&quot;answer&quot;] is answer
+&gt;&gt;&gt; globs["answer"] is answer
 True</code></pre>
-<p>Au sein des fonctions, il y a en général des variables <strong>locales</strong> à la fonction. C’est en particulier le cas des paramètres de la fonction, et – en l’absence d’instruction contraire – des variables qui y sont assignées. Dans le corps de cette fonction, l’espace de noms associé peut être obtenu en invoquant <code>locals()</code>.</p>
+<p>Au sein des fonctions, il y a en général des variables
+<strong>locales</strong> à la fonction. C’est en particulier le cas des
+paramètres de la fonction, et – en l’absence d’instruction contraire –
+des variables qui y sont assignées. Dans le corps de cette fonction,
+l’espace de noms associé peut être obtenu en invoquant
+<code>locals()</code>.</p>
 <pre class="python"><code>&gt;&gt;&gt; x = 1
 &gt;&gt;&gt; def f(y):
 ...     z = 3
 ...     locs = locals()
-...     print(&quot;x&quot; in locs)
-...     print(&quot;y&quot; in locs)
-...     print(&quot;z&quot; in locs)
+...     print("x" in locs)
+...     print("y" in locs)
+...     print("z" in locs)
 ... 
 &gt;&gt;&gt; f(2)
 False
 True
 True</code></pre>
-<p>Il est donc possible pour une variable locale de cacher (🇺🇸 : <strong>shadow</strong>) une variable globale :</p>
+<p>Il est donc possible pour une variable locale de cacher (🇺🇸 :
+<strong>shadow</strong>) une variable globale :</p>
 <pre class="python"><code>&gt;&gt;&gt; a = 1
 &gt;&gt;&gt; def f():
 ...     a = 2  # assigned =&gt; local
@@ -272,14 +322,17 @@ True</code></pre>
 2
 &gt;&gt;&gt; a  # in the global scope =&gt; the value remains unchanged
 1</code></pre>
-<p>En l’absence d’une telle affectation, au sein d’une fonction, les variables globales restent accessibles, mais donc en lecture seule :</p>
+<p>En l’absence d’une telle affectation, au sein d’une fonction, les
+variables globales restent accessibles, mais donc en lecture seule :</p>
 <pre class="python"><code>&gt;&gt;&gt; a = 1
 &gt;&gt;&gt; def f():
 ...     print(a)
 ...
 &gt;&gt;&gt; f()
 1</code></pre>
-<p>Si l’on souhaite affecter une nouvelle valeur à une variable globale dans le corps d’une fonction, il est nécessaire d’y déclarer la variable comme globale :</p>
+<p>Si l’on souhaite affecter une nouvelle valeur à une variable globale
+dans le corps d’une fonction, il est nécessaire d’y déclarer la variable
+comme globale :</p>
 <pre class="python"><code>&gt;&gt;&gt; a = 1
 &gt;&gt;&gt; def f():
 ...     global a
@@ -290,16 +343,24 @@ True</code></pre>
 &gt;&gt;&gt; f()
 &gt;&gt;&gt; print(a)
 2</code></pre>
-<p>Il existe également une portée <strong>intégrée</strong> (🇺🇸 : <strong>built-in</strong>) et en cas de fonctions <strong>emboitées</strong> (🇺🇸 : <strong>nested</strong>), le concept de portée externe ; cf par exemple <a href="https://realpython.com/python-scope-legb-rule/">la description de la règle LEGB</a>.</p>
+<p>Il existe également une portée <strong>intégrée</strong> (🇺🇸 :
+<strong>built-in</strong>) et en cas de fonctions
+<strong>emboitées</strong> (🇺🇸 : <strong>nested</strong>), le concept de
+portée externe ; cf par exemple <a href="https://realpython.com/python-scope-legb-rule/">la description de
+la règle LEGB</a>.</p>
 <h2 id="invocables">Invocables</h2>
-<p>On qualifie d’<strong>invocable</strong> (ou <strong>appelable</strong> ; 🇺🇸 : <strong>callable</strong>) tout objet se comportant comme une fonction, c’est-à-dire pouvant être appelé (invoqué) avec la même syntaxe que les fonctions.</p>
+<p>On qualifie d’<strong>invocable</strong> (ou
+<strong>appelable</strong> ; 🇺🇸 : <strong>callable</strong>) tout objet
+se comportant comme une fonction, c’est-à-dire pouvant être appelé
+(invoqué) avec la même syntaxe que les fonctions.</p>
 <p>Ainsi, l’entier <code>0</code> n’est pas invocable :</p>
 <pre class="python"><code>&gt;&gt;&gt; zero = 0
 &gt;&gt;&gt; zero()
 Traceback (most recent call last):
-  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
-TypeError: &#39;int&#39; object is not callable</code></pre>
-<p>mais la fonction sans argument qui renvoie <code>0</code> est invocable :</p>
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: 'int' object is not callable</code></pre>
+<p>mais la fonction sans argument qui renvoie <code>0</code> est
+invocable :</p>
 <pre class="python"><code>&gt;&gt;&gt; def zero_fun():
 ...     return 0
 ...
@@ -307,27 +368,31 @@ TypeError: &#39;int&#39; object is not callable</code></pre>
 0</code></pre>
 <p>ce qui n’est pas une surprise puisque c’est une fonction !</p>
 <pre class="python"><code>&gt;&gt;&gt; type(zero_fun)
-&lt;class &#39;function&#39;&gt;
+&lt;class 'function'&gt;
 &gt;&gt;&gt; import types
 &gt;&gt;&gt; isinstance(zero_fun, types.FunctionType)
 True</code></pre>
-<p>L’invocabilité des objets Python peut être testée avec la fonction <code>callable</code> :</p>
+<p>L’invocabilité des objets Python peut être testée avec la fonction
+<code>callable</code> :</p>
 <pre class="python"><code>&gt;&gt;&gt; callable(zero)
 False
 &gt;&gt;&gt; callable(zero_fun)
 True</code></pre>
-<p>Notons que ce test permet de dire si un objet est invocable, mais pas si on peut l’invoquer sans arguments (ni combien d’arguments sont nécessaires, de quel type, etc.). Ainsi :</p>
+<p>Notons que ce test permet de dire si un objet est invocable, mais pas
+si on peut l’invoquer sans arguments (ni combien d’arguments sont
+nécessaires, de quel type, etc.). Ainsi :</p>
 <pre class="python"><code>&gt;&gt;&gt; callable(hash)
 True</code></pre>
 <p>Mais :</p>
 <pre class="python"><code>&gt;&gt;&gt; hash()
 Traceback (most recent call last):
-  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
 TypeError: hash() takes exactly one argument (0 given)</code></pre>
 <p>Toutefois :</p>
 <pre class="python"><code>&gt;&gt;&gt; hash(2**100)
 549755813888</code></pre>
-<p>Pour en savoir plus sur les arguments attendus, il faudra se reporter à la documentation de l’objet considéré.</p>
+<p>Pour en savoir plus sur les arguments attendus, il faudra se reporter
+à la documentation de l’objet considéré.</p>
 <h3 id="types">Types</h3>
 <p>Un objet comme <code>int</code> est également invocable :</p>
 <pre class="python"><code>&gt;&gt;&gt; callable(int)
@@ -337,21 +402,22 @@ True</code></pre>
 0
 &gt;&gt;&gt; int(0.0)
 0
-&gt;&gt;&gt; int(&quot;0&quot;)
+&gt;&gt;&gt; int("0")
 0</code></pre>
 <p>Pourtant, ce n’est pas une function, mais un type :</p>
 <pre class="python"><code>&gt;&gt;&gt; type(int)
-&lt;class &#39;type&#39;&gt;
+&lt;class 'type'&gt;
 &gt;&gt;&gt; type(int) is type  # 🤯
 True
 &gt;&gt;&gt; isinstance(int, types.FunctionType)
 False</code></pre>
-<p>Rappelons que les types (ou classes) ont vocation, quand on les appelle, à créer des instances du type considéré :</p>
+<p>Rappelons que les types (ou classes) ont vocation, quand on les
+appelle, à créer des instances du type considéré :</p>
 <pre class="python"><code>&gt;&gt;&gt; isinstance(int(), int)
 True
 &gt;&gt;&gt; isinstance(int(0.0), int)
 True
-&gt;&gt;&gt; isinstance(int(&quot;0&quot;), int)
+&gt;&gt;&gt; isinstance(int("0"), int)
 True</code></pre>
 <p>Les classes que vous définissez sont également invocables :</p>
 <pre class="python"><code>class Transmogrifier:
@@ -362,39 +428,52 @@ True
 &gt;&gt;&gt; isinstance(transmogrifier, Transmogrifier)
 True</code></pre>
 <h3 id="méthodes">Méthodes</h3>
-<p>Un <a href="https://calvinandhobbes.fandom.com/wiki/Transmogrifier">transmogrifieur</a> peut transformer son utilisateur en ce qu’il souhaite (par défaut, un tigre 🐯 ; mais on n’a pas spécifié la taille du tigre ! 😉).</p>
+<p>Un <a href="https://calvinandhobbes.fandom.com/wiki/Transmogrifier">transmogrifieur</a>
+peut transformer son utilisateur en ce qu’il souhaite (par défaut, un
+tigre 🐯 ; mais on n’a pas spécifié la taille du tigre ! 😉).</p>
 <figure>
-<img src="https://www.nicepng.com/png/full/198-1980373_calvin-and-hobbes-png-hd-calvin-and-hobbes.png" alt="Calvin (à droite) transformé en tigre" /><figcaption><a href="https://calvinandhobbes.fandom.com/wiki/Calvin_in_Tiger_Form_(Transmogrifier_alter_ego)">Calvin (à droite) transformé en tigre</a></figcaption>
+<img alt="Calvin (à droite) transformé en tigre" src="https://www.nicepng.com/png/full/198-1980373_calvin-and-hobbes-png-hd-calvin-and-hobbes.png"/>
+<figcaption aria-hidden="true"><a href="https://calvinandhobbes.fandom.com/wiki/Calvin_in_Tiger_Form_(Transmogrifier_alter_ego)">Calvin
+(à droite) transformé en tigre</a></figcaption>
 </figure>
 <pre class="python"><code>class Transmogrifier:
-    def __init__(self, turn_into=&quot;tiger&quot;):
+    def __init__(self, turn_into="tiger"):
         self.turn_into = turn_into
     def activate(self, user):
         return self.turn_into</code></pre>
 <pre class="python"><code>&gt;&gt;&gt; transmogrifier = Transmogrifier()
-&gt;&gt;&gt; transmogrifier.activate(&quot;calvin&quot;)
-&#39;tiger&#39;</code></pre>
-<p>L’opération <code>transmogrifier.activate(&quot;calvin&quot;)</code> n’est pas “atomique” : elle consiste d’abord à obtenir l’attribut <code>activate</code> de l’objet <code>transmogrifier</code>, puis à l’invoquer avec l’argument <code>&quot;calvin&quot;</code>.</p>
+&gt;&gt;&gt; transmogrifier.activate("calvin")
+'tiger'</code></pre>
+<p>L’opération <code>transmogrifier.activate("calvin")</code> n’est pas
+“atomique” : elle consiste d’abord à obtenir l’attribut
+<code>activate</code> de l’objet <code>transmogrifier</code>, puis à
+l’invoquer avec l’argument <code>"calvin"</code>.</p>
 <pre class="python"><code>&gt;&gt;&gt; transmogrify = transmogrifier.activate
 &gt;&gt;&gt; callable(transmogrify)
 True
-&gt;&gt;&gt; transmogrify(&quot;calvin&quot;)
-&#39;tiger&#39;</code></pre>
-<p>Cela est possible car <code>activate</code> est une méthode (liée à l’instance <code>transmogrifier</code> de <code>Transmogrifier</code>) et est donc invocable.</p>
+&gt;&gt;&gt; transmogrify("calvin")
+'tiger'</code></pre>
+<p>Cela est possible car <code>activate</code> est une méthode (liée à
+l’instance <code>transmogrifier</code> de <code>Transmogrifier</code>)
+et est donc invocable.</p>
 <pre class="python"><code>&gt;&gt;&gt; transmogrify
 &lt;bound method Transmogrifier.activate ...&gt;
 &gt;&gt;&gt; type(transmogrify)
-&lt;class &#39;method&#39;&gt;
+&lt;class 'method'&gt;
 &gt;&gt;&gt; import types
 &gt;&gt;&gt; type(transmogrify) is types.MethodType
 True</code></pre>
 <h3 id="instances">Instances</h3>
-<p>Notons qu’à ce stade <code>Transmogrifier</code> est invocable et la méthode <code>activate</code> des transmogrifieurs également. Mais les transmogrifieurs eux-mêmes ne le sont pas :</p>
+<p>Notons qu’à ce stade <code>Transmogrifier</code> est invocable et la
+méthode <code>activate</code> des transmogrifieurs également. Mais les
+transmogrifieurs eux-mêmes ne le sont pas :</p>
 <pre class="python"><code>&gt;&gt;&gt; callable(transmogrifier)
 False</code></pre>
-<p>Si nous estimons que c’est préférable, nous pouvons faire en sorte qu’ils le deviennent. Il semble assez raisonnable de faire en sorte qu’invoquer un transmogrifieur l’active :</p>
+<p>Si nous estimons que c’est préférable, nous pouvons faire en sorte
+qu’ils le deviennent. Il semble assez raisonnable de faire en sorte
+qu’invoquer un transmogrifieur l’active :</p>
 <pre class="python"><code>class Transmogrifier:
-    def __init__(self, turn_into=&quot;tiger&quot;):
+    def __init__(self, turn_into="tiger"):
         self.turn_into = turn_into
     def activate(self, user):
         return self.turn_into
@@ -403,15 +482,24 @@ False</code></pre>
 <pre class="python"><code>&gt;&gt;&gt; transmogrifier = Transmogrifier()
 &gt;&gt;&gt; callable(transmogrifier)
 True</code></pre>
-<p>Nous pouvons alors simplifier l’usage du transmogrifieur de la façon suivante :</p>
-<pre class="python"><code>&gt;&gt;&gt; transmogrifier(&quot;calvin&quot;)
-&#39;tiger&#39;</code></pre>
+<p>Nous pouvons alors simplifier l’usage du transmogrifieur de la façon
+suivante :</p>
+<pre class="python"><code>&gt;&gt;&gt; transmogrifier("calvin")
+'tiger'</code></pre>
 <h2 id="fonctions-génératrices">Fonctions génératrices</h2>
-<p>Une fonction est <strong>génératrice</strong> si sa définition utilise le mot-clé <code>yield</code>.</p>
+<p>Une fonction est <strong>génératrice</strong> si sa définition
+utilise le mot-clé <code>yield</code>.</p>
 <ul>
-<li><p>Appeler une fonction génératrice n’exécute pas son code immédiatement, mais fournit comme valeur de retour un itérateur.</p></li>
-<li><p>Accéder au premier élément de cet itérateur exécute la fonction jusqu’à atteindre le premier <code>yield</code> ; la fonction renvoie alors la valeur fournie au <code>yield</code>, puis pause son exécution.</p></li>
-<li><p>Accéder au second élément de cet itérateur reprend le fil de l’exécution à ce point, jusqu’à atteindre le second <code>yield</code>, etc.</p></li>
+<li><p>Appeler une fonction génératrice n’exécute pas son code
+immédiatement, mais fournit comme valeur de retour un
+itérateur.</p></li>
+<li><p>Accéder au premier élément de cet itérateur exécute la fonction
+jusqu’à atteindre le premier <code>yield</code> ; la fonction renvoie
+alors la valeur fournie au <code>yield</code>, puis pause son
+exécution.</p></li>
+<li><p>Accéder au second élément de cet itérateur reprend le fil de
+l’exécution à ce point, jusqu’à atteindre le second <code>yield</code>,
+etc.</p></li>
 </ul>
 <p>Ainsi, avec</p>
 <pre class="python"><code>def one_two_three():
@@ -430,9 +518,9 @@ True</code></pre>
 [1, 2, 3]</code></pre>
 <h4 id="exemples-source-itertools">Exemples (source: <a href="https://docs.python.org/3/library/itertools.html#module-itertools">itertools</a>)</h4>
 <pre class="python"><code>def count(start=0, step=1):
-    &quot;&quot;&quot;
+    """
     Generate the sequence start, start + step, start + 2*step, ...
-    &quot;&quot;&quot;
+    """
     value = start
     while True:
         yield value
@@ -455,17 +543,17 @@ True</code></pre>
 15 
 17 
 19</code></pre>
-<hr />
+<hr/>
 <pre class="python"><code>def cycle(iterable):
-    &quot;&quot;&quot;
+    """
     Yield all items from an iterable, then repeat this sequence indefinitely. 
-    &quot;&quot;&quot;
+    """
     items = list(iterable)
     while items:
         for item in items:
             yield item</code></pre>
 <p>Usage :</p>
-<pre class="python"><code>&gt;&gt;&gt; for i, item in enumerate(cycle(&quot;ABCD&quot;)):
+<pre class="python"><code>&gt;&gt;&gt; for i, item in enumerate(cycle("ABCD")):
 ...     if i &gt;= 12:
 ...         break
 ...     else:
@@ -483,11 +571,11 @@ A
 B 
 C 
 D</code></pre>
-<hr />
+<hr/>
 <pre class="python"><code>def repeat(object, n=None):
-    &quot;&quot;&quot;
+    """
     Yield object an object n times (or indefinitely if n is None).
-    &quot;&quot;&quot;
+    """
     if n is None:
         while True:
             yield object
@@ -499,12 +587,29 @@ D</code></pre>
 [10, 10, 10]</code></pre>
 <h4 id="exercices">Exercices</h4>
 <ul>
-<li><p>Implémentez votre propre version des fonctions standards <code>range</code>, <code>enumerate</code> et <code>zip</code> en utilisant les fonctions génératrices.</p></li>
-<li><p>Revoyez la définition de la fonction <code>fibonacci</code> pour en faire une fonction génératrice, qui renvoie les nombres de Fibonnaci sous forme d’itérateur plutôt que de liste. Faites en sorte que lorsque l’argument <code>n</code> n’est pas fourni, l’itérateur parcoure l’intégralité de la suite.</p></li>
+<li><p>Implémentez votre propre version des fonctions standards
+<code>range</code>, <code>enumerate</code> et <code>zip</code> en
+utilisant les fonctions génératrices.</p></li>
+<li><p>Revoyez la définition de la fonction <code>fibonacci</code> pour
+en faire une fonction génératrice, qui renvoie les nombres de Fibonnaci
+sous forme d’itérateur plutôt que de liste. Faites en sorte que lorsque
+l’argument <code>n</code> n’est pas fourni, l’itérateur parcoure
+l’intégralité de la suite.</p></li>
 </ul>
 <h2 id="programmation-fonctionnelle">Programmation fonctionnelle</h2>
-<p>Un des traits de la <a href="https://fr.wikipedia.org/wiki/Programmation_fonctionnelle"><strong>programmation fonctionelle</strong></a>, un style de programmation que supporte (en partie) Python, est de permettre de manipuler les fonctions comme des objets comme les autres, pouvant être désignés par des variables, stockés dans des conteneurs, passés comme arguments à d’autres fonctions, etc. Une fonction acceptant comme argument des fonctions et/ou en renvoyant est une <strong>fonction d’ordre supérieur</strong> (🇺🇸 : <strong>higher-order function</strong>).</p>
-<p>Les librairies mathématiques exploitent souvent avec profit ces fonctions d’ordre supérieures. Ainsi, la librairie de différentiation automatique <a href="https://github.com/HIPS/autograd#autograd---">Autograd</a> définit une fonction d’ordre supérieur <code>grad</code> qui associe à une fonction d’un argument réel sa dérivée.</p>
+<p>Un des traits de la <a href="https://fr.wikipedia.org/wiki/Programmation_fonctionnelle"><strong>programmation
+fonctionelle</strong></a>, un style de programmation que supporte (en
+partie) Python, est de permettre de manipuler les fonctions comme des
+objets comme les autres, pouvant être désignés par des variables,
+stockés dans des conteneurs, passés comme arguments à d’autres
+fonctions, etc. Une fonction acceptant comme argument des fonctions
+et/ou en renvoyant est une <strong>fonction d’ordre supérieur</strong>
+(🇺🇸 : <strong>higher-order function</strong>).</p>
+<p>Les librairies mathématiques exploitent souvent avec profit ces
+fonctions d’ordre supérieures. Ainsi, la librairie de différentiation
+automatique <a href="https://github.com/HIPS/autograd#autograd---">Autograd</a> définit
+une fonction d’ordre supérieur <code>grad</code> qui associe à une
+fonction d’un argument réel sa dérivée.</p>
 <p>Sa documentation donne l’exemple suivant d’usage :</p>
 <pre class="python"><code>&gt;&gt;&gt; import autograd.numpy as np 
 &gt;&gt;&gt; from autograd import grad   
@@ -515,19 +620,26 @@ D</code></pre>
 &gt;&gt;&gt; d_tanh = grad(tanh)  # d_tanh is the derivative of tanh   
 &gt;&gt;&gt; d_tanh(1.0)          # we evaluate it at x = 1.0              
 0.419974341614026</code></pre>
-<p>Un autre usage important des fonctions d’ordre supérieur est l’exploitation de <strong>fonctions de rappels</strong> (🇺🇸 : <strong>callbacks</strong>), notamment dans les interfaces graphiques.</p>
-<p>Par exemple, regardons comment est programmée l’application graphique donnée comme example dans <a href="http://tkdocs.com/tutorial/firstexample.html#design">le tutoriel de la bibliothèque Tk</a> :</p>
+<p>Un autre usage important des fonctions d’ordre supérieur est
+l’exploitation de <strong>fonctions de rappels</strong> (🇺🇸 :
+<strong>callbacks</strong>), notamment dans les interfaces
+graphiques.</p>
+<p>Par exemple, regardons comment est programmée l’application graphique
+donnée comme example dans <a href="http://tkdocs.com/tutorial/firstexample.html#design">le tutoriel
+de la bibliothèque Tk</a> :</p>
 <figure>
-<img src="images/converter.png" alt="Convertisseur de pieds en mètres" /><figcaption>Convertisseur de pieds en mètres</figcaption>
+<img alt="Convertisseur de pieds en mètres" src="images/converter.png"/>
+<figcaption aria-hidden="true">Convertisseur de pieds en
+mètres</figcaption>
 </figure>
 <p>L’interface graphique est en partie définie par le code :</p>
 <pre class="python"><code>from tkinter import *
 from tkinter import ttk
 
 root = Tk()
-root.title(&quot;Feet to Meters&quot;)
+root.title("Feet to Meters")
 
-mainframe = ttk.Frame(root, padding=&quot;3 3 12 12&quot;)
+mainframe = ttk.Frame(root, padding="3 3 12 12")
 mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
 root.columnconfigure(0, weight=1)
 root.rowconfigure(0, weight=1)
@@ -538,8 +650,14 @@ feet_entry.grid(column=2, row=1, sticky=(W, E))
 
 meters = StringVar()
 ttk.Label(mainframe, textvariable=meters).grid(column=2, row=2, sticky=(W, E))</code></pre>
-<p>Retenons simplement à ce stade que <code>root</code> est la fenêtre principale de l’application, <code>feet</code> le champ de texte où nous rentrons la valeur de la longueur en pieds et <code>meters</code> le champ de texte qui devra afficher la longueur équivalent en mètres lorsque l’on cliquesur le bouton.</p>
-<p>Pour que l’application se comporte comme voulu, nous définissons une fonction <code>calculate</code> qui a chaque fois qu’elle est invoquée, lit la longueur en pied et écrit la longeur en mètres :</p>
+<p>Retenons simplement à ce stade que <code>root</code> est la fenêtre
+principale de l’application, <code>feet</code> le champ de texte où nous
+rentrons la valeur de la longueur en pieds et <code>meters</code> le
+champ de texte qui devra afficher la longueur équivalent en mètres
+lorsque l’on cliquesur le bouton.</p>
+<p>Pour que l’application se comporte comme voulu, nous définissons une
+fonction <code>calculate</code> qui a chaque fois qu’elle est invoquée,
+lit la longueur en pied et écrit la longeur en mètres :</p>
 <pre class="python"><code>def calculate(*args):
     try:
         value = float(feet.get())
@@ -547,16 +665,19 @@ ttk.Label(mainframe, textvariable=meters).grid(column=2, row=2, sticky=(W, E))</
         meters.set(meters_value)
     except ValueError:
         pass</code></pre>
-<p>Puis nous créons un bouton qui <strong>rappelle</strong> cette fonction (de rappel) à chaque fois qu’il est pressé :</p>
+<p>Puis nous créons un bouton qui <strong>rappelle</strong> cette
+fonction (de rappel) à chaque fois qu’il est pressé :</p>
 <pre class="python"><code>ttk.Button(
     mainframe, 
-    text=&quot;Calculate&quot;, 
+    text="Calculate", 
     command=calculate
 ).grid(column=3, row=3, sticky=W)</code></pre>
-<p>Quelques labels de plus dans l’interface graphique, un peu de positionnement, et nous sommes prếts à lancer la boucle d’exécution du code !</p>
-<pre class="python"><code>ttk.Label(mainframe, text=&quot;feet&quot;).grid(column=3, row=1, sticky=W)
-ttk.Label(mainframe, text=&quot;is equivalent to&quot;).grid(column=1, row=2, sticky=E)
-ttk.Label(mainframe, text=&quot;meters&quot;).grid(column=3, row=2, sticky=W)
+<p>Quelques labels de plus dans l’interface graphique, un peu de
+positionnement, et nous sommes prếts à lancer la boucle d’exécution du
+code !</p>
+<pre class="python"><code>ttk.Label(mainframe, text="feet").grid(column=3, row=1, sticky=W)
+ttk.Label(mainframe, text="is equivalent to").grid(column=1, row=2, sticky=E)
+ttk.Label(mainframe, text="meters").grid(column=3, row=2, sticky=W)
 
 for child in mainframe.winfo_children(): 
     child.grid_configure(padx=5, pady=5)
@@ -565,60 +686,103 @@ feet_entry.focus()
 
 root.mainloop()</code></pre>
 <h3 id="lambda">Lambda</h3>
-<p>Les <strong>fonctions lambda</strong> en Python sont une construction qui n’augmente pas l’expressivité du langage – on ne peut rien faire avec des fonctions lambda qu’on ne pouvait déjà faire avec les fonctions classiques – mais permet dans certains cas d’obtenir un code plus concis.</p>
-<p>Ainsi, pour trouver numériquement le zéro de la fonction <span class="math inline">\(x \mapsto x^2 - 2\)</span> entre <span class="math inline">\(0\)</span> et <span class="math inline">\(2\)</span> avec <code>scipy</code>, après avoir importé une fonction de recherche de racines :</p>
+<p>Les <strong>fonctions lambda</strong> en Python sont une construction
+qui n’augmente pas l’expressivité du langage – on ne peut rien faire
+avec des fonctions lambda qu’on ne pouvait déjà faire avec les fonctions
+classiques – mais permet dans certains cas d’obtenir un code plus
+concis.</p>
+<p>Ainsi, pour trouver numériquement le zéro de la fonction <span class="math inline">\(x \mapsto x^2 - 2\)</span> entre <span class="math inline">\(0\)</span> et <span class="math inline">\(2\)</span> avec <code>scipy</code>, après avoir
+importé une fonction de recherche de racines :</p>
 <pre class="python"><code>from scipy.optimize import root_scalar as find_root</code></pre>
-<p>on peut définir la fonction qui nous intéresse, ce qui suppose de la nommer (par exemple <code>f</code>) :</p>
+<p>on peut définir la fonction qui nous intéresse, ce qui suppose de la
+nommer (par exemple <code>f</code>) :</p>
 <pre class="python"><code>def f(x):
     return x*x - 2</code></pre>
-<p>puis appeler la routine de recherche de zéros de <code>scipy</code> :</p>
+<p>puis appeler la routine de recherche de zéros de <code>scipy</code>
+:</p>
 <pre class="python"><code>&gt;&gt;&gt; find_root(f, bracket=[0, 2])
       converged: True
-           flag: &#39;converged&#39;
+           flag: 'converged'
  function_calls: 9
      iterations: 8
            root: 1.4142135623731364</code></pre>
-<p>Mais on peut aussi passer l’étape préalable de définition et de nommage de la function, et faire cet opération à la volée, dans l’appel à <code>find_root</code>, au moyen d’une fonction lambda :</p>
+<p>Mais on peut aussi passer l’étape préalable de définition et de
+nommage de la function, et faire cet opération à la volée, dans l’appel
+à <code>find_root</code>, au moyen d’une fonction lambda :</p>
 <pre class="python"><code>&gt;&gt;&gt; find_root(lambda x: x*x-2, bracket=[0, 2])
       converged: True
-           flag: &#39;converged&#39;
+           flag: 'converged'
  function_calls: 9
      iterations: 8
            root: 1.4142135623731364</code></pre>
-<p>Le mot-clé <code>lambda</code> fait référence à la notation traditionnelle du <a href="https://fr.wikipedia.org/wiki/Lambda-calcul"><span class="math inline">\(\lambda\)</span>-calcul</a> ; on y désignerait la fonction <span class="math inline">\(x \mapsto x^2+1\)</span> par la notation <span class="math inline">\((\lambda x.x^2+1)\)</span>.</p>
+<p>Le mot-clé <code>lambda</code> fait référence à la notation
+traditionnelle du <a href="https://fr.wikipedia.org/wiki/Lambda-calcul"><span class="math inline">\(\lambda\)</span>-calcul</a> ; on y désignerait la
+fonction <span class="math inline">\(x \mapsto x^2+1\)</span> par la
+notation <span class="math inline">\((\lambda x.x^2+1)\)</span>.</p>
 <h3 id="fermetures">Fermetures</h3>
 <p>Ainsi parlait Wikipédia :</p>
 <blockquote>
-<p>Dans un langage de programmation, une <strong>fermeture</strong> ou <strong>clôture</strong> (🇺🇸 : <strong>closure</strong>) est une fonction accompagnée de son environnement lexical.</p>
-<p>L’<strong>environnement lexical</strong> d’une fonction est l’ensemble des variables non locales qu’elle a capturées, soit par valeur (c’est-à-dire par copie des valeurs des variables), soit par référence (c’est-à-dire par copie des adresses mémoires des variables).</p>
-<p>Une fermeture est donc créée, entre autres, lorsqu’une fonction est définie dans le corps d’une autre fonction et utilise des paramètres ou des variables locales de cette dernière.</p>
-<p>Source : <a href="https://fr.wikipedia.org/wiki/Fermeture_(informatique)"><img src="icons/Wikipedia.svg" style="height: 1em; display: inline; vertical-align: -0.175em;" /> Fermeture (informatique)</a></p>
+<p>Dans un langage de programmation, une <strong>fermeture</strong> ou
+<strong>clôture</strong> (🇺🇸 : <strong>closure</strong>) est une
+fonction accompagnée de son environnement lexical.</p>
+<p>L’<strong>environnement lexical</strong> d’une fonction est
+l’ensemble des variables non locales qu’elle a capturées, soit par
+valeur (c’est-à-dire par copie des valeurs des variables), soit par
+référence (c’est-à-dire par copie des adresses mémoires des
+variables).</p>
+<p>Une fermeture est donc créée, entre autres, lorsqu’une fonction est
+définie dans le corps d’une autre fonction et utilise des paramètres ou
+des variables locales de cette dernière.</p>
+<p>Source : <a href="https://fr.wikipedia.org/wiki/Fermeture_(informatique)"><img src="icons/Wikipedia.svg" style="height: 1em; display: inline; vertical-align: -0.175em;"/>
+Fermeture (informatique)</a></p>
 </blockquote>
-<p>Essayons de donner un exemple concret illustrant cette définition.</p>
+<p>Essayons de donner un exemple concret illustrant cette
+définition.</p>
 <h4 id="evaluateur-dexpression">Evaluateur d’expression</h4>
-<p>La fonction intégrée <code>eval</code> permet de calculer la valeur d’expressions représentées par des chaînes de caractères. Ainsi :</p>
+<p>La fonction intégrée <code>eval</code> permet de calculer la valeur
+d’expressions représentées par des chaînes de caractères. Ainsi :</p>
 <pre class="python"><code>&gt;&gt;&gt; x = 1 
 &gt;&gt;&gt; y = 2
-&gt;&gt;&gt; eval(&quot;x + y&quot;)
+&gt;&gt;&gt; eval("x + y")
 3</code></pre>
-<p>Il est également possible d’ignorer l’espace de nom global et de spécifier explicitement l’espace de nom que devra utiliser l’évaluateur :</p>
-<pre class="python"><code>&gt;&gt;&gt; namespace = {&quot;x&quot;: 3, &quot;y&quot;: 4}
-&gt;&gt;&gt; eval(&quot;x + y&quot;, namespace)
+<p>Il est également possible d’ignorer l’espace de nom global et de
+spécifier explicitement l’espace de nom que devra utiliser l’évaluateur
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; namespace = {"x": 3, "y": 4}
+&gt;&gt;&gt; eval("x + y", namespace)
 7</code></pre>
-<p>Nous aimerions disposer d’une fonction d’ordre supérieur – disons <code>fun</code> – qui associe à une expression, comme <code>&quot;x+y&quot;</code>, une fonction qui acceptera les arguments nommés nécessaires pour évaler l’expression – ici <code>x</code> et <code>y</code> – et renverra la valeur associée de l’expression.</p>
+<p>Nous aimerions disposer d’une fonction d’ordre supérieur – disons
+<code>fun</code> – qui associe à une expression, comme
+<code>"x+y"</code>, une fonction qui acceptera les arguments nommés
+nécessaires pour évaler l’expression – ici <code>x</code> et
+<code>y</code> – et renverra la valeur associée de l’expression.</p>
 <p>Avec les fermetures de fonctions, rien de plus simple :</p>
 <pre class="python"><code>def fun(expression):
     def f(**kwargs): 
        return eval(expression, kwargs)
     return f</code></pre>
-<p>On remarquera que <code>eval(expression, kwargs)</code> utilise la variable <code>kwargs</code> qui est locale à <code>f</code> (car passée en paramètre). Mais elle utilise également <code>expression</code> qui est une variable locale de <code>fun</code> ; elle appartient à l’environnement lexical de <code>f</code> qui est donc une fermeture.</p>
+<p>On remarquera que <code>eval(expression, kwargs)</code> utilise la
+variable <code>kwargs</code> qui est locale à <code>f</code> (car passée
+en paramètre). Mais elle utilise également <code>expression</code> qui
+est une variable locale de <code>fun</code> ; elle appartient à
+l’environnement lexical de <code>f</code> qui est donc une
+fermeture.</p>
 <p>Voilà comment utiliser notre fonction <code>fun</code> :</p>
-<pre class="python"><code>&gt;&gt;&gt; add_xy = fun(&quot;x + y&quot;)
+<pre class="python"><code>&gt;&gt;&gt; add_xy = fun("x + y")
 &gt;&gt;&gt; add_xy(x=4, y=5)
 9</code></pre>
-<hr />
-<p>Les variables non-locales d’une fermeture sont accessibles en lecture seule par défaut. Pour les modifier, il faut au préalable les déclarer explicitement comme non-locales à la fermeture. (La situation est donc similaire celle des variables globales exploitées dans les fonctions.)</p>
-<p>Par exemple, la fonction <code>make_get_set</code> génère deux fermetures qui accèdent à la même variable <code>x</code> (qui est locale à <code>make_get_set</code>) : <code>get</code> permet de lire la valeur de <code>x</code> et n’a donc pas besoin de la déclarer comme non-locale ; mais <code>set</code> doit permettre de changer la valeur de cette variable et la déclare donc comme non-locale :</p>
+<hr/>
+<p>Les variables non-locales d’une fermeture sont accessibles en lecture
+seule par défaut. Pour les modifier, il faut au préalable les déclarer
+explicitement comme non-locales à la fermeture. (La situation est donc
+similaire celle des variables globales exploitées dans les
+fonctions.)</p>
+<p>Par exemple, la fonction <code>make_get_set</code> génère deux
+fermetures qui accèdent à la même variable <code>x</code> (qui est
+locale à <code>make_get_set</code>) : <code>get</code> permet de lire la
+valeur de <code>x</code> et n’a donc pas besoin de la déclarer comme
+non-locale ; mais <code>set</code> doit permettre de changer la valeur
+de cette variable et la déclare donc comme non-locale :</p>
 <pre class="python"><code>def make_get_set(x):
      def get():
          return x
@@ -633,8 +797,10 @@ root.mainloop()</code></pre>
 &gt;&gt;&gt; set(5)
 &gt;&gt;&gt; get()
 5</code></pre>
-<hr />
-<p>Il est bon de savoir que les variables non-locales sont capturées par référence en Python, et non par valeur, ce qui peut dans certains cas rendre votre vie … intéressante ! 😂</p>
+<hr/>
+<p>Il est bon de savoir que les variables non-locales sont capturées par
+référence en Python, et non par valeur, ce qui peut dans certains cas
+rendre votre vie … intéressante ! 😂</p>
 <p>Par exemple, le programmeur ayant écrit :</p>
 <pre class="python"><code>def make_actions():
     actions = []
@@ -643,14 +809,22 @@ root.mainloop()</code></pre>
             print(i)
         actions.append(printer)
     return actions</code></pre>
-<p>s’attend probablement à générer une liste de 3 actions qui afficheront respectivement 0, 1 et 2 lorsqu’elles seront appelées. Mais comme le <code>i</code> utilisé par la fonction <code>printer</code> est capturé par référence, sa valeur effective est déterminée uniquement au moment de l’appel <code>print(i)</code>. Hors à ce moment-là, la boucle <code>for</code> a déjà été exécutée, donc <code>i</code> vaut <code>2</code>. Par conséquent, on obtient en fait :</p>
+<p>s’attend probablement à générer une liste de 3 actions qui
+afficheront respectivement 0, 1 et 2 lorsqu’elles seront appelées. Mais
+comme le <code>i</code> utilisé par la fonction <code>printer</code> est
+capturé par référence, sa valeur effective est déterminée uniquement au
+moment de l’appel <code>print(i)</code>. Hors à ce moment-là, la boucle
+<code>for</code> a déjà été exécutée, donc <code>i</code> vaut
+<code>2</code>. Par conséquent, on obtient en fait :</p>
 <pre class="python"><code>&gt;&gt;&gt; for action in make_actions():
 ...     action()
 ...
 2
 2
 2</code></pre>
-<p>Le “hack” classique pour résoudre ce problème consiste à utiliser le fait que les arguments par défaut d’une fonction sont évalués lors de sa définition. Par conséquent, si l’on définit :</p>
+<p>Le “hack” classique pour résoudre ce problème consiste à utiliser le
+fait que les arguments par défaut d’une fonction sont évalués lors de sa
+définition. Par conséquent, si l’on définit :</p>
 <pre class="python"><code>def make_actions():
     actions = []
     for i in range(3):
@@ -666,51 +840,75 @@ root.mainloop()</code></pre>
 1
 2</code></pre>
 <h3 id="décorateurs">Décorateurs</h3>
-<p>Les <strong>décorateurs</strong> sont un “sucre syntaxique” utilisant le symbole <code>@</code> et facilitant la mise en d’oeuvre d’un schéma assez courant que nous allons illustrer sur un exemple.</p>
-<p>Imaginons que nous ayons développé une fonction <code>plus_one</code></p>
+<p>Les <strong>décorateurs</strong> sont un “sucre syntaxique” utilisant
+le symbole <code>@</code> et facilitant la mise en d’oeuvre d’un schéma
+assez courant que nous allons illustrer sur un exemple.</p>
+<p>Imaginons que nous ayons développé une fonction
+<code>plus_one</code></p>
 <pre class="python"><code>def plus_one(x):
     return x + 1</code></pre>
-<p>mais qu’en la testant dans un programme, nous trouvons son comportement mystérieux. Pour comprendre ce qui se passe, nous modifions sa définition pour afficher ses arguments et les valeurs qu’elle renvoie à chaque fois qu’elle est appelée.</p>
+<p>mais qu’en la testant dans un programme, nous trouvons son
+comportement mystérieux. Pour comprendre ce qui se passe, nous modifions
+sa définition pour afficher ses arguments et les valeurs qu’elle renvoie
+à chaque fois qu’elle est appelée.</p>
 <pre class="python"><code>def plus_one(x):
-    print(&quot;input:&quot;, x)
+    print("input:", x)
     y = x + 1
-    print(&quot;output:&quot;, y)
+    print("output:", y)
     return y</code></pre>
-<p>avec la ferme intention de retirer ce code supplémentaire une fois le mystère éclairci.</p>
-<p>Ce procédé n’est toutefois pas très satisfaisant. Plutôt que de modifier le code de <code>plus_one</code>, nous pouvons développer une fonction <code>debug</code> qui prendra la fonction <code>plus_one</code> comme argument et renverra une nouvelle fonction qui fonctionne comme <code>plus_one</code> à ceci près qu’elle affiche les arguments et la valeur de sortie :</p>
+<p>avec la ferme intention de retirer ce code supplémentaire une fois le
+mystère éclairci.</p>
+<p>Ce procédé n’est toutefois pas très satisfaisant. Plutôt que de
+modifier le code de <code>plus_one</code>, nous pouvons développer une
+fonction <code>debug</code> qui prendra la fonction
+<code>plus_one</code> comme argument et renverra une nouvelle fonction
+qui fonctionne comme <code>plus_one</code> à ceci près qu’elle affiche
+les arguments et la valeur de sortie :</p>
 <pre class="python"><code>def debug(f):
     def f_debug(x):
-        print(&quot;input:&quot;, x)
+        print("input:", x)
         y = f(x)
-        print(&quot;output:&quot;, y)
+        print("output:", y)
         return y
     return f_debug</code></pre>
-<p>Pour tester le code en situation réelle, il nous suffit alors de remplacer la fonction <code>plus_one</code> classique par cette nouvelle fonction</p>
+<p>Pour tester le code en situation réelle, il nous suffit alors de
+remplacer la fonction <code>plus_one</code> classique par cette nouvelle
+fonction</p>
 <pre class="python"><code>plus_one = debug(plus_one)</code></pre>
-<p>puis d’effacer uniquement cette ligne supplémentaire une fois le mystère éclairci.</p>
+<p>puis d’effacer uniquement cette ligne supplémentaire une fois le
+mystère éclairci.</p>
 <p>Il s’avère que le code</p>
 <pre class="python"><code>def plus_one(x):
     return x + 1
 
 plus_one = debug(plus_one)</code></pre>
-<p>est équivalent à la construction suivante utilisant le décorateur <code>@debug</code> :</p>
+<p>est équivalent à la construction suivante utilisant le décorateur
+<code>@debug</code> :</p>
 <pre class="python"><code>@debug
 def plus_one(x):
     return x + 1</code></pre>
-<p>On pourra trouver cette seconde notation plus agréable et lisible !</p>
+<p>On pourra trouver cette seconde notation plus agréable et lisible
+!</p>
 <h4 id="exemple">Exemple</h4>
-<p>La fonction d’ordre supérieur <code>count</code> ci-dessous peut être utilisée sous forme de décorateur pour enregistrer le nombre de fois où une fonction a été invoquée (le nombre d’appels de la fonction est stocké dans l’attribut <code>count</code> de la fonction) :</p>
+<p>La fonction d’ordre supérieur <code>count</code> ci-dessous peut être
+utilisée sous forme de décorateur pour enregistrer le nombre de fois où
+une fonction a été invoquée (le nombre d’appels de la fonction est
+stocké dans l’attribut <code>count</code> de la fonction) :</p>
 <pre class="python"><code>def count(f):
     def counted_f(x):
         counted_f.count += 1
         return f(x)
     counted_f.count = 0
     return counted_f</code></pre>
-<p>Par exemple, si l’on recherche à localiser la racine positive de la fonction <span class="math inline">\(x \mapsto x^2 - 2\)</span>, qui est <span class="math inline">\(\sqrt{2}\)</span>, on peut la définir en la décorant avec <code>@count</code> :</p>
+<p>Par exemple, si l’on recherche à localiser la racine positive de la
+fonction <span class="math inline">\(x \mapsto x^2 - 2\)</span>, qui est
+<span class="math inline">\(\sqrt{2}\)</span>, on peut la définir en la
+décorant avec <code>@count</code> :</p>
 <pre class="python"><code>@count
 def f(x):
     return x*x - 2</code></pre>
-<p>Puis procéder par itérations successives pour produire une estimation de <span class="math inline">\(\sqrt{2}\)</span> :</p>
+<p>Puis procéder par itérations successives pour produire une estimation
+de <span class="math inline">\(\sqrt{2}\)</span> :</p>
 <pre class="python"><code>&gt;&gt;&gt; f(0)
 -2
 &gt;&gt;&gt; f(1)
@@ -729,13 +927,15 @@ def f(x):
 0.01639999999999997
 &gt;&gt;&gt; f(1.41)
 -0.011900000000000244</code></pre>
-<p>Et constater à posteriori combien d’appels de la fonction <code>f</code> ont été nécessaires :</p>
+<p>Et constater à posteriori combien d’appels de la fonction
+<code>f</code> ont été nécessaires :</p>
 <pre class="python"><code>&gt;&gt;&gt; f.count
 9</code></pre>
-<section class="footnotes">
-<hr />
+<section class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr/>
 <ol>
-<li id="fn1"><p>ou plus généralement un objet itérable.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p>ou plus généralement un objet
+itérable.<a class="footnote-back" href="#fnref1" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </body>
