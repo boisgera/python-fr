@@ -11,7 +11,7 @@ Python 🇫🇷
   - 📖 Le retour du retour du serpent *(à paraître)*
 
 
-📉 Modèles épidémologiques
+🦠 Modèles épidémologiques
 --------------------------------------------------------------------------------
 
   - 📖 Le modèle SIR *(à paraître)*
