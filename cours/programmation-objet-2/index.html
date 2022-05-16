@@ -106,7 +106,7 @@
 <h1 class="title">Programmation Orientée Objet 2</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
 Boisgérault</a>, MINES Paris, Université PSL</p>
-<p class="date">Dimanche 15 mai 2022</p>
+<p class="date">Lundi 16 mai 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -121,8 +121,8 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/7511fba">
-          #7511fba
+<a href="https://github.com/boisgera/python-fr/commit/a35291c">
+          #a35291c
         </a>
 </p>
 
@@ -142,7 +142,14 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#todo" id="toc-todo">TODO</a></li>
-<li><a href="#intro" id="toc-intro">Intro</a></li>
+<li><a href="#introduction-todo" id="toc-introduction-todo">Introduction
+🚧 TODO 🚧</a></li>
+<li><a href="#typage-implicite" id="toc-typage-implicite">Typage
+implicite</a>
+<ul>
+<li><a href="#exemple" id="toc-exemple">Exemple</a></li>
+<li><a href="#analyse" id="toc-analyse">Analyse</a></li>
+</ul></li>
 </ul>
 </nav></details>
 
@@ -166,6 +173,75 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 <li><p>doctest</p></li>
 </ul></li>
 </ul>
-<h1 id="intro">Intro</h1>
+<h1 id="introduction-todo">Introduction 🚧 TODO 🚧</h1>
+<h1 id="typage-implicite">Typage implicite</h1>
+<h2 id="exemple">Exemple</h2>
+<p>La fonction <code>copy_file</code> lit le contenu d’un objet fichier
+et l’écrit dans un autre.</p>
+<pre class="python"><code>def copy_file(input, output):
+    data = input.read()
+    output.write(data)</code></pre>
+<p>Créons un (tout petit) fichier binaire <code>image.png</code> sur
+notre disque dur</p>
+<pre class="python"><code>&gt;&gt;&gt; with open("image.png", mode="bw") as image_file:
+...     image_file.write(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x01\x00\x00\x00\x01\x00\x01\x03\x00\x00\x00f\xbc:%\x00\x00\x00\x03PLTE\xb5\xd0\xd0c\x04\x16\xea\x00\x00\x00\x1fIDATh\x81\xed\xc1\x01\r\x00\x00\x00\xc2\xa0\xf7Om\x0e7\xa0\x00\x00\x00\x00\x00\x00\x00\x00\xbe\r!\x00\x00\x01\x9a`\xe1\xd5\x00\x00\x00\x00IEND\xaeB`\x82')
+...</code></pre>
+<p>puis exploitons <code>copy_file</code> pour en créer un copie nommée
+<code>image-copy.png</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; input = open("image.png", mode="br")
+&gt;&gt;&gt; output = open("image-copy.png", mode="bw")
+&gt;&gt;&gt; copy_file(input, output)</code></pre>
+<p>Tout se passe comme prévu ! Néanmoins, on aurait pu faire l’économie
+de la création du fichier initial et créer un objet similaire à un
+fichier, mais qui stocke son contenu en mémoire plutôt que sur notre
+disque dur.</p>
+<pre class="python"><code>&gt;&gt;&gt; import io
+&gt;&gt;&gt; buffer = io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x01\x00\x00\x00\x01\x00\x01\x03\x00\x00\x00f\xbc:%\x00\x00\x00\x03PLTE\xb5\xd0\xd0c\x04\x16\xea\x00\x00\x00\x1fIDATh\x81\xed\xc1\x01\r\x00\x00\x00\xc2\xa0\xf7Om\x0e7\xa0\x00\x00\x00\x00\x00\x00\x00\x00\xbe\r!\x00\x00\x01\x9a`\xe1\xd5\x00\x00\x00\x00IEND\xaeB`\x82')
+&gt;&gt;&gt; buffer.seek(0)</code></pre>
+<p>(L’appel <code>buffer.seek(0)</code> repositionne le curseur de
+lecture/écriture au début du fichier.)</p>
+<p>On peut alors copier son contenu de la même façon que
+précédemment</p>
+<pre class="python"><code>&gt;&gt;&gt; input = buffer
+&gt;&gt;&gt; output = open("image-copy.png", mode="bw")
+&gt;&gt;&gt; copy_file(input, output)</code></pre>
+<p>En fait l’image originale est une tuile bleue-gris utilisée par le
+projet de cartographie OpenStreetMap (cf. <a href="https://www.mjt.me.uk/posts/smallest-png/">“The smallest 256x256
+single-color PNG file, and where you’ve seen it”</a>).</p>
+<p>Elle est disponible en ligne à l’adresse <a class="uri" href="https://www.mjt.me.uk/assets/images/smallest-png/openstreetmap.png">https://www.mjt.me.uk/assets/images/smallest-png/openstreetmap.png</a>.
+On aurait donc pu créer un objet similaire à un fichier mais qui sait
+ouvrir des ressources Web plutôt que de recopier à la main son
+contenu.</p>
+<pre class="python"><code>&gt;&gt;&gt; from urllib.requests import urlopen
+&gt;&gt;&gt; url = "https://www.mjt.me.uk/assets/images/smallest-png/openstreetmap.png"
+&gt;&gt;&gt; input = urlopen(url)</code></pre>
+<p>A nouveau, la copie entre ce fichier distant et sa copie locale
+s’effectue comme précédemment.</p>
+<pre class="python"><code>&gt;&gt;&gt; output = open("image-copy.png", mode="bw")
+&gt;&gt;&gt; copy_file(input, output)</code></pre>
+<h2 id="analyse">Analyse</h2>
+<p>Ce qui compte dans les trois cas d’usage précédents, ça n’est pas que
+l’objet <code>input</code> soit un vrai fichier, mais qu’il se comporte
+comme tel. Ici, très précisément la fonction <code>copy_file</code> a
+besoin d’un objet <code>input</code> qui :</p>
+<ul>
+<li><p>à une méthode <code>read</code>,</p></li>
+<li><p>qui s’invoque sans argument,</p></li>
+<li><p>et renvoie un objet de type <code>bytes</code>.</p></li>
+</ul>
+<p>C’est tout ce que la fonction <code>copy_file</code> exige de son
+argument <code>input</code> pour que ça marche : qu’il soit suffisamment
+similaire à un “vrai” fichier. On ne demande pas à ce qu’il soit d’un
+type particulier, par exemple qu’il valide un test du type
+<code>isinstance(input, File)</code>.</p>
+<p>Ce concept moins exigeant de typage, c’est ce qu’en Python on appelle
+le <strong>typage canard</strong> (🇺🇸 <strong>duck typing</strong>)
+d’après la citation attribuée à James Whitcomb Riley</p>
+<blockquote>
+<p>When I see a bird that walks like a duck and swims like a duck and
+quacks like a duck, I call that bird a duck. 🦆</p>
+</blockquote>
+<p>(Si je vois un oiseau qui vole comme un canard, nage comme un canard
+et cancane comme un canard, alors j’appelle cet oiseau un canard.)</p>
 </body>
 </html>
