@@ -636,7 +636,7 @@ L'usage est immédiat
 
 
 Les valeurs produites par la méthode `random` ne sont plus nécessairement
-des multiples de $2^{-53}$ (il y a néanmoins un peu plus d'une chance sur
+des multiples de $2^{-53}$ (il y a néanmoins plus d'une chance sur
 deux que cela soit le cas).
 ```python
 >>> r.random() * 2**53
