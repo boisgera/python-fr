@@ -40,7 +40,7 @@ Python 🇫🇷
 
   - 📖 [Programmation objet 1](https://boisgera.github.io/python-fr/cours/programmation-objet/index.html)
 
-  - 📖 Programmation objet 2 *(à paraître)*
+  - 📖 [Programmation objet 2 (🚧 en construction 🚧)](https://boisgera.github.io/python-fr/cours/programmation-objet-2/index.html)
 
 
 --------------------------------------------------------------------------------

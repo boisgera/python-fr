@@ -6,39 +6,20 @@ license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 date: auto
 ---
 
-# TODO
+# 🚧 TODO 🚧
 
   - Polymorphism
 
-  - Latent ("duck") typing
+  - ~~Latent/structural ("duck") typing~~
 
-  - Subtyping, inheritance
+  - ~~Subtyping, inheritance~~ `issubclass`
 
-  - Inheritance / composition / delegation
-
-  - Examples in stdlib (duck typing, hierarchy, subtyping, etc.) :
-
-    - file-like (filesystem, url, string buffer)
-
-    - iterable
-
-    - readline (?)
-
-    - codecs (?)
-
-    - datetime, zoneinfo
-
-    - pickle/copy
-
-    - random
-
-    - tk
-
-    - doctest
+  - Inheritance vs composition vs delegation
 
 
+# Introduction 
 
-# Introduction 🚧 TODO 🚧
+🚧 TODO 🚧
 
 # Typage implicite
 
@@ -153,6 +134,8 @@ ce protocole et à son utilisateur de lire et de le respecter.
 
 ## Protocoles standards
 
+🚧 TODO 🚧
+
 ## Vérification statique
 
 Il existe des outils qui permettent de formaliser (partiellement) 
@@ -226,114 +209,463 @@ Found 1 error in 1 file (checked 1 source file)
 
 # Héritage
 
-What example / base ? Abstract ? Point2D/Point3D? LocalFile/URLFile/InMemoryFile?
-(issue with read / write? Do read only?)
+Considérons à nouveau notre classe de nombres complexes "maison".
 
-TODO:
+```python
+class Complex:
+    def __init__(self, real, imag):
+        self.set_real(real)
+        self.set_imag(imag)
+    def get_real(self):
+        return self._real
+    def set_real(self, real):
+        if isinstance(real, float):
+            self._real = real
+        else:
+            raise TypeError(f"{real!r} is not a float")
+    real = property(get_real, set_real)
+    def get_imag(self):
+        return self._imag
+    def set_imag(self, imag):
+        if isinstance(imag, float):
+            self._imag = imag
+        else:
+            raise TypeError(f"{imag!r} is not a float")
+    imag = property(get_imag, set_imag)
+    def conjugate(self):
+        return Complex(self._real, -self._imag)
+    def __repr__(self):
+        # ⚠️ weird output when self.imag < 0
+        return f"({self._real}+{self._imag}j)"
+    def __add__(self, other):
+        return Complex(
+            self._real + other._real, 
+            self._imag + other._imag
+        )
+```
 
-  - extend: add attributes, methods, special methods
+Nous allons essayer de nous doter d'une nouvelle classe de nombres complexes,
+`Complex2` dont les instances auront un comportement qui nous convient mieux, 
+sans modifier le code source de `Complex`, mais en exploitant ses fonctionnalités
+au maximum.
 
-  - replace : override attributes, method
+Pour cela, nous allons dériver la class `Complex2` de la classe `Complex`.
+Au minimum, cela signifie une déclaration de la forme
 
-  - blend: call / use parent methods
+```python
+class Complex2(Complex):
+    pass
+```
 
-(explain late dispatch)
+A ce stade, pour l'essentiel, pas de changement dans le comportement des
+nombres complexes qui en sont les instances, car toutes les méthodes
+de `Complex2` sont héritées de celles de `Complex` :
+
+```python
+>>> z = Complex2(0.5, 1.5)
+>>> z
+(0.5+1.5j)
+>>> z.real
+0.5
+>>> z.real = -0.5
+>>> z
+(-0.5+1.5j)
+>>> z.real = "Hello"
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 11, in set_real
+TypeError: 'Hello' is not a float
+>>> w = Complex2.conjugate(z)
+>>> w.real
+0.5
+>>> w.imag
+-1.5
+>>> z + z.conjugate()
+(1+0j)
+```
+
+On a même
+
+```python
+>>> isinstance(z, Complex)
+True
+```
+
+Seuls changements visibles, on a désormais
+
+```python
+>>> type(z) is Complex
+False
+>>> type(z) is Complex2
+True
+>>> isinstance(z, Complex2)
+```
+
+Ce qui motive au départ l'introduction d'une nouvelle classe de nombres
+complexes, c'est que l'on a oublié d'implémenter la multiplication :
+
+```python
+>>> Complex(1.0, 0.0) * Complex(0.0, 1.0)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: unsupported operand type(s) for *: 'Complex' and 'Complex'
+```
+
+Réparons cet oubli en ajoutant une méthode `__mul__` à la classe `Complex2`
+
+```python
+class Complex2(Complex):
+    def __mul__(self, other):
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return Complex2(real, imag)
+```
+
+```python
+>>> Complex2(1.0, 0.0) * Complex2(0.0, 1.0)
+(0.0+1.0j)
+```
+
+C'est mieux ! Il y a en fait un subtil bug (voyez-vous lequel ?) mais nous
+allons attendre un peu pour le corriger, nous serons bientôt mieux placés
+pour corriger le problème.
+
+En attendant, nous allons faire en sorte que notre constructeur soit un peu
+plus polyvalent ; nous aimerions bien pouvoir construire un nouvel objet
+complex à partir de tout objet qui possède des attributs numériques
+`real` et `imag`, par exemple, un nombre complexe intégré, instance de
+la class `complex`. Avec la classe `Complex`, cela ne marche pas :
+
+```python
+>>> Complex(0.5+1.5j)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: __init__() missing 1 required positional argument: 'imag'
+```
+
+et pas plus avec la classe `Complex2` :
+
+```python
+>>> Complex2(0.5+1.5j)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: __init__() missing 1 required positional argument: 'imag'
+```
+
+En effet, en l'absence de constructeur `__init__` qui lui soit propres,
+les nouveaux complexes sont instanciées au moyen de la méthode `__init__`
+héritée.
+
+Mais on peut définir un nouveau constructeur `__init__` qui aura la 
+priorité. Pour ce faire, on teste si le premier argument nommé
+`real_or_complex` à des champs `real` et `imag`. Sinon c'est le
+cas on l'interprête comme un nombre complexe ; dans le cas contraire un
+utilise cet argument comme partie réelle et le second comme partie imaginaire.
+
+```python
+class Complex2(Complex):
+    def __init__(self, real_or_complex, imag=None):
+        try:
+            real = real_or_complex.real
+            imag = real_or_complex.imag
+        except AttributeError:
+            real = real_or_complex
+            imag = imag
+        self.real = real
+        self.imag = imag
+    def __mul__(self, other):
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return Complex2(real, imag)
+```
+
+On notera que les deux dernières lignes du constructeurs sont un copié-collé
+du code du constructeur parent. Autant faire appel directement à celui-ci !
+On pourra au choix utiliser la syntaxe explicite 
+`Complex.__init__(self, real, imag)` ou la construction `super()`
+comme ci-dessous :
 
 
-# Use case
+```python
+class Complex2(Complex):
+    def __init__(self, real_or_complex, imag=None):
+        try:
+            real = real_or_complex.real
+            imag = real_or_complex.imag
+        except AttributeError:
+            real = real_or_complex
+            imag = imag
+        super().__init__(real, imag)
+    def __mul__(self, other):
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return Complex2(real, imag)
+```
+
+Désormais, le constructeur de `Complex2` accepte les arguments complexes :
+
+```python
+>>> Complex2(0.5+1.5j)
+(0.5+1.5j)
+>>> Complex2(Complex(0.5, 1.5))
+(0.5+1.5j)
+```
+
+Il est temps de revenir à notre subtil bug. En héritant la méthode `__add__`
+de la classe parent `Complex`, on va malheureusement toujours obtenir une
+instance de `Complex` quand on additionne des instances de `Complex2`.
+
+```python
+>>> z = Complex2(0.5, 1.5)
+>>> w = z + z
+>>> type(w)
+<class '__main__.Complex'>
+```
+
+Il est possible de corriger cela directement en réimplémentant `__add__`
+dans la class dérivée
+
+```python
+class Complex2(Complex):
+    def __init__(self, real_or_complex, imag=None):
+        try:
+            real = real_or_complex.real
+            imag = real_or_complex.imag
+        except AttributeError:
+            real = real_or_complex
+            imag = imag
+        super().__init__(real, imag)
+    def __add__(self, other):
+        return Complex2(
+            self.real + other.real, 
+            self.imag + other.imag
+        )
+    def __mul__(self, other):
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return Complex2(real, imag)
+```
+
+Ca marche, mais cela revient à perdre le bénéfice de ce qui a déjà été implémenté. 
+On peut être plus subtil, appeler la méthode de la classe parente pour 
+l'addition et corriger à posteriori le type du résultat, avec notre
+constructeur flambant neuf :
+
+```python
+class Complex2(Complex):
+    def __init__(self, real_or_complex, imag=None):
+        try:
+            real = real_or_complex.real
+            imag = real_or_complex.imag
+        except AttributeError:
+            real = real_or_complex
+            imag = imag
+        super().__init__(real, imag)
+    def __add__(self, other):
+        # ℹ️ sum = Complex.__add__(self, other) would also work.
+        sum = super().__add__(other) 
+        return Complex2(sum)
+    def __mul__(self, other):
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return Complex2(real, imag)
+```
+
+Et désormais la somme se comporte comme prévu
+
+```python
+>>> z = Complex2(0.5, 1.5)
+>>> w = z + z
+>>> type(w)
+<class '__main__.Complex2'>
+```
+
+Au passage, remarquons que si une génération future de développeur doit 
+reprendre notre travail et introduire une classe `Complex3` qui dérivera
+de `Complex2`, ils vont être confrontés au même problème. Pour leur
+faciliter la vie, on peut utiliser un code qui va adapter le type
+de la valeur renvoyée au type de `self` et qui pourra donc être
+héritée telle quelle dans `Complex3`.
+
+```python
+class Complex2(Complex):
+    def __init__(self, real_or_complex, imag=None):
+        try:
+            real = real_or_complex.real
+            imag = real_or_complex.imag
+        except AttributeError:
+            real = real_or_complex
+            imag = imag
+        super().__init__(real, imag)
+    def __add__(self, other):
+        ComplexType = type(self)
+        sum = super().__add__(other)
+        return ComplexType(sum)
+    def __mul__(self, other):
+        ComplexType = type(self)
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return ComplexType(real, imag)
+```
+
+
+
+# La bibliothèque standard
+
+## `pathlib`
+
+🚧 TODO 🚧
+
+## `random`
+
+### Introduction
+
+Le module de la bibliothèque Python standard `random` permet de générer des 
+nombres pseudo-aléatoires.
+
+```python
+>>> import random
+```
+
+La fonction `random` du module va générer des nombres à virgule flottante 
+uniformément distribués entre 0 et 1.
+
+```python
+>>> random.random()
+0.17288416418484898
+>>> random.random()
+0.7270494197615684
+>>> random.random()
+0.22967289202282093
+```
+
+De multiples fonctions sont fournies pour générer des nombres pseudo-aléatoires
+suivant des distributions de probabilité diverses. Par exemple, pour générer
+des nombres distribués selon la gaussienne d'espérance $\mu = 0.0$ et 
+d'écart-type $\sigma = 1.0$, on peut invoquer
+
+```python
+>>> random.gauss(mu=0.0, sigma=1.0)
+0.7010040262172509
+>>> random.gauss(mu=0.0, sigma=1.0)
+0.11430668630347102
+>>> random.gauss(mu=0.0, sigma=1.0)
+-0.49389733826503307
+```
+
+
+### Interface orientée objet
+
+L'étude du fichier source [random.py](https://github.com/python/cpython/blob/3.10/Lib/random.py)
+nous informe que l'interface classique du module n'est qu'un fin vernis au-dessus
+d'une architecture objet. Le module définit une classe `Random`, puis crée une
+instance privé `_inst` dans ce module. Les "fonctions" du module `random`
+comme `gauss` sont simplement des raccourcis vers les méthodes de cette instance
+
+```python
+>>> random.random
+<built-in method random of Random object at 0x55a5a09ad260>
+>>> random.gauss
+<bound method Random.gauss of <random.Random object at 0x55a5a09ad260>>
+>>> r = random._inst
+>>> type(r)
+<class 'random.Random'>
+>>> r.random
+<built-in method random of Random object at 0x55a5a09ad260>
+>>> r.gauss
+<bound method Random.gauss of <random.Random object at 0x55a5a09ad260>>
+```
+
+La méthode `random` utilisée par défaut génère des nombres entiers aléatoires 
+compris entre $0$ et $2^{53} - 1$ (la probabilité de chaque entier étant
+identique), puis divise le résultat par $2^{53}$. Inconvénient de cette
+approche : `random()` renvoie une grandeur qui est toujours un multiple
+de $2^{-53}$. Le nombre flottant $2^{-1074}$ par exemple, qui est le plus
+petit nombre flottant strictement positif n'a aucune chance d'être produit.
+
+```python
+>>> r.random() * 2**53
+4346481833061509.0
+>>> r.random() * 2**53
+6826402970501312.0
+>>> r.random() * 2**53
+5570978756682725.0
+```
+
+Si c'est un problème pour vous, il est possible de corriger ce comportement
+comme le suggère la [documentation du module `random`](https://docs.python.org/fr/3/library/random.html#recipes) en définissant une classe dérivée de `Random` qui
+surcharge la méthode `random`
+
+```python
+from math import ldexp
+
+class AltRandom(random.Random):
+    def random(self):
+        mantissa = 0x10_0000_0000_0000 | self.getrandbits(52)
+        exponent = -53
+        x = 0
+        while not x:
+            x = self.getrandbits(32)
+            exponent += x.bit_length() - 32
+        return ldexp(mantissa, exponent)
+```
+
+L'usage est immédiat
+
+```python
+>>> r = AltRandom()
+>>> r.random()
+0.2768487552410033
+>>> r.random()
+0.08881389087065399
+>>> r.random()
+0.28173863914986846
+```
+
+
+Les valeurs produites par la méthode `random` ne sont plus nécessairement
+des multiples de $2^{-53}$ (il y a néanmoins un peu plus d'une chance sur
+deux que cela soit le cas).
+```python
+>>> r.random() * 2**53
+6118147054761291.0
+>>> r.random() * 2**53
+1809975186779188.8
+>>> r.random() * 2**53
+6828617072759119.0
+```
+
+Les autres distributions de probabilités exploitant la méthode `random`
+comme source de valeurs aléatoires, nous n'avons pas besoin de réimplémenter
+quoi que ce soit d'autre pour bénéficier très largement de cette source
+aléatoire améliorée.
+
+```python
+>>> r.gauss(mu=0.0, sigma=1.0)
+-0.28865100238160024
+>>> r.gauss(mu=0.0, sigma=1.0)
+-0.5190938357947126
+>>> r.gauss(mu=0.0, sigma=1.0)
+1.0356452612439027
+
+```
+
+## `doctest`
+
+🚧 TODO 🚧
 
 doctest? With pass for thumbs up in return : pass on thumbs up directive.
 
 
-<!--
-```python
->>> import random
->>> random.seed(0)
->>> random.random()
-0.8444218515250481
->>> random.random()
-0.7579544029403025
->>> random.gauss(mu=0.0, sigma=1.0)
--0.6797144480784211
->>> random.gauss(mu=0.0, sigma=1.0)
-0.3705035674606598
-```
-
-```python
->>> random.seed(0)
->>> random.random()
-0.8444218515250481
->>> random.random()
-0.7579544029403025
->>> random.gauss(mu=0.0, sigma=1.0)
--0.6797144480784211
->>> random.gauss(mu=0.0, sigma=1.0)
-0.3705035674606598
-```
-
-```python
->>> random.getstate()
-(3, (1372342863, 3221959423, 4180954279, 3990540705, 1021773023, 2223090966, 3843864895, 597749037, 4038628808, 2184695301, 2599863370, 1285463076, 3619013288, 3445797418, 662770754, 586125062, 1346770502, 3658746180, 3438111236, 309182431, 3796115977, 3396521978, 406330169, 2387780391, 2469455462, 2266287431, 1699932795, 4049251296, 2880579946, 2212080061, 3732465507, 2085677040, 3780473213, 2666506866, 2546029306, 3062944794, 3831291871, 2699197260, 1538606110, 2628704661, 2899336459, 3451611859, 99931860, 1959678400, 1104806618, 222110430, 2129932650, 956476906, 1123944865, 4148113835, 3692694084, 1144181241, 329767184, 3790223790, 2243139411, 3664375038, 1649616822, 2085955322, 878670707, 427637247, 1097949229, 3413060003, 2868874638, 714350532, 2486509003, 3288554389, 1763249054, 3065280929, 3617934738, 630740700, 76720155, 3508325981, 3932676767, 1329309665, 1100166609, 3150737391, 3713849116, 1027154122, 621059281, 2649419324, 1724153688, 787407208, 2006574677, 2947315466, 1182636319, 3824689780, 1212132099, 4044342334, 315023297, 3553864982, 1157225958, 1432164329, 1160723985, 371272026, 927525248, 1908778666, 1373080387, 1470677278, 801074131, 3914200339, 3381407135, 2878632719, 3924891213, 4265632409, 2538399467, 2281243182, 3528786809, 875255179, 900526794, 3848503840, 1800107094, 99435770, 2252333719, 459600575, 3980788272, 642015534, 3185107417, 3358361764, 109426005, 1526990449, 2897953574, 735827974, 292571356, 656909865, 1811241718, 3852326868, 935626136, 576421325, 428560518, 2760997449, 2373789786, 2483545676, 990053668, 4260816364, 2400672108, 931204375, 1656208850, 1752543171, 3393345042, 2975883932, 3535909646, 441369518, 1875275912, 3788298971, 1604151293, 3265285628, 3389517324, 1129673657, 158637840, 3401368526, 3511603269, 1365694929, 2076135726, 144518747, 1738447909, 3315335210, 696514991, 2903756646, 1692635312, 2492835022, 793066282, 3701291598, 1682146840, 2833764772, 1874922241, 1109375682, 2157966518, 2136578897, 2614256798, 2861779371, 2698885417, 160504417, 554219202, 1430333145, 716754647, 529846619, 3482487583, 829954169, 2479439816, 1934256524, 140815401, 1125214395, 1642506558, 1276896160, 3983009834, 1007760484, 3281113000, 139221400, 361504304, 3713284634, 2928612637, 935745191, 4151018351, 3848439956, 3104510935, 615014456, 2939062496, 1306813042, 2930774231, 1126465550, 39679357, 4157006879, 3487860998, 4211840723, 4199318320, 3081958281, 1231549084, 114041891, 1456998828, 4027354301, 779738931, 2010884098, 3007041435, 1711812332, 1173077090, 2341061349, 2446045442, 3860139934, 3135005041, 1937407922, 4130038091, 4004503321, 3899652703, 1806610961, 3173634158, 3201508203, 1971746461, 2278546448, 2657844960, 2678611962, 2241832425, 1883633391, 3181942897, 2792225916, 1475682425, 1169520747, 176579167, 3554068333, 4262273005, 2352440083, 1253626969, 572672438, 1524846517, 1147813165, 3942527944, 3167059431, 1688983706, 463078297, 3955475903, 894345047, 3894065346, 1892851780, 1869067318, 3416414633, 2408185539, 2584178019, 1536598083, 1738798172, 212705107, 3295820959, 2164521947, 1063447507, 4125226161, 1611652661, 2186239661, 43480999, 3233893377, 1157189060, 3865800845, 2580347146, 3522458126, 3833272017, 2577087932, 3480966526, 3731431004, 1721158498, 1011307417, 3952810466, 2262537757, 642429441, 971181236, 362223105, 1255663603, 146673027, 2069157663, 1273202481, 120747504, 3207942888, 3721730895, 3643503245, 3816306763, 3137048487, 2860458877, 1819115946, 230113293, 3614309992, 916806549, 923982787, 2460427649, 467621168, 934475584, 1085334794, 3075553476, 2827600963, 614120395, 763452512, 3876411276, 42356791, 149721240, 3427418988, 3168682449, 3386540377, 3369227246, 3430314618, 585185811, 3994790629, 1295417371, 3112055284, 3311144040, 1059910922, 3540388763, 455829500, 3061532685, 2182265378, 607235460, 3248562707, 3580560719, 3868768753, 740125315, 4068402071, 4048707696, 3779755980, 2863645708, 3854638905, 3401978190, 2702849333, 2769927328, 1519450755, 84928381, 1224162609, 1520368433, 480115764, 37675693, 657908362, 3808994824, 1171659743, 2699029399, 2015754554, 2753802761, 2050370709, 1273170742, 2140991184, 4266961092, 1786701666, 3880429141, 759425704, 45926880, 836647469, 1573125967, 1163571132, 203220878, 861333837, 4060383179, 2628819199, 3536629941, 2457334432, 1867577917, 3536511998, 3697335810, 3133380389, 1404482804, 881246958, 4135024728, 534752881, 595543441, 33441746, 4269857928, 1314335199, 2505095316, 1578860014, 1875057095, 509159986, 1944155236, 70374715, 2945217752, 4041521547, 2966052890, 145655727, 714593746, 1002319513, 519269594, 2926922359, 944143625, 3916879502, 2378371484, 912744193, 3910705684, 2276700770, 4142358138, 3964824208, 2780717615, 4081508385, 236938235, 3840831868, 647425534, 2210040950, 2279462069, 168097603, 1461160443, 1580267216, 2324105764, 2690677560, 1690421599, 3577506112, 738462960, 2274273062, 2504137643, 3265350434, 1366106822, 2974016022, 1988817242, 797755685, 2403760280, 641540828, 3788701957, 2779856144, 2104598935, 3745352634, 1577129078, 1373804927, 3903547821, 2872229328, 3056383831, 3072291562, 2275982065, 1522674624, 3582423212, 3669935104, 3633938225, 629521463, 1238893987, 3075431842, 813637316, 3510510638, 2917340917, 2768681237, 1942077161, 3758057471, 1933876081, 2244433730, 1480577031, 1351970442, 396252158, 4175666695, 1357894203, 234330270, 3181220453, 1331961817, 784329267, 779668731, 2328048439, 1103091157, 3004928118, 1162468270, 3007103493, 2725514842, 274062491, 3149489948, 2987599126, 3292515534, 282168320, 959822509, 2291575880, 3673412248, 162691783, 1230667779, 2485346968, 2008336037, 3320353719, 3822671307, 3089220377, 3503681079, 1302975933, 3327766732, 3674135615, 1073069922, 2772807178, 3196662328, 1713328812, 1475744247, 1685385181, 1643753643, 3794162811, 2190568646, 2689827007, 3126829736, 2761526147, 2511266684, 1782816864, 2926893516, 3512983057, 2661970973, 2689095779, 1199154380, 382426272, 643849114, 807267160, 1518924385, 1695080083, 2934795830, 4181065090, 3342589537, 2406648073, 1186040699, 2721983068, 2970957157, 3556085447, 3070386458, 3046088386, 1804573955, 2003863284, 4166932229, 2182095175, 2134701977, 911628328, 2867572258, 1276531023, 518250163, 2617826095, 21746525, 2080648289, 1970004495, 2621101460, 3726800574, 155341573, 2577500508, 1723761283, 3633471938, 222521000, 2717308343, 4013182446, 2258756213, 771120786, 815922213, 3754576141, 2998487214, 3115409480, 3002705922, 1074978656, 3006531599, 823178279, 416424292, 43442668, 1726938224, 3934805529, 161873912, 2803348707, 1043589181, 102006005, 1730373835, 1210399249, 2434080783, 2191863758, 3057527658, 3614195070, 3229819907, 334710481, 2664502177, 1325604787, 3988671798, 2576445889, 2959706600, 2017397749, 1080624230, 903812120, 1214058725, 1799750730, 3417289034, 807297012, 1437878312, 2645448696, 2089144691, 1348214076, 2839011040, 648098687, 4294223352, 3774352159, 968459174, 396311303, 1631056285, 3504308190, 1279074970, 1878080429, 2991953531, 3355603528, 1614988643, 388314152, 964861631, 3836107078, 126268069, 1350108355, 1730114235, 926577527, 430314525, 756676482, 2364788864, 3573266150, 2877606665, 2554592887, 2297285047, 4155839037, 1342607531, 1587367306, 1366061151, 1625602653, 1519619151, 150082289, 2420444017, 2103580590, 1875045396, 3514756929, 3527524385, 3119378202, 418789356, 8), None)
-```
-
-```python
->>> state = random.getstate()
-```
-
-```python
->>> random.gauss(mu=0.0, sigma=1.0)
--1.016348894188071
->>> random.gauss(mu=0.0, sigma=1.0)
--0.07212002278507135
-```
-
-```python
->>> random.setstate(state)
->>> random.gauss(mu=0.0, sigma=1.0)
--1.016348894188071
->>> random.gauss(mu=0.0, sigma=1.0)
--0.07212002278507135
-```
-
-### Interface orientée objet
-
-```python
->>> import random
->>> r = random._inst
->>> type(r)
-<class 'random.Random'>
->>> r.seed(0)
->>> r.random()
-0.8444218515250481
->>> r.random()
-0.7579544029403025
->>> r.gauss(mu=0.0, sigma=1.0)
--0.6797144480784211
->>> r.gauss(mu=0.0, sigma=1.0)
-0.3705035674606598
-```
-
-> Class Random can also be subclassed if you want to use a different basic generator of your own devising: in that case, override the random(), seed(), getstate(), and setstate() methods.
-
-
-```python
-import math
-
-class IHaveNoIdeaWhatIAmDoingRandom(random.Random):
-    def __init__(self, seed=None):
-        self.seed(seed)
-    def seed(self, number=None):
-        if number is None:
-            number = 0.0
-        state = abs(number) % 1.0
-        self.setstate(state)
-    def getstate(self):
-        return self._state
-    def setstate(self, state):
-        self._state = state
-    def random(self):
-        value = self.getstate()
-        self.setstate((value + math.pi) % 1.0)
-        return value
-```
--->

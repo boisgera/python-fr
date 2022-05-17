@@ -640,6 +640,8 @@ Traceback (most recent call last):
 TypeError: 'Hello' is not a float
 ```
 
+<!--
+
 # Objectification (Examples)
 
 ```
@@ -863,3 +865,4 @@ AttributeError: can't set attribute
 help(copy)
 ```
 
+-->
