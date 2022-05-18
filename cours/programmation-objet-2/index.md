@@ -14,6 +14,8 @@ date: auto
 
   - ~~Subtyping, inheritance~~ `issubclass`
 
+  - (Very) late dispatch
+
   - Inheritance vs composition vs delegation
 
 
@@ -666,6 +668,117 @@ aléatoire améliorée.
 
 🚧 TODO 🚧
 
-doctest? With pass for thumbs up in return : pass on thumbs up directive.
+doctest? With pass for thumbs up in return : pass on thumbs up directive
+(unless an error happens: wrong value ok, but not exception).
+
+```python
+# file: add.py
+
+def add(x, y):
+    """
+    Numerical sum of two objects
+
+    Usage:
+
+    >>> add(1, 1)
+    2
+    >>> add(0.5, 0.25)
+    0.75
+    >>> add([1], [2])
+    [3]
+    """
+    return x+y
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+```
+
+```python
+$ python add.py 
+**********************************************************************
+File "add.py", line 13, in __main__.add
+Failed example:
+    add([1], [2])
+Expected:
+    [3]
+Got:
+    [1, 2]
+**********************************************************************
+1 items had failures:
+   1 of   3 in __main__.add
+***Test Failed*** 1 failures.
+```
 
 
+```python
+# file: doctest_patch.py
+
+import doctest
+_doctest_OutputChecker = doctest.OutputChecker
+
+class OutputChecker(_doctest_OutputChecker):
+    def check_output(self, want, got, optionflags):
+        if "🐛" in got:
+            return True
+        else:
+            return super().check_output(want, got, optionflags)
+
+# 🐒 Monkey-patching
+doctest.OutputChecker = OutputChecker
+```
+
+```python
+# file: add.py
+
+def add(x, y):
+    """
+    Numerical sum of two objects
+
+    Usage:
+
+    >>> add(1, 1)
+    2
+    >>> add(0.5, 0.25)
+    0.75
+    >>> add([1], [2])
+    [3] 🐛
+    """
+    return x+y
+
+if __name__ == "__main__":
+    import doctest_patch
+    import doctest
+    doctest.testmod()
+```
+
+```bash
+$ python add.py
+```
+
+```bash
+$ python add.py -v
+$ python add.py -v
+Trying:
+    add(1, 1)
+Expecting:
+    2
+ok
+Trying:
+    add(0.5, 0.25)
+Expecting:
+    0.75
+ok
+Trying:
+    add([1], [2])
+Expecting:
+    [3] 🐛
+ok
+1 items had no tests:
+    __main__
+1 items passed all tests:
+   3 tests in __main__.add
+3 tests in 2 items.
+3 passed and 0 failed.
+Test passed.
+```
