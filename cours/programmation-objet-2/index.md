@@ -523,19 +523,86 @@ class Complex2(Complex):
 ```
 
 
-
 # La bibliothèque standard
 
 ## `pathlib`
 
-🚧 TODO 🚧
+Le module de la bibliothèque Python standard [`pathlib`] fournit des classes
+de chemins représentant les fichiers et répertoire d'un système de fichiers.
+Plus précisément
+
+[`pathlib`]: https://docs.python.org/fr/3/library/pathlib.html
+
+> Les classes de chemins sont divisées en chemins purs, qui fournissent uniquement des opérations de manipulation sans entrées-sorties, et chemins concrets, 
+qui héritent des chemins purs et fournissent également les opérations d'entrées-sorties.
+
+Autrement dit, les chemins purs -- instances de `PurePath` -- permettent 
+de désigner des fichiers mais sans accéder au système de fichier proprement dit.
+Les instances de `Path` -- qui dérive de `PurePath` -- le permettent.
+
+Les classes de chemin sont de plus distinguées selon que le système de fichier
+soit Windows ou Posix (Linux et MacOS), mais on ne s'en préoccupera pas trop.
+
+Par exemple, sur ma machine (Linux), je peux désigner la racine du système
+de fichier par un chemin pur et l'utiliser pour construire le chemin (pur)
+vers le répertoire racine d'hypothétiques utilisateurs `linus` et `boisgera` :
+
+```python
+>>> ROOT = PurePath("/")
+>>> LINUS_HOMEDIR = ROOT / "home" / "linus"
+>>> BOISGERA_HOMEDIR = ROOT / "home" / "boisgera"
+```
+
+mais je ne peux pas tester si ces répertoires existent bel et bien :
+
+```python
+>>> LINUS_HOMEDIR.exists()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'PurePosixPath' object has no attribute 'exists'
+>>> BOISGERA_HOMEDIR.exists()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'PurePosixPath' object has no attribute 'exists'
+```
+
+Par contre, je peux le faire après avoir converti ces fichiers en instances
+de `Path` :
+
+```python
+>>> LINUS_HOMEDIR = Path(LINUS_HOMEDIR)
+>>> BOISGERA_HOMEDIR = Path(BOISGERA_HOMEDIR)
+>>> LINUS_HOMEDIR.exists()
+False
+>>> BOISGERA_HOMEDIR.exists()
+True
+```
+
+Alternativement, et c'est sans doute le plus simple, on aurait pu partir
+dès le début d'un `Path` pour désigner la racine
+
+```python
+>>> ROOT = Path("/")
+>>> LINUS_HOMEDIR = ROOT / "home" / "linus"
+>>> BOISGERA_HOMEDIR = ROOT / "home" / "boisgera"
+>>> LINUS_HOMEDIR.exists()
+False
+>>> BOISGERA_HOMEDIR.exists()
+True
+```
+
+Comme `Path` dérive de `PurePath`, les instances de `Path` peuvent être
+utilisées partout où les instances de `PurePath` feraient l'affaire.
+
 
 ## `random`
 
 ### Introduction
 
-Le module de la bibliothèque Python standard `random` permet de générer des 
+Le module de la bibliothèque Python standard [`random`] permet de générer des 
 nombres pseudo-aléatoires.
+
+[`random`]: https://docs.python.org/fr/3/library/random.html
 
 ```python
 >>> import random
@@ -666,10 +733,12 @@ aléatoire améliorée.
 
 ## `doctest`
 
-🚧 TODO 🚧
+[Doctest](https://docs.python.org/fr/3/library/doctest.html) 
+est un module de tests unitaires dans la bibliothèque standard.
+Il vérifie que les exemples de votre documentation sont
+conformes au comportement effectif de votre code. 
 
-doctest? With pass for thumbs up in return : pass on thumbs up directive
-(unless an error happens: wrong value ok, but not exception).
+Par exemple, avec le code
 
 ```python
 # file: add.py
@@ -694,6 +763,10 @@ if __name__ == "__main__":
     doctest.testmod()
 ```
 
+l'exécution du fichier vous signale que parmi les trois exemples d'usage
+de votre fonction `add`, le résultat pour l'un d'entre eux est différent de
+ce qui était attendu :
+
 ```python
 $ python add.py 
 **********************************************************************
@@ -710,6 +783,26 @@ Got:
 ***Test Failed*** 1 failures.
 ```
 
+En effet, si on veut une addition des listes "à la NumPy", alors le code
+actuel n'est pas le bon ! Car `+` utilisé sur les listes les concatène
+au lieu de faire la somme élément par élément.
+
+Nous avons diagnostiqué le problème, mais nous n'avons pas le temps
+d'y apporter une solution dans l'immédiat.
+Nous allons donc faire en sorte de supprimer temporairement de telles erreurs
+en marquant les résults connus comme erronés par un symbole 🐛 
+(🇺🇸 **bug** ou 🇫🇷 **bogue**). 
+Cela nous servira de pense-bête !
+
+
+Pour cela, nous allons dériver de la classe [`OutputChecker`] de `doctest`
+et surcharger sa méthode `check_output` pour signaler que tout test dont
+le résultat comporte un symbole de bug doit être considéré comme validé.
+Puis, nous allons insérer la classe qui en résulte en lieu et en place
+de la classe `OutputChecker` de `doctest`, pour changer le comportement
+du module.
+
+[`OutputChecker`]: https://docs.python.org/fr/3/library/doctest.html#doctest.OutputChecker
 
 ```python
 # file: doctest_patch.py
@@ -727,6 +820,9 @@ class OutputChecker(_doctest_OutputChecker):
 # 🐒 Monkey-patching
 doctest.OutputChecker = OutputChecker
 ```
+
+Si l'on modifie légèrement le fichier `add.py` pour marquer notre test
+problématique et importer `doctest_patch`
 
 ```python
 # file: add.py
@@ -747,17 +843,21 @@ def add(x, y):
     return x+y
 
 if __name__ == "__main__":
-    import doctest_patch
     import doctest
+    import doctest_patch
     doctest.testmod()
 ```
+
+alors les tests s'exécutent sans erreur (aucun affichage veut dire que tout va
+bien).
 
 ```bash
 $ python add.py
 ```
 
+On peut le vérifier en exécutant les tests en mode "verbeux" :
+
 ```bash
-$ python add.py -v
 $ python add.py -v
 Trying:
     add(1, 1)

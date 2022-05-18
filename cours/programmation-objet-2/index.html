@@ -122,8 +122,8 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/bd30eae">
-          #bd30eae
+<a href="https://github.com/boisgera/python-fr/commit/3dda5cc">
+          #3dda5cc
         </a>
 </p>
 
@@ -551,10 +551,62 @@ utiliser un code qui va adapter le type de la valeur renvoyée au type de
         return ComplexType(real, imag)</code></pre>
 <h1 id="la-bibliothèque-standard">La bibliothèque standard</h1>
 <h2 id="pathlib"><code>pathlib</code></h2>
-<p>🚧 TODO 🚧</p>
+<p>Le module de la bibliothèque Python standard <a href="https://docs.python.org/fr/3/library/pathlib.html"><code>pathlib</code></a>
+fournit des classes de chemins représentant les fichiers et répertoire
+d’un système de fichiers. Plus précisément</p>
+<blockquote>
+<p>Les classes de chemins sont divisées en chemins purs, qui fournissent
+uniquement des opérations de manipulation sans entrées-sorties, et
+chemins concrets, qui héritent des chemins purs et fournissent également
+les opérations d’entrées-sorties.</p>
+</blockquote>
+<p>Autrement dit, les chemins purs – instances de <code>PurePath</code>
+– permettent de désigner des fichiers mais sans accéder au système de
+fichier proprement dit. Les instances de <code>Path</code> – qui dérive
+de <code>PurePath</code> – le permettent.</p>
+<p>Les classes de chemin sont de plus distinguées selon que le système
+de fichier soit Windows ou Posix (Linux et MacOS), mais on ne s’en
+préoccupera pas trop.</p>
+<p>Par exemple, sur ma machine (Linux), je peux désigner la racine du
+système de fichier par un chemin pur et l’utiliser pour construire le
+chemin (pur) vers le répertoire racine d’hypothétiques utilisateurs
+<code>linus</code> et <code>boisgera</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; ROOT = PurePath("/")
+&gt;&gt;&gt; LINUS_HOMEDIR = ROOT / "home" / "linus"
+&gt;&gt;&gt; BOISGERA_HOMEDIR = ROOT / "home" / "boisgera"</code></pre>
+<p>mais je ne peux pas tester si ces répertoires existent bel et bien
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; LINUS_HOMEDIR.exists()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: 'PurePosixPath' object has no attribute 'exists'
+&gt;&gt;&gt; BOISGERA_HOMEDIR.exists()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: 'PurePosixPath' object has no attribute 'exists'</code></pre>
+<p>Par contre, je peux le faire après avoir converti ces fichiers en
+instances de <code>Path</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; LINUS_HOMEDIR = Path(LINUS_HOMEDIR)
+&gt;&gt;&gt; BOISGERA_HOMEDIR = Path(BOISGERA_HOMEDIR)
+&gt;&gt;&gt; LINUS_HOMEDIR.exists()
+False
+&gt;&gt;&gt; BOISGERA_HOMEDIR.exists()
+True</code></pre>
+<p>Alternativement, et c’est sans doute le plus simple, on aurait pu
+partir dès le début d’un <code>Path</code> pour désigner la racine</p>
+<pre class="python"><code>&gt;&gt;&gt; ROOT = Path("/")
+&gt;&gt;&gt; LINUS_HOMEDIR = ROOT / "home" / "linus"
+&gt;&gt;&gt; BOISGERA_HOMEDIR = ROOT / "home" / "boisgera"
+&gt;&gt;&gt; LINUS_HOMEDIR.exists()
+False
+&gt;&gt;&gt; BOISGERA_HOMEDIR.exists()
+True</code></pre>
+<p>Comme <code>Path</code> dérive de <code>PurePath</code>, les
+instances de <code>Path</code> peuvent être utilisées partout où les
+instances de <code>PurePath</code> feraient l’affaire.</p>
 <h2 id="random"><code>random</code></h2>
 <h3 id="introduction-1">Introduction</h3>
-<p>Le module de la bibliothèque Python standard <code>random</code>
+<p>Le module de la bibliothèque Python standard <a href="https://docs.python.org/fr/3/library/random.html"><code>random</code></a>
 permet de générer des nombres pseudo-aléatoires.</p>
 <pre class="python"><code>&gt;&gt;&gt; import random</code></pre>
 <p>La fonction <code>random</code> du module va générer des nombres à
@@ -655,10 +707,11 @@ largement de cette source aléatoire améliorée.</p>
 1.0356452612439027
 </code></pre>
 <h2 id="doctest"><code>doctest</code></h2>
-<p>🚧 TODO 🚧</p>
-<p>doctest? With pass for thumbs up in return : pass on thumbs up
-directive (unless an error happens: wrong value ok, but not
-exception).</p>
+<p><a href="https://docs.python.org/fr/3/library/doctest.html">Doctest</a> est
+un module de tests unitaires dans la bibliothèque standard. Il vérifie
+que les exemples de votre documentation sont conformes au comportement
+effectif de votre code.</p>
+<p>Par exemple, avec le code</p>
 <pre class="python"><code># file: add.py
 
 def add(x, y):
@@ -679,6 +732,9 @@ def add(x, y):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()</code></pre>
+<p>l’exécution du fichier vous signale que parmi les trois exemples
+d’usage de votre fonction <code>add</code>, le résultat pour l’un
+d’entre eux est différent de ce qui était attendu :</p>
 <pre class="python"><code>$ python add.py 
 **********************************************************************
 File "add.py", line 13, in __main__.add
@@ -692,6 +748,21 @@ Got:
 1 items had failures:
    1 of   3 in __main__.add
 ***Test Failed*** 1 failures.</code></pre>
+<p>En effet, si on veut une addition des listes “à la NumPy”, alors le
+code actuel n’est pas le bon ! Car <code>+</code> utilisé sur les listes
+les concatène au lieu de faire la somme élément par élément.</p>
+<p>Nous avons diagnostiqué le problème, mais nous n’avons pas le temps
+d’y apporter une solution dans l’immédiat. Nous allons donc faire en
+sorte de supprimer temporairement de telles erreurs en marquant les
+résults connus comme erronés par un symbole 🐛 (🇺🇸 <strong>bug</strong>
+ou 🇫🇷 <strong>bogue</strong>). Cela nous servira de pense-bête !</p>
+<p>Pour cela, nous allons dériver de la classe <a href="https://docs.python.org/fr/3/library/doctest.html#doctest.OutputChecker"><code>OutputChecker</code></a>
+de <code>doctest</code> et surcharger sa méthode
+<code>check_output</code> pour signaler que tout test dont le résultat
+comporte un symbole de bug doit être considéré comme validé. Puis, nous
+allons insérer la classe qui en résulte en lieu et en place de la classe
+<code>OutputChecker</code> de <code>doctest</code>, pour changer le
+comportement du module.</p>
 <pre class="python"><code># file: doctest_patch.py
 
 import doctest
@@ -706,6 +777,9 @@ class OutputChecker(_doctest_OutputChecker):
 
 # 🐒 Monkey-patching
 doctest.OutputChecker = OutputChecker</code></pre>
+<p>Si l’on modifie légèrement le fichier <code>add.py</code> pour
+marquer notre test problématique et importer
+<code>doctest_patch</code></p>
 <pre class="python"><code># file: add.py
 
 def add(x, y):
@@ -724,12 +798,14 @@ def add(x, y):
     return x+y
 
 if __name__ == "__main__":
-    import doctest_patch
     import doctest
+    import doctest_patch
     doctest.testmod()</code></pre>
+<p>alors les tests s’exécutent sans erreur (aucun affichage veut dire
+que tout va bien).</p>
 <pre class="bash"><code>$ python add.py</code></pre>
+<p>On peut le vérifier en exécutant les tests en mode “verbeux” :</p>
 <pre class="bash"><code>$ python add.py -v
-$ python add.py -v
 Trying:
     add(1, 1)
 Expecting:
