@@ -14,7 +14,7 @@ Python 🇫🇷
 🦠 Modèles épidémologiques
 --------------------------------------------------------------------------------
 
-  - 📖 [Le modèle SIR (🚧 en travaux 🚧)](https://boisgera.github.io/python-fr/tps/SIR/index.html)
+  - 📖 [Le modèle SIR](https://boisgera.github.io/python-fr/tps/SIR/index.html)
 
 
 🧭 Orientation
