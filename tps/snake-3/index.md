@@ -1,17 +1,26 @@
-🕹️ Conception orientée objet & Jeu vidéo
+---
+title: Le retour du retour du serpent
+author: 
+- "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@minesparis.psl.eu), MINES Paris -- PSL"
+license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
+date: auto
+---
+
+
+🕹️ Introduction
 ================================================================================
 
-Nous allons remanier le jeu [🐍 snake.py](../games/solutions/snake.py),
-dans une premier temps sans lui ajouter de fonctionnalités.
-Nous nous contenterons de revisiter son organisation et de tenter de le rendre 
-plus robuste / réutilisable / compréhensible / extensible. 
+Nous allons remanier (à nouveau !) le jeu [🐍 snake.py](../snake-2/solutions/snake-v2.4.py),
+en exploitant une conception orientée objet.
+Nous tenterons de rendre son code plus robuste / réutilisable / compréhensible 
+/ maintenable. 
 Nous tâcherons ensuite de tirer les bénéfices de cette réorganisation 
 en développant – avec le minimum d'effort de développement – 
-un 🤖 bot qui assistera le joueur dans la poursuite du hi-score. 
+un 🤖 bot qui assistera le joueur dans la poursuite du high-score. 
 
 
 ✔️ Validation
---------------------------------------------------------------------------------
+================================================================================
 
 Quelles sont les valeurs admissibles pour la direction du serpent ?
 Implémenter une fonction `check_direction` qui prenne en argument une
@@ -33,7 +42,7 @@ géométrie de serpent, ne renvoie rien si elle est valide et lève
 l'exception appropriée dans le cas contraire.
 
 🐍 Un type `Snake`
---------------------------------------------------------------------------------
+================================================================================
 
 Implémenter une classe `Snake` encapsulant la géométrie et la direction du
 serpent :
@@ -73,18 +82,18 @@ Enfin, associer aux accesseurs `get_direction`, `set_direction`,
 et adapter le code client en conséquence.
 
 🏃 En mouvement
---------------------------------------------------------------------------------
+================================================================================
 
 Introduire une méthode `move` dans la classe `Snake` qui va mettre à jour
 la géométrie du serpent en tenant compte de la direction courante du serpent
 et de la position des fruits (à remettre à jour le cas échéant).
 
-Adapter la boucle générale du programme  [🐍 snake.py](../games/solutions/snake.py) 
+Adapter la boucle générale du programme  [🐍 snake.py](../snake-2/solutions/snake-v2.4.py) 
 pour intégrer les développements de la classe `Snake`. Vérifier en y jouant que le comportement du jeu reste identique.
 
 
 🗃️ Etat du jeu
---------------------------------------------------------------------------------
+================================================================================
 
 Définir une classe `State` représentant l'état à un instant donné du programme.
 On souhaite pouvoir initialiser cet état par un code de la forme
@@ -106,7 +115,8 @@ Quelle autre type de fonctionnalité pourrait être prise en charge par la class
 `State` ?
 
 🧱 Constantes
---------------------------------------------------------------------------------
+================================================================================
+
 
 🧹 **Nettoyage de printemps !** 
 Déplacer la définition des constantes du programme 
@@ -117,11 +127,12 @@ puis les importer dans `snake.py` avec :
 from constants import *
 ```
 
-📄 Solution : [constants.py](../games/solutions/constants.py)
+📄 Solution : [constants.py](solutions/constants.py)
 
 
 ⚙️ Moteur de jeu
---------------------------------------------------------------------------------
+================================================================================
+
 
 On souhaite désormais séparer aussi nettement que possible le code qui relève 
 spécifiquement de notre jeu et le code générique, commun à (presque) tous les
@@ -132,7 +143,7 @@ la récupération des évènements, etc.
 
 On souhaite pouvoir exploiter cette classe générique en définissant une
 classe `SnakeGame` qui en dérive et qui régit le jeu du serpent. 
-`SnakeGame` sera définie de la façon suivante (fichier complet : 📄 [snake.py](../games/solutions/snake.py)) :
+`SnakeGame` sera définie de la façon suivante (fichier complet : 📄 [snake.py](solutions/snake.py)) :
 
 ``` python
 from game import Game
@@ -182,11 +193,12 @@ snake_game.start()
 
 Développer la classe `Game` en conséquence !
 
-📄 Solution : [game.py](../games/solutions/game.py)
+📄 Solution : [game.py](solutions/game.py)
 
 
 🤖 Pilote automatique
---------------------------------------------------------------------------------
+================================================================================
+
 
 On souhaite faciliter la vie du joueur: lorsque celui-ci ne presse aucune touche
 pendant une frame, votre programme devra prendre une décision à sa place pour
@@ -211,4 +223,4 @@ snake_game = AutoSnakeGame(size=(X * W, Y * H), fps=FPS)
 snake_game.start()
 ```
 
-📄 Solution : [autosnake.py](../games/solutions/autosnake.py)
+📄 Solution : [autosnake.py](solutions/autosnake.py)
