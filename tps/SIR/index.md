@@ -554,12 +554,12 @@ t = arange(0, 5*YEAR)
 S, I, R = results["sol"](t)
 ```
 
-#### 🚀 Création
+#### 👶 Création
 
-Créer un **tableau de données** (🇺🇸 **dataframe**) [pandas] stockant les valeurs
-journalières de $S$, $I$ et $R$ dans des colonnes de même nom. Ajouter ensuite
+Créez un **tableau de données** (🇺🇸 **dataframe**) [pandas] stockant les valeurs
+journalières de $S$, $I$ et $R$ dans des colonnes de même nom. Ajoutez ensuite
 les colonnes des valeurs (constantes dans notre modèle) $\beta$, $\gamma$
-et $\omega$ (on nommera les colonnes correspondantes `beta`, `gamma` et `omega`).
+et $\omega$ ; on nommera les colonnes correspondantes `beta`, `gamma` et `omega`.
 Afficher un résumé du tableau avant et après cet ajout.
 
 [pandas]: https://pandas.pydata.org/
@@ -618,17 +618,18 @@ df["omega"] = omega
 
 L'étape précédente a stocké dans le tableau toutes les données dont on aura
 besoin par la suite. Les grandeurs qu'on pourra désormais y ajouter se déduiront
-des données qui y sont stocké.
+des données qui y sont déjà présentes.
 
   - Ajoutez une colonne `N` dont les valeurs sont les sommes de `S`, `I` et `R`,
     puis ajoutez une colonne `R0` calculant la ratio entre `beta` et `gamma`.
 
   - L'épidémie a commencé le 1er janvier 2020. Créez une colonne `date` 
-    donnant le jour associé à chaque ligne de donnée, puis l'adopter comme
-    index (plutôt que d'utiliser l'entier qui nous a servi jusqu'à présent).
+    donnant le jour associé à chaque ligne de donnée, puis adoptez 
+    cette colonne comme index (plutôt que d'utiliser l'entier qui nous a 
+    servi jusqu'à présent).
 
-  - Calculer le nombre de nouveaux infectés $\beta I S/N$ chaque jour et
-    définir une nouvelle colonne `T` comptabilisant le nombre total d'infecté
+  - Calculez le nombre de nouveaux infectés $\beta I S/N$ chaque jour et
+    définissez une nouvelle colonne `T` comptabilisant le nombre total d'infectés
     depuis le début de l'épidémie.
 
 <details>
@@ -754,7 +755,7 @@ date                                        ...
 
 </details>
 
-#### Graphiques
+#### 📈 Graphiques
 
  1. Représentez graphiquement avec la méthode `plot` des tableaux pandas 
     le contenu du tableau de données.
@@ -764,9 +765,9 @@ date                                        ...
  3. Renouvellez l'opération en ne représentant que les valeurs de `S`, `I` et `R`
     et en utilisant la méthode `plot.area` avec l'option `stacked=True`.
 
- 4. Revenir à l'étape 2 en ajoutant `T` au jeu de variables représentées.
+ 4. Revenir à l'étape 2 en ajoutant `T` au jeu des variables sélectionnées.
 
- 5. Représenter les même variables avec la même méthode, mais uniquement sur
+ 5. Représentez les même variables avec la même méthode, mais uniquement sur
     la première année de l'épidémie.
 
 ![](images/SIR-pandas-5.svg)
@@ -826,11 +827,11 @@ date                                        ...
 
 </details>
 
-#### Export
+#### 🚚 Export
 
-Exporter votre tableau pandas au formats CSV, puis ouvrez une
-des deux versions avec LibreOffice, Google Sheets ou Excel (ou application
-équivalente de votre choix.
+Exportez votre tableau pandas au formats CSV, puis ouvrez-le 
+LibreOffice, Google Sheets ou Excel (ou une application
+équivalente de votre choix).
 
 ![](images/SIR-CSV.png)
 

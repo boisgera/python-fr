@@ -122,8 +122,8 @@ Boisgérault</a>, MINES ParisTech</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/b358cff">
-          #b358cff
+<a href="https://github.com/boisgera/python-fr/commit/95d3e46">
+          #95d3e46
         </a>
 </p>
 
@@ -523,13 +523,13 @@ results = solve_ivp(
 
 t = arange(0, 5*YEAR)
 S, I, R = results["sol"](t)</code></pre>
-<h4 id="création">🚀 Création</h4>
-<p>Créer un <strong>tableau de données</strong> (🇺🇸
+<h4 id="création">👶 Création</h4>
+<p>Créez un <strong>tableau de données</strong> (🇺🇸
 <strong>dataframe</strong>) <a href="https://pandas.pydata.org/">pandas</a> stockant les valeurs
-journalières de <span class="math inline">\(S\)</span>, <span class="math inline">\(I\)</span> et <span class="math inline">\(R\)</span> dans des colonnes de même nom. Ajouter
-ensuite les colonnes des valeurs (constantes dans notre modèle) <span class="math inline">\(\beta\)</span>, <span class="math inline">\(\gamma\)</span> et <span class="math inline">\(\omega\)</span> (on nommera les colonnes
+journalières de <span class="math inline">\(S\)</span>, <span class="math inline">\(I\)</span> et <span class="math inline">\(R\)</span> dans des colonnes de même nom. Ajoutez
+ensuite les colonnes des valeurs (constantes dans notre modèle) <span class="math inline">\(\beta\)</span>, <span class="math inline">\(\gamma\)</span> et <span class="math inline">\(\omega\)</span> ; on nommera les colonnes
 correspondantes <code>beta</code>, <code>gamma</code> et
-<code>omega</code>). Afficher un résumé du tableau avant et après cet
+<code>omega</code>. Afficher un résumé du tableau avant et après cet
 ajout.</p>
 <details>
 <summary>
@@ -574,7 +574,7 @@ df["omega"] = omega</code></pre>
 <h4 id="calculs">🧮 Calculs</h4>
 <p>L’étape précédente a stocké dans le tableau toutes les données dont
 on aura besoin par la suite. Les grandeurs qu’on pourra désormais y
-ajouter se déduiront des données qui y sont stocké.</p>
+ajouter se déduiront des données qui y sont déjà présentes.</p>
 <ul>
 <li><p>Ajoutez une colonne <code>N</code> dont les valeurs sont les
 sommes de <code>S</code>, <code>I</code> et <code>R</code>, puis ajoutez
@@ -582,11 +582,11 @@ une colonne <code>R0</code> calculant la ratio entre <code>beta</code>
 et <code>gamma</code>.</p></li>
 <li><p>L’épidémie a commencé le 1er janvier 2020. Créez une colonne
 <code>date</code> donnant le jour associé à chaque ligne de donnée, puis
-l’adopter comme index (plutôt que d’utiliser l’entier qui nous a servi
-jusqu’à présent).</p></li>
-<li><p>Calculer le nombre de nouveaux infectés <span class="math inline">\(\beta I S/N\)</span> chaque jour et définir une
-nouvelle colonne <code>T</code> comptabilisant le nombre total d’infecté
-depuis le début de l’épidémie.</p></li>
+adoptez cette colonne comme index (plutôt que d’utiliser l’entier qui
+nous a servi jusqu’à présent).</p></li>
+<li><p>Calculez le nombre de nouveaux infectés <span class="math inline">\(\beta I S/N\)</span> chaque jour et définissez une
+nouvelle colonne <code>T</code> comptabilisant le nombre total
+d’infectés depuis le début de l’épidémie.</p></li>
 </ul>
 <details>
 <summary>
@@ -695,7 +695,7 @@ date                                        ...
 
 [1825 rows x 10 columns]</code></pre>
 </details>
-<h4 id="graphiques">Graphiques</h4>
+<h4 id="graphiques">📈 Graphiques</h4>
 <ol type="1">
 <li><p>Représentez graphiquement avec la méthode <code>plot</code> des
 tableaux pandas le contenu du tableau de données.</p></li>
@@ -705,9 +705,9 @@ tableaux pandas le contenu du tableau de données.</p></li>
 <code>S</code>, <code>I</code> et <code>R</code> et en utilisant la
 méthode <code>plot.area</code> avec l’option
 <code>stacked=True</code>.</p></li>
-<li><p>Revenir à l’étape 2 en ajoutant <code>T</code> au jeu de
-variables représentées.</p></li>
-<li><p>Représenter les même variables avec la même méthode, mais
+<li><p>Revenir à l’étape 2 en ajoutant <code>T</code> au jeu des
+variables sélectionnées.</p></li>
+<li><p>Représentez les même variables avec la même méthode, mais
 uniquement sur la première année de l’épidémie.</p></li>
 </ol>
 <p><img src="images/SIR-pandas-5.svg"/></p>
@@ -739,10 +739,10 @@ uniquement sur la première année de l’épidémie.</p></li>
 &gt;&gt;&gt; plt.show()</code></pre>
 <p><img src="images/SIR-pandas-5.svg"/></p>
 </details>
-<h4 id="export">Export</h4>
-<p>Exporter votre tableau pandas au formats CSV, puis ouvrez une des
-deux versions avec LibreOffice, Google Sheets ou Excel (ou application
-équivalente de votre choix.</p>
+<h4 id="export">🚚 Export</h4>
+<p>Exportez votre tableau pandas au formats CSV, puis ouvrez-le
+LibreOffice, Google Sheets ou Excel (ou une application équivalente de
+votre choix).</p>
 <p><img src="images/SIR-CSV.png"/></p>
 <details>
 <summary>
