@@ -427,8 +427,7 @@ avec les même résultats que précédemment
 </details>
 
 
-## Génération de dynamique
-
+## Généralisation
 
 Vous avez sans doute remarqué que la dynamique du modèle SIR est entièrement
 déterminée par les flux existant entre les "compartiments" de population
@@ -512,4 +511,334 @@ def make_dstate(dynamics):
     return fun 
 ```
 
+</details>
+
+
+# Tableaux
+
+On reproduit ici l'intégralité du code qui permet de générer la séquence des 
+valeurs journalières de $S$, $I$ et $R$ pendant les 5 premières années de 
+l'épidémie :
+
+```python
+from numpy import *
+from scipy.integrate import solve_ivp
+
+WEEK = 7
+YEAR = 365
+beta = 1 / (WEEK)
+gamma = 1 / (2 * WEEK)
+omega = 1 / YEAR
+
+N = 100
+S0, I0 = 99.0, 1.0
+R0 = N - S0 - I0
+
+def dSIR(t, SIR):
+    S, I, R = SIR
+    dS = omega * R - beta * I * S / N
+    dI = beta * I * S / N - gamma * I
+    dR = gamma * I - omega * R  
+    return (dS, dI, dR)
+
+t_span = [0.0, 5*YEAR]
+
+results = solve_ivp(
+    dSIR, 
+    y0=(S0, I0, R0), 
+    t_span=t_span, 
+    dense_output=True, 
+)
+
+t = arange(0, 5*YEAR)
+S, I, R = results["sol"](t)
+```
+
+#### 🚀 Création
+
+Créer un **tableau de données** (🇺🇸 **dataframe**) [pandas] stockant les valeurs
+journalières de $S$, $I$ et $R$ dans des colonnes de même nom. Ajouter ensuite
+les colonnes des valeurs (constantes dans notre modèle) $\beta$, $\gamma$
+et $\omega$ (on nommera les colonnes correspondantes `beta`, `gamma` et `omega`).
+Afficher un résumé du tableau avant et après cet ajout.
+
+[pandas]: https://pandas.pydata.org/
+
+<details>
+<summary>
+#### ✨ Solution
+</summary>
+
+```python
+>>> import pandas as pd
+>>> df = pd.DataFrame({"S":S, "I": I, "R": R})
+>>> df # doctest: +ELLIPSIS
+              S         I          R
+0     99.000000  1.000000   0.000000
+1     98.853717  1.072397   0.073885
+2     98.697303  1.149788   0.152909
+3     98.530103  1.232472   0.237425
+4     98.351424  1.320767   0.327809
+                      ...
+1820  50.279454  1.851949  47.868597
+1821  50.277556  1.852686  47.869759
+1822  50.275613  1.853418  47.870969
+1823  50.273626  1.854145  47.872229
+1824  50.271597  1.854867  47.873536
+
+[1825 rows x 3 columns]
+```
+
+```python
+df["beta"] = beta
+df["gamma"] = gamma
+df["omega"] = omega
+```
+
+```python
+>>> df
+              S         I          R      beta     gamma    omega
+0     99.000000  1.000000   0.000000  0.142857  0.071429  0.00274
+1     98.853717  1.072397   0.073885  0.142857  0.071429  0.00274
+2     98.697303  1.149788   0.152909  0.142857  0.071429  0.00274
+3     98.530103  1.232472   0.237425  0.142857  0.071429  0.00274
+4     98.351424  1.320767   0.327809  0.142857  0.071429  0.00274
+                                 ...
+1820  50.279454  1.851949  47.868597  0.142857  0.071429  0.00274
+1821  50.277556  1.852686  47.869759  0.142857  0.071429  0.00274
+1822  50.275613  1.853418  47.870969  0.142857  0.071429  0.00274
+1823  50.273626  1.854145  47.872229  0.142857  0.071429  0.00274
+1824  50.271597  1.854867  47.873536  0.142857  0.071429  0.00274
+
+[1825 rows x 6 columns]
+```
+</details>
+
+#### 🧮 Calculs
+
+L'étape précédente a stocké dans le tableau toutes les données dont on aura
+besoin par la suite. Les grandeurs qu'on pourra désormais y ajouter se déduiront
+des données qui y sont stocké.
+
+  - Ajoutez une colonne `N` dont les valeurs sont les sommes de `S`, `I` et `R`,
+    puis ajoutez une colonne `R0` calculant la ratio entre `beta` et `gamma`.
+
+  - L'épidémie a commencé le 1er janvier 2020. Créez une colonne `date` 
+    donnant le jour associé à chaque ligne de donnée, puis l'adopter comme
+    index (plutôt que d'utiliser l'entier qui nous a servi jusqu'à présent).
+
+  - Calculer le nombre de nouveaux infectés $\beta I S/N$ chaque jour et
+    définir une nouvelle colonne `T` comptabilisant le nombre total d'infecté
+    depuis le début de l'épidémie.
+
+<details>
+<summary>
+#### ✨ Solution
+</summary>
+```python
+df["N"] = df["S"] + df["I"] + df["R"]
+df["R0"] = df["beta"] / df["gamma"]
+```
+
+```python
+>>> df # doctest: +ELLIPSIS
+              S         I          R  ...    omega      N   R0
+0     99.000000  1.000000   0.000000  ...  0.00274  100.0  2.0
+1     98.853717  1.072397   0.073885  ...  0.00274  100.0  2.0
+2     98.697303  1.149788   0.152909  ...  0.00274  100.0  2.0
+3     98.530103  1.232472   0.237425  ...  0.00274  100.0  2.0
+4     98.351424  1.320767   0.327809  ...  0.00274  100.0  2.0
+      ...
+1820  50.279454  1.851949  47.868597  ...  0.00274  100.0  2.0
+1821  50.277556  1.852686  47.869759  ...  0.00274  100.0  2.0
+1822  50.275613  1.853418  47.870969  ...  0.00274  100.0  2.0
+1823  50.273626  1.854145  47.872229  ...  0.00274  100.0  2.0
+1824  50.271597  1.854867  47.873536  ...  0.00274  100.0  2.0
+
+[1825 rows x 8 columns]
+```
+
+```python
+>>> datetime64("2020-01-01")
+numpy.datetime64('2020-01-01')
+>>> start = datetime64("2020-01-01")
+>>> end = start + len(df["S"]) - 1
+>>> start
+numpy.datetime64('2020-01-01')
+>>> end
+numpy.datetime64('2024-12-29')
+>>> dates = pd.date_range(start, end)
+>>> dates # doctest: +ELLIPSIS
+DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04',
+               '2020-01-05', '2020-01-06', '2020-01-07', '2020-01-08',
+               '2020-01-09', '2020-01-10',
+               ...
+               '2024-12-20', '2024-12-21', '2024-12-22', '2024-12-23',
+               '2024-12-24', '2024-12-25', '2024-12-26', '2024-12-27',
+               '2024-12-28', '2024-12-29'],
+              dtype='datetime64[ns]', length=1825, freq='D')
+>>> df["date"] = dates
+>>> df # doctest: +ELLIPSIS
+              S         I          R  ...      N   R0       date
+0     99.000000  1.000000   0.000000  ...  100.0  2.0 2020-01-01
+1     98.853717  1.072397   0.073885  ...  100.0  2.0 2020-01-02
+2     98.697303  1.149788   0.152909  ...  100.0  2.0 2020-01-03
+3     98.530103  1.232472   0.237425  ...  100.0  2.0 2020-01-04
+4     98.351424  1.320767   0.327809  ...  100.0  2.0 2020-01-05
+      ...
+1820  50.279454  1.851949  47.868597  ...  100.0  2.0 2024-12-25
+1821  50.277556  1.852686  47.869759  ...  100.0  2.0 2024-12-26
+1822  50.275613  1.853418  47.870969  ...  100.0  2.0 2024-12-27
+1823  50.273626  1.854145  47.872229  ...  100.0  2.0 2024-12-28
+1824  50.271597  1.854867  47.873536  ...  100.0  2.0 2024-12-29
+
+[1825 rows x 9 columns]
+>>> df = df.set_index("date")
+>>> df
+                    S         I          R  ...    omega      N   R0
+date                                        ...                     
+2020-01-01  99.000000  1.000000   0.000000  ...  0.00274  100.0  2.0
+2020-01-02  98.853717  1.072397   0.073885  ...  0.00274  100.0  2.0
+2020-01-03  98.697303  1.149788   0.152909  ...  0.00274  100.0  2.0
+2020-01-04  98.530103  1.232472   0.237425  ...  0.00274  100.0  2.0
+2020-01-05  98.351424  1.320767   0.327809  ...  0.00274  100.0  2.0
+                                            ...
+2024-12-25  50.279454  1.851949  47.868597  ...  0.00274  100.0  2.0
+2024-12-26  50.277556  1.852686  47.869759  ...  0.00274  100.0  2.0
+2024-12-27  50.275613  1.853418  47.870969  ...  0.00274  100.0  2.0
+2024-12-28  50.273626  1.854145  47.872229  ...  0.00274  100.0  2.0
+2024-12-29  50.271597  1.854867  47.873536  ...  0.00274  100.0  2.0
+
+[1825 rows x 8 columns]
+```
+
+```python
+>>> df = df.eval("new_I = beta * I * S / N")
+>>> df # doctest: +ELLIPSIS
+                    S         I          R  ...      N   R0     new_I
+date                                        ...                      
+2020-01-01  99.000000  1.000000   0.000000  ...  100.0  2.0  0.141429
+2020-01-02  98.853717  1.072397   0.073885  ...  100.0  2.0  0.151444
+2020-01-03  98.697303  1.149788   0.152909  ...  100.0  2.0  0.162116
+2020-01-04  98.530103  1.232472   0.237425  ...  100.0  2.0  0.173479
+2020-01-05  98.351424  1.320767   0.327809  ...  100.0  2.0  0.185570
+                                            ...
+2024-12-25  50.279454  1.851949  47.868597  ...  100.0  2.0  0.133021
+2024-12-26  50.277556  1.852686  47.869759  ...  100.0  2.0  0.133069
+2024-12-27  50.275613  1.853418  47.870969  ...  100.0  2.0  0.133117
+2024-12-28  50.273626  1.854145  47.872229  ...  100.0  2.0  0.133164
+2024-12-29  50.271597  1.854867  47.873536  ...  100.0  2.0  0.133210
+
+[1825 rows x 9 columns]
+```
+
+```python
+>>> df["T"] = df["new_I"].cumsum()
+>>> df # doctest: + ELLIPSIS
+                    S         I          R  ...   R0     new_I     T
+date                                        ...                           
+2020-01-01  99.000000  1.000000   0.000000  ...  2.0  0.141429    0.141429
+2020-01-02  98.853717  1.072397   0.073885  ...  2.0  0.151444    0.292872
+2020-01-03  98.697303  1.149788   0.152909  ...  2.0  0.162116    0.454988
+2020-01-04  98.530103  1.232472   0.237425  ...  2.0  0.173479    0.628467
+2020-01-05  98.351424  1.320767   0.327809  ...  2.0  0.185570    0.814038
+                                            ...
+2024-12-25  50.279454  1.851949  47.868597  ...  2.0  0.133021  286.095531
+2024-12-26  50.277556  1.852686  47.869759  ...  2.0  0.133069  286.228601
+2024-12-27  50.275613  1.853418  47.870969  ...  2.0  0.133117  286.361717
+2024-12-28  50.273626  1.854145  47.872229  ...  2.0  0.133164  286.494881
+2024-12-29  50.271597  1.854867  47.873536  ...  2.0  0.133210  286.628091
+
+[1825 rows x 10 columns]
+```
+
+</details>
+
+#### Graphiques
+
+ 1. Représentez graphiquement avec la méthode `plot` des tableaux pandas 
+    le contenu du tableau de données.
+
+ 2. Renouvellez l'opération en ne représentant que les valeurs de `S`, `I` et `R`.
+
+ 3. Renouvellez l'opération en ne représentant que les valeurs de `S`, `I` et `R`
+    et en utilisant la méthode `plot.area` avec l'option `stacked=True`.
+
+ 4. Revenir à l'étape 2 en ajoutant `T` au jeu de variables représentées.
+
+ 5. Représenter les même variables avec la même méthode, mais uniquement sur
+    la première année de l'épidémie.
+
+![](images/SIR-pandas-5.svg)
+
+<details>
+<summary>
+#### ✨ Solution
+</summary>
+```python
+>>> import matplotlib.pyplot as plt
+```
+
+```python
+>>> df.plot()
+>>> plt.show()
+```
+
+![](images/SIR-pandas-1.svg)
+
+```python
+>>> df_SIR = df[["S", "I", "R"]]
+>>> df_SIR.plot()
+>>> plt.show()
+```
+
+![](images/SIR-pandas-2.svg)
+
+
+```python
+>>> df_SIR.plot.area(stacked=True)
+<AxesSubplot:xlabel='date'>
+>>> plt.ylim((0.0, 100.0))
+(0.0, 100.0)
+>>> plt.show()
+```
+
+![](images/SIR-pandas-3.svg)
+
+
+```python
+>>> df_SIRT = df[["S", "I", "R", "T"]]
+>>> df_SIRT.plot()
+>>> plt.show()
+```
+
+![](images/SIR-pandas-4.svg)
+
+```python
+>>> df_SIRT_1st_year = df_SIRT["2020-01-01":"2021-01-01"] 
+>>> df_SIRT_1st_year.plot()
+<AxesSubplot:xlabel='date'>
+>>> plt.show()
+```
+
+![](images/SIR-pandas-5.svg)
+
+
+</details>
+
+#### Export
+
+Exporter votre tableau pandas au formats CSV, puis ouvrez une
+des deux versions avec LibreOffice, Google Sheets ou Excel (ou application
+équivalente de votre choix.
+
+![](images/SIR-CSV.png)
+
+<details>
+<summary>
+#### ✨ Solution
+</summary>
+```python
+>>> df.to_csv("SIR.csv")
+```
 </details>

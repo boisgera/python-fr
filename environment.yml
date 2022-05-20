@@ -16,6 +16,7 @@ dependencies:
   - autograd
   - scipy
   - matplotlib
+  - pandas
   - pillow
   - ffmpeg
   - sympy

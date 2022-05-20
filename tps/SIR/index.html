@@ -107,7 +107,7 @@
 <h1 class="title">Le modèle épidémiologique SIR</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
 Boisgérault</a>, MINES ParisTech</p>
-<p class="date">Mercredi 18 mai 2022</p>
+<p class="date">Vendredi 20 mai 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -122,8 +122,8 @@ Boisgérault</a>, MINES ParisTech</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/84940ec">
-          #84940ec
+<a href="https://github.com/boisgera/python-fr/commit/6cb1dc1">
+          #6cb1dc1
         </a>
 </p>
 
@@ -150,7 +150,8 @@ Boisgérault</a>, MINES ParisTech</p>
 <li><a href="#temps-continu" id="toc-temps-continu">Temps
 continu</a></li>
 <li><a href="#evènements" id="toc-evènements">Evènements</a></li>
-<li><a href="#génération-de-dynamique" id="toc-génération-de-dynamique">Génération de dynamique</a></li>
+<li><a href="#généralisation" id="toc-généralisation">Généralisation</a></li>
+<li><a href="#tableaux" id="toc-tableaux">Tableaux</a></li>
 </ul>
 </nav></details>
 
@@ -427,7 +428,7 @@ fonction <code>event</code> :</p>
 )</code></pre>
 <p>avec les même résultats que précédemment</p>
 </details>
-<h2 id="génération-de-dynamique">Génération de dynamique</h2>
+<h2 id="généralisation">Généralisation</h2>
 <p>Vous avez sans doute remarqué que la dynamique du modèle SIR est
 entièrement déterminée par les flux existant entre les “compartiments”
 de population <span class="math inline">\(S\)</span>, <span class="math inline">\(I\)</span> et <span class="math inline">\(R\)</span>, qui peuvent être décrits par la
@@ -485,6 +486,269 @@ Par exemple :</p>
         return dstate
         
     return fun </code></pre>
+</details>
+<h1 id="tableaux">Tableaux</h1>
+<p>On reproduit ici l’intégralité du code qui permet de générer la
+séquence des valeurs journalières de <span class="math inline">\(S\)</span>, <span class="math inline">\(I\)</span>
+et <span class="math inline">\(R\)</span> pendant les 5 premières années
+de l’épidémie :</p>
+<pre class="python"><code>from numpy import *
+from scipy.integrate import solve_ivp
+
+WEEK = 7
+YEAR = 365
+beta = 1 / (WEEK)
+gamma = 1 / (2 * WEEK)
+omega = 1 / YEAR
+
+N = 100
+S0, I0 = 99.0, 1.0
+R0 = N - S0 - I0
+
+def dSIR(t, SIR):
+    S, I, R = SIR
+    dS = omega * R - beta * I * S / N
+    dI = beta * I * S / N - gamma * I
+    dR = gamma * I - omega * R  
+    return (dS, dI, dR)
+
+t_span = [0.0, 5*YEAR]
+
+results = solve_ivp(
+    dSIR, 
+    y0=(S0, I0, R0), 
+    t_span=t_span, 
+    dense_output=True, 
+)
+
+t = arange(0, 5*YEAR)
+S, I, R = results["sol"](t)</code></pre>
+<h4 id="création">🚀 Création</h4>
+<p>Créer un <strong>tableau de données</strong> (🇺🇸
+<strong>dataframe</strong>) <a href="https://pandas.pydata.org/">pandas</a> stockant les valeurs
+journalières de <span class="math inline">\(S\)</span>, <span class="math inline">\(I\)</span> et <span class="math inline">\(R\)</span> dans des colonnes de même nom. Ajouter
+ensuite les colonnes des valeurs (constantes dans notre modèle) <span class="math inline">\(\beta\)</span>, <span class="math inline">\(\gamma\)</span> et <span class="math inline">\(\omega\)</span> (on nommera les colonnes
+correspondantes <code>beta</code>, <code>gamma</code> et
+<code>omega</code>). Afficher un résumé du tableau avant et après cet
+ajout.</p>
+<details>
+<summary>
+<h4 id="solution-6">✨ Solution</h4>
+</summary>
+<pre class="python"><code>&gt;&gt;&gt; import pandas as pd
+&gt;&gt;&gt; df = pd.DataFrame({"S":S, "I": I, "R": R})
+&gt;&gt;&gt; df # doctest: +ELLIPSIS
+              S         I          R
+0     99.000000  1.000000   0.000000
+1     98.853717  1.072397   0.073885
+2     98.697303  1.149788   0.152909
+3     98.530103  1.232472   0.237425
+4     98.351424  1.320767   0.327809
+                      ...
+1820  50.279454  1.851949  47.868597
+1821  50.277556  1.852686  47.869759
+1822  50.275613  1.853418  47.870969
+1823  50.273626  1.854145  47.872229
+1824  50.271597  1.854867  47.873536
+
+[1825 rows x 3 columns]</code></pre>
+<pre class="python"><code>df["beta"] = beta
+df["gamma"] = gamma
+df["omega"] = omega</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; df
+              S         I          R      beta     gamma    omega
+0     99.000000  1.000000   0.000000  0.142857  0.071429  0.00274
+1     98.853717  1.072397   0.073885  0.142857  0.071429  0.00274
+2     98.697303  1.149788   0.152909  0.142857  0.071429  0.00274
+3     98.530103  1.232472   0.237425  0.142857  0.071429  0.00274
+4     98.351424  1.320767   0.327809  0.142857  0.071429  0.00274
+                                 ...
+1820  50.279454  1.851949  47.868597  0.142857  0.071429  0.00274
+1821  50.277556  1.852686  47.869759  0.142857  0.071429  0.00274
+1822  50.275613  1.853418  47.870969  0.142857  0.071429  0.00274
+1823  50.273626  1.854145  47.872229  0.142857  0.071429  0.00274
+1824  50.271597  1.854867  47.873536  0.142857  0.071429  0.00274
+
+[1825 rows x 6 columns]</code></pre>
+</details>
+<h4 id="calculs">🧮 Calculs</h4>
+<p>L’étape précédente a stocké dans le tableau toutes les données dont
+on aura besoin par la suite. Les grandeurs qu’on pourra désormais y
+ajouter se déduiront des données qui y sont stocké.</p>
+<ul>
+<li><p>Ajoutez une colonne <code>N</code> dont les valeurs sont les
+sommes de <code>S</code>, <code>I</code> et <code>R</code>, puis ajoutez
+une colonne <code>R0</code> calculant la ratio entre <code>beta</code>
+et <code>gamma</code>.</p></li>
+<li><p>L’épidémie a commencé le 1er janvier 2020. Créez une colonne
+<code>date</code> donnant le jour associé à chaque ligne de donnée, puis
+l’adopter comme index (plutôt que d’utiliser l’entier qui nous a servi
+jusqu’à présent).</p></li>
+<li><p>Calculer le nombre de nouveaux infectés <span class="math inline">\(\beta I S/N\)</span> chaque jour et définir une
+nouvelle colonne <code>T</code> comptabilisant le nombre total d’infecté
+depuis le début de l’épidémie.</p></li>
+</ul>
+<details>
+<summary>
+<h4 id="solution-7">✨ Solution</h4>
+</summary>
+<pre class="python"><code>df["N"] = df["S"] + df["I"] + df["R"]
+df["R0"] = df["beta"] / df["gamma"]</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; df # doctest: +ELLIPSIS
+              S         I          R  ...    omega      N   R0
+0     99.000000  1.000000   0.000000  ...  0.00274  100.0  2.0
+1     98.853717  1.072397   0.073885  ...  0.00274  100.0  2.0
+2     98.697303  1.149788   0.152909  ...  0.00274  100.0  2.0
+3     98.530103  1.232472   0.237425  ...  0.00274  100.0  2.0
+4     98.351424  1.320767   0.327809  ...  0.00274  100.0  2.0
+      ...
+1820  50.279454  1.851949  47.868597  ...  0.00274  100.0  2.0
+1821  50.277556  1.852686  47.869759  ...  0.00274  100.0  2.0
+1822  50.275613  1.853418  47.870969  ...  0.00274  100.0  2.0
+1823  50.273626  1.854145  47.872229  ...  0.00274  100.0  2.0
+1824  50.271597  1.854867  47.873536  ...  0.00274  100.0  2.0
+
+[1825 rows x 8 columns]</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; datetime64("2020-01-01")
+numpy.datetime64('2020-01-01')
+&gt;&gt;&gt; start = datetime64("2020-01-01")
+&gt;&gt;&gt; end = start + len(df["S"]) - 1
+&gt;&gt;&gt; start
+numpy.datetime64('2020-01-01')
+&gt;&gt;&gt; end
+numpy.datetime64('2024-12-29')
+&gt;&gt;&gt; dates = pd.date_range(start, end)
+&gt;&gt;&gt; dates # doctest: +ELLIPSIS
+DatetimeIndex(['2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04',
+               '2020-01-05', '2020-01-06', '2020-01-07', '2020-01-08',
+               '2020-01-09', '2020-01-10',
+               ...
+               '2024-12-20', '2024-12-21', '2024-12-22', '2024-12-23',
+               '2024-12-24', '2024-12-25', '2024-12-26', '2024-12-27',
+               '2024-12-28', '2024-12-29'],
+              dtype='datetime64[ns]', length=1825, freq='D')
+&gt;&gt;&gt; df["date"] = dates
+&gt;&gt;&gt; df # doctest: +ELLIPSIS
+              S         I          R  ...      N   R0       date
+0     99.000000  1.000000   0.000000  ...  100.0  2.0 2020-01-01
+1     98.853717  1.072397   0.073885  ...  100.0  2.0 2020-01-02
+2     98.697303  1.149788   0.152909  ...  100.0  2.0 2020-01-03
+3     98.530103  1.232472   0.237425  ...  100.0  2.0 2020-01-04
+4     98.351424  1.320767   0.327809  ...  100.0  2.0 2020-01-05
+      ...
+1820  50.279454  1.851949  47.868597  ...  100.0  2.0 2024-12-25
+1821  50.277556  1.852686  47.869759  ...  100.0  2.0 2024-12-26
+1822  50.275613  1.853418  47.870969  ...  100.0  2.0 2024-12-27
+1823  50.273626  1.854145  47.872229  ...  100.0  2.0 2024-12-28
+1824  50.271597  1.854867  47.873536  ...  100.0  2.0 2024-12-29
+
+[1825 rows x 9 columns]
+&gt;&gt;&gt; df = df.set_index("date")
+&gt;&gt;&gt; df
+                    S         I          R  ...    omega      N   R0
+date                                        ...                     
+2020-01-01  99.000000  1.000000   0.000000  ...  0.00274  100.0  2.0
+2020-01-02  98.853717  1.072397   0.073885  ...  0.00274  100.0  2.0
+2020-01-03  98.697303  1.149788   0.152909  ...  0.00274  100.0  2.0
+2020-01-04  98.530103  1.232472   0.237425  ...  0.00274  100.0  2.0
+2020-01-05  98.351424  1.320767   0.327809  ...  0.00274  100.0  2.0
+                                            ...
+2024-12-25  50.279454  1.851949  47.868597  ...  0.00274  100.0  2.0
+2024-12-26  50.277556  1.852686  47.869759  ...  0.00274  100.0  2.0
+2024-12-27  50.275613  1.853418  47.870969  ...  0.00274  100.0  2.0
+2024-12-28  50.273626  1.854145  47.872229  ...  0.00274  100.0  2.0
+2024-12-29  50.271597  1.854867  47.873536  ...  0.00274  100.0  2.0
+
+[1825 rows x 8 columns]</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; df = df.eval("new_I = beta * I * S / N")
+&gt;&gt;&gt; df # doctest: +ELLIPSIS
+                    S         I          R  ...      N   R0     new_I
+date                                        ...                      
+2020-01-01  99.000000  1.000000   0.000000  ...  100.0  2.0  0.141429
+2020-01-02  98.853717  1.072397   0.073885  ...  100.0  2.0  0.151444
+2020-01-03  98.697303  1.149788   0.152909  ...  100.0  2.0  0.162116
+2020-01-04  98.530103  1.232472   0.237425  ...  100.0  2.0  0.173479
+2020-01-05  98.351424  1.320767   0.327809  ...  100.0  2.0  0.185570
+                                            ...
+2024-12-25  50.279454  1.851949  47.868597  ...  100.0  2.0  0.133021
+2024-12-26  50.277556  1.852686  47.869759  ...  100.0  2.0  0.133069
+2024-12-27  50.275613  1.853418  47.870969  ...  100.0  2.0  0.133117
+2024-12-28  50.273626  1.854145  47.872229  ...  100.0  2.0  0.133164
+2024-12-29  50.271597  1.854867  47.873536  ...  100.0  2.0  0.133210
+
+[1825 rows x 9 columns]</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; df["T"] = df["new_I"].cumsum()
+&gt;&gt;&gt; df # doctest: + ELLIPSIS
+                    S         I          R  ...   R0     new_I     T
+date                                        ...                           
+2020-01-01  99.000000  1.000000   0.000000  ...  2.0  0.141429    0.141429
+2020-01-02  98.853717  1.072397   0.073885  ...  2.0  0.151444    0.292872
+2020-01-03  98.697303  1.149788   0.152909  ...  2.0  0.162116    0.454988
+2020-01-04  98.530103  1.232472   0.237425  ...  2.0  0.173479    0.628467
+2020-01-05  98.351424  1.320767   0.327809  ...  2.0  0.185570    0.814038
+                                            ...
+2024-12-25  50.279454  1.851949  47.868597  ...  2.0  0.133021  286.095531
+2024-12-26  50.277556  1.852686  47.869759  ...  2.0  0.133069  286.228601
+2024-12-27  50.275613  1.853418  47.870969  ...  2.0  0.133117  286.361717
+2024-12-28  50.273626  1.854145  47.872229  ...  2.0  0.133164  286.494881
+2024-12-29  50.271597  1.854867  47.873536  ...  2.0  0.133210  286.628091
+
+[1825 rows x 10 columns]</code></pre>
+</details>
+<h4 id="graphiques">Graphiques</h4>
+<ol type="1">
+<li><p>Représentez graphiquement avec la méthode <code>plot</code> des
+tableaux pandas le contenu du tableau de données.</p></li>
+<li><p>Renouvellez l’opération en ne représentant que les valeurs de
+<code>S</code>, <code>I</code> et <code>R</code>.</p></li>
+<li><p>Renouvellez l’opération en ne représentant que les valeurs de
+<code>S</code>, <code>I</code> et <code>R</code> et en utilisant la
+méthode <code>plot.area</code> avec l’option
+<code>stacked=True</code>.</p></li>
+<li><p>Revenir à l’étape 2 en ajoutant <code>T</code> au jeu de
+variables représentées.</p></li>
+<li><p>Représenter les même variables avec la même méthode, mais
+uniquement sur la première année de l’épidémie.</p></li>
+</ol>
+<p><img src="images/SIR-pandas-5.svg"/></p>
+<details>
+<summary>
+<h4 id="solution-8">✨ Solution</h4>
+</summary>
+<pre class="python"><code>&gt;&gt;&gt; import matplotlib.pyplot as plt</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; df.plot()
+&gt;&gt;&gt; plt.show()</code></pre>
+<p><img src="images/SIR-pandas-1.svg"/></p>
+<pre class="python"><code>&gt;&gt;&gt; df_SIR = df[["S", "I", "R"]]
+&gt;&gt;&gt; df_SIR.plot()
+&gt;&gt;&gt; plt.show()</code></pre>
+<p><img src="images/SIR-pandas-2.svg"/></p>
+<pre class="python"><code>&gt;&gt;&gt; df_SIR.plot.area(stacked=True)
+&lt;AxesSubplot:xlabel='date'&gt;
+&gt;&gt;&gt; plt.ylim((0.0, 100.0))
+(0.0, 100.0)
+&gt;&gt;&gt; plt.show()</code></pre>
+<p><img src="images/SIR-pandas-3.svg"/></p>
+<pre class="python"><code>&gt;&gt;&gt; df_SIRT = df[["S", "I", "R", "T"]]
+&gt;&gt;&gt; df_SIRT.plot()
+&gt;&gt;&gt; plt.show()</code></pre>
+<p><img src="images/SIR-pandas-4.svg"/></p>
+<pre class="python"><code>&gt;&gt;&gt; df_SIRT_1st_year = df_SIRT["2020-01-01":"2021-01-01"] 
+&gt;&gt;&gt; df_SIRT_1st_year.plot()
+&lt;AxesSubplot:xlabel='date'&gt;
+&gt;&gt;&gt; plt.show()</code></pre>
+<p><img src="images/SIR-pandas-5.svg"/></p>
+</details>
+<h4 id="export">Export</h4>
+<p>Exporter votre tableau pandas au formats CSV, puis ouvrez une des
+deux versions avec LibreOffice, Google Sheets ou Excel (ou application
+équivalente de votre choix.</p>
+<p><img src="images/SIR-CSV.png"/></p>
+<details>
+<summary>
+<h4 id="solution-9">✨ Solution</h4>
+</summary>
+<pre class="python"><code>&gt;&gt;&gt; df.to_csv("SIR.csv")</code></pre>
 </details>
 <section class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr/>
