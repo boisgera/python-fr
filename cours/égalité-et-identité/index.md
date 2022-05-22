@@ -8,8 +8,6 @@ license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 
 # Egalité
 
-**TODO:** `!=`
-
 L'expression `x == y` détermine si les objets `x` et `y` sont égaux :
 
 ``` python
