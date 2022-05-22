@@ -13,7 +13,7 @@
 <meta charset="utf-8"/>
 <meta content="pandoc" name="generator"/>
 <meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
-<meta content="Sébastien Boisgérault, MINES Paris, Université PSL" name="author"/>
+<meta content="Sébastien Boisgérault, Mines Paris, Université PSL" name="author"/>
 <title>Le serpent</title>
 <style>
     code{white-space: pre-wrap;}
@@ -105,8 +105,8 @@
 <header id="title-block-header">
 <h1 class="title">Le serpent</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
-Boisgérault</a>, MINES Paris, Université PSL</p>
-<p class="date">Mardi, 17 mai 2022</p>
+Boisgérault</a>, Mines Paris, Université PSL</p>
+<p class="date">Dimanche 22 mai 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -121,8 +121,17 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/42b43c7">
-          #42b43c7
+<a href="https://github.com/boisgera/python-fr/commit/7e86a67">
+          #7e86a67
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/edit.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/edit/master/tps/snake-1/index.md">
+          Edition
         </a>
 </p>
 </header>
@@ -156,7 +165,7 @@ serpent qui bouge</a></li>
 <p>Ce TP vous propose de développer un petit jeu en Python. Il constitue
 une introduction à la conception et à la réalisation d’un programme
 complet.</p>
-<p>Son sujet est un classique du jeu vidéo: le 🐍 <a href="https://fr.wikipedia.org/wiki/Snake_(genre_de_jeu_vid%C3%A9o)">Snake</a>.
+<p>Son sujet est un classique du jeu vidéo : le 🐍 <a href="https://fr.wikipedia.org/wiki/Snake_(genre_de_jeu_vid%C3%A9o)">snake</a>.
 Si vous ne connaissez pas son principe, prenez un moment pour découvrir
 <a href="http://slither.io/">slither.io</a>, qui en est est une version
 moderne … et complexe !</p>
@@ -168,8 +177,8 @@ les fonctionnalités s’enrichiront à chaque nouvelle étape.</p>
 <p>⚠️ Ce qui suit suppose que vous avez installé Python avec
 <code>conda</code> et que vous avez un terminal <code>bash</code>
 fonctionnel sur votre ordinateur.</p>
-<p>Commencez par créer un environnement nommé “snake”, dédié au TP et
-contenant Python 3.9</p>
+<p>Commencez par créer un environnement nommé <code>snake</code>, dédié
+au TP et contenant Python 3.9</p>
 <pre class="bash"><code>(base) $ conda create -n snake python=3.9</code></pre>
 <p>Puis activez-le</p>
 <pre class="bash"><code>(base) $ conda activate snake</code></pre>
@@ -200,22 +209,18 @@ dans cet environnement :</p>
 de VS Code pour Python</a>.</p>
 <p><strong>Suggestion #2.</strong> Indiquez à VS Code (et pas uniquement
 au terminal) qu’on souhaite travailler dans l’environnement conda
-<code>snake</code> : cliquer dans la bannière du bas la zone qui indique
+<code>snake</code> : cliquez dans la bannière du bas la zone qui indique
 le Python courant.</p>
-<p><strong>Suggestion #3.</strong> Pour lancer le programme directement
-depuis VS Code :</p>
-<ul>
-<li>ouvrir la palette de commandes
-<ul>
-<li><code>⇧ ⌘ P</code> Shift-Command-P (mac)</li>
-<li><code>⇧ ⌃ P</code> Shift-Control-P (windows)</li>
-</ul></li>
-<li>chercher la fonction <em>Toggle Integrated Terminal</em>
-<ul>
-<li>mémoriser le raccourci clavier</li>
-<li>qui est Control-backtick sur Mac (le backtick c’est `)</li>
-</ul></li>
-</ul>
+<!--
+**Suggestion #3.** Pour lancer le programme directement depuis VS Code :
+
+- ouvrir la palette de commandes
+  - `⇧ ⌘ P` Shift-Command-P (mac)
+  - `⇧ ⌃ P` Shift-Control-P (windows)
+- chercher la fonction *Toggle Integrated Terminal*
+  - mémoriser le raccourci clavier
+  - qui est Control-backtick sur Mac (le backtick c'est `)
+-->
 <!--
 Premiers pas avec PyGame
 --------------------------------------------------------------------------------
@@ -635,7 +640,7 @@ complètement fonctionnel :</p>
 murs, ce qui est une condition d’échec.</p></li>
 <li><p>Enfin on peut afficher le score. La façon la plus simple de
 procéder est de changer le titre de la fenêtre, avec la fonction
-<code>set_caption()</code>:</p>
+<code>set_caption</code> :</p>
 <pre class="python"><code>score = 0
 pygame.display.set_caption(f"Score : {score}")</code></pre></li>
 </ul>

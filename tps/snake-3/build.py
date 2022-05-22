@@ -77,8 +77,7 @@ def post_process_html():
     """)
     html.body.header.append(p)
 
-    # Include github link into header
-        
+    # Include github hash into the header
     hash_ = git("rev-parse", "--short", "HEAD").strip()
     p = HTML(f"""
       <p>
@@ -92,6 +91,32 @@ def post_process_html():
         <a 
           href='https://github.com/boisgera/python-fr/commit/{hash_}'>
           #{hash_}
+        </a>
+      </p>
+    """)
+    html.body.header.append(p)
+
+    # Include "edit" link into the header
+    # https://github.com/boisgera/python-fr/edit/master/tps/snake-1/build.py
+    # find the location of the project wrt project root.
+    path = Path().absolute()
+    r = ""
+    while not (path / ".git").exists():
+        r = path.name + ("/" if r else "") + r
+        path = path.parent
+    edit_path = f"https://github.com/boisgera/python-fr/edit/master/{r}/index.md"
+    p = HTML(f"""
+      <p>
+        <span style='display:inline-block;width:1em;position:relative;margin-right:0.25em'>
+          <img 
+            style='position:relative;top:0.15em;'
+            height='auto' width='100%' 
+            src='icons/edit.svg'>
+          </img>
+        </span>
+        <a 
+          href={edit_path}>
+          Edition
         </a>
       </p>
     """)

@@ -1,7 +1,8 @@
 ---
 title: Le serpent
 author: 
-- "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@minesparis.psl.eu), MINES Paris, Université PSL"
+- "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@minesparis.psl.eu), 
+Mines Paris, Université PSL"
 license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 date: auto
 ---
@@ -18,7 +19,7 @@ Introduction
 Ce TP vous propose de développer un petit jeu en Python. Il constitue 
 une introduction à la conception et à la réalisation d'un programme complet.
 
-Son sujet est un classique du jeu vidéo: le 🐍 [Snake].
+Son sujet est un classique du jeu vidéo : le 🐍 [snake].
 Si vous ne connaissez pas son principe, prenez un moment pour 
 découvrir [slither.io](http://slither.io/), 
 qui en est est une version moderne ... et complexe ! 
@@ -37,7 +38,7 @@ Prérequis
 ⚠️ Ce qui suit suppose que vous avez installé Python avec `conda`
 et que vous avez un terminal `bash` fonctionnel sur votre ordinateur.
 
-Commencez par créer un environnement nommé "snake", dédié au TP et 
+Commencez par créer un environnement nommé `snake`, dédié au TP et 
 contenant Python 3.9
 
 ```bash
@@ -98,8 +99,9 @@ Avec Visual Studio Code
 
 **Suggestion #2.** Indiquez à VS Code (et pas uniquement au terminal) 
 qu'on souhaite travailler dans l'environnement conda `snake` :
-cliquer dans la bannière du bas la zone qui indique le Python courant.
+cliquez dans la bannière du bas la zone qui indique le Python courant.
 
+<!--
 **Suggestion #3.** Pour lancer le programme directement depuis VS Code :
 
 - ouvrir la palette de commandes
@@ -108,6 +110,7 @@ cliquer dans la bannière du bas la zone qui indique le Python courant.
 - chercher la fonction *Toggle Integrated Terminal*
   - mémoriser le raccourci clavier
   - qui est Control-backtick sur Mac (le backtick c'est `)
+-->
 
 <!--
 Premiers pas avec PyGame
@@ -553,7 +556,7 @@ fonctionnel :
 
 - Enfin on peut afficher le score.
   La façon la plus simple de procéder est de changer le titre de la fenêtre, 
-  avec la fonction `set_caption()`:
+  avec la fonction `set_caption` :
   ```python
   score = 0
   pygame.display.set_caption(f"Score : {score}")
