@@ -53,9 +53,9 @@ Définir de telles sections ; on suggère par défaut les labels suivants en com
 En Python, l'usage est de désigner les grandeurs constantes par des noms
 en majuscules (ici dans la section "Setup"). 
 Un des intérêts d'avoir explicitement une section où l'on
-déclare les constante et que l'on évite d'avoir à dupliquer leur valeur
+déclare les constantes et que l'on évite d'avoir à dupliquer leur valeur
 "en dur" dans le code et que si ultérieurement on est amené à changer leur
-valeur, il suffira de le faire à un endroit du code.
+valeur, il suffira de le faire à un seul endroit.
 
   - Définir les constantes entières 
 
@@ -169,8 +169,8 @@ L'état du jeu à un instant donné est capturé par les variables
 
 # Gestion configurable des événements
 
-Le code de gestion des évènements commence à ressembler à du spagetthi ...
-On souhaiterait remplacerce code qui grossit à chaque fois que l'on rajoute 
+Le code de gestion des évènements commence à ressembler à du spaghetti ...
+On souhaiterait remplacer ce code qui grossit à chaque fois que l'on rajoute 
 une fonctionnalité par une fonction générique
 
 ```python

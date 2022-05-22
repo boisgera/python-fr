@@ -119,7 +119,6 @@ La mutiplication d'une liste par un entier `n` est également définie : elle
 produit `n` copies de la liste initiale qui sont concaténées.
 
 ```python
->>>
 >>> 3 * [7, 1]
 [7, 1, 7, 1, 7, 1]
 ```
@@ -130,7 +129,6 @@ La boucle `for` permet d'itérer sur tous les éléments d'une liste.
 >>> l = [1, 2, 3, 4]
 >>> len(l)
 4
->>>
 >>> for i in l:
 ...     print(i)
 ...
@@ -398,7 +396,7 @@ ne dépend pas du nombre d'éléments dans la structure, cf. par exemple
 [l'article Wikipédia qui y est consacré](https://fr.wikipedia.org/wiki/Table_de_hachage). 
 A l'inverse, l'implémentation des tableaux associatifs dans une structure plus simple, 
 comme la liste de liste `[["a", 1], ["b": 2], ["c": 3]]` conduirait à une augmentation 
-linéaire en fonction du nombre d'élements dans la structure.
+du temps d'accès croissant linéairement avec le nombre d'élements dans la structure.
 </details>
 
 # N-uplets

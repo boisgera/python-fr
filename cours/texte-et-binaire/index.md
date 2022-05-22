@@ -10,8 +10,8 @@ date: today
 
 ## Chaînes de caractères
 
-Les chaînes de caractères Python sont définies comme des caractères [Unicode]
-délimités par les caractères `'` ou `"`.
+Les chaînes de caractères Python sont définies comme des suites de caractères 
+[Unicode] délimités par les caractères `'` ou `"`.
 
 [Unicode]: https://fr.wikipedia.org/wiki/Unicode
 
@@ -59,7 +59,7 @@ J'ai compris!
 
 etc.
 
-Les caractères Unicode sont caractérisés par un 🇺🇸 [**code point**](https://en.wikipedia.org/wiki/Code_point), un entier le plus souvent représenté sous la forme "U+????????" où les `?` sont
+Un caractère Unicode est caractérisé par un 🇺🇸 [**code point**](https://en.wikipedia.org/wiki/Code_point), un entier le plus souvent représenté sous la forme "U+????????" où les `?` sont
 des caractères hécadécimaux ; ce qui se traduit en Python par
 `\U????????`. Par exemple :
 
@@ -95,7 +95,7 @@ Les émojis par exemple nécessitent la syntaxe la plus longue :
 
 
 Le chaînes de caractères se comportement également comme des collections
-(immuables) de caractères ... même s'il n'existe pas de type "caractère"! 
+(immuables) de caractères ... même s'il n'existe pas de type "caractère" ! 
 (Un "caractère" est en fait représenté comme une chaîne de caractères
 de longueur 1.)
 
@@ -288,8 +288,8 @@ mode `"w"` (pour "write")
 mais cela n'est pas nécessairement une bonne idée, car Python va alors
 décider par lui-même de l'encodage utilisé pour convertir votre texte en
 données binaires. Il va pour cela utiliser l'encodage déclaré par votre
-environnement (et encore, si tout va bien ...). Sur ma machine, il s'agit 
-d'UTF-8, et que ce choix me convient
+environnement (et encore, si tout va bien ...). Sur ma machine, 
+coup de chance, il s'agit d'UTF-8, et ce choix me convient
 
 ```python
 >>> import locale
@@ -298,8 +298,9 @@ d'UTF-8, et que ce choix me convient
 ```
 
 mais rien ne dit que ce soit la même chose sur votre machine. Si nous devons
-ensuite partager les fichiers texte, il faut être en mesure de savoir comment
-ils sont encodés, ou mieux encore, de choisir quel encodage est utilisé. 
+ensuite partager les fichiers texte avec d'autres personne, 
+il faut être en mesure de savoir comment ils sont encodés, ou mieux encore, 
+de choisir quel encodage est utilisé. 
 Le plus sage consiste à spécifier systématiquement et explicitement quel 
 encodage vous souhaitez utiliser.
 
@@ -368,7 +369,7 @@ Hello world! 👋
 
 Mais, si vous voulez accéder à des données qui ne sont pas du 
 **texte en clair** (🇺🇸 **plain text**) comme une image ou un document PDF, 
-ou bien du texte que vous décoderez vous-même, utiliser le mode
+ou bien du texte que vous décoderez vous-même, utilisez le mode
 "binaire" `"b"` (en lecture comme en écriture) :
 
 ```python

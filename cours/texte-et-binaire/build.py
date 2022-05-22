@@ -99,7 +99,7 @@ def post_process_html():
 
     # Set the date to now.
     # plumbum.local.env["LC_TIME"] = "en_US.utf-8" 
-    date_ = date("+%A, %d %B %Y").strip().capitalize()
+    date_ = date("+%A %d %B %Y").strip().capitalize()
     html.body.header(class_="date")[0].string = date_
 
     # Enable Mathjax Equation Numbers (and label + eqref)

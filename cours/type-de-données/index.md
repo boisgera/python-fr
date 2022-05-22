@@ -9,7 +9,7 @@ date: today
 
 # Absence de valeur
 
-Python fournit une valeur `None` qui signale ... l'absence de valeur!
+Python fournit une valeur `None` qui signale ... l'absence de valeur !
 D'ailleurs, l'interpréteur Python ne veut pas nous l'afficher quand
 on fournit cette valeur sur l'invite de commandes : 
 
@@ -24,7 +24,7 @@ Passer par une variable ne change rien.
 >>> a
 ```
 
-Par contre on peut expliciter afficher `None`, par exemple avec la fonction `print` :
+Par contre on peut explicitement afficher `None`, par exemple avec la fonction `print` :
 
 ```python
 >>> print(a)
@@ -50,8 +50,8 @@ False
 True
 ```
 
-Attention, une variable affectée à `None` et une variable indéfinie (qui n'est
-liée à aucune valeur) c'est subtilement différent. Si la variable `y` n'a pas
+Attention, une variable affectée à `None` ; une variable indéfinie (qui n'est
+liée à aucune valeur) c'est (subtilement) différent. Si la variable `y` n'a pas
 encore été introduite (ou a été effacée avec `del y`),
  l'évaluation de l'expression `y is None` provoque une erreur
 
@@ -62,7 +62,7 @@ Traceback (most recent call last):
 NameError: name 'y' is not defined
 ```
 
-comme d'ailleurs toute expression qui utilise `y`:
+comme d'ailleurs toute expression qui utilise `y` :
 
 ```python
 >>> y
@@ -122,7 +122,7 @@ inutile de renvoyer une valeur.
 Par exemple, invoquer la fonction `sleep` du module Python `time` va mettre
 en pause le programme qui l'invoque (ici l'interpréteur Python) pendant un temps
 déterminé, puis le laisser suivre son cours. L'effet de bord attendu ici,
-c'est la pause dans le programme. Utilisons cette fonction pour dans notre
+c'est la pause dans le programme. Utilisons cette fonction dans notre
 propre fonction `think`
 
 ```python
@@ -190,7 +190,7 @@ KeyError: 'c'
 ```
 
 Cela n'est pas toujours très pratique. Heureusement il existe une méthode
-auxilaire qui permet de renvoyer une valeur particulière en cas d'échec.
+auxiliaire qui permet de renvoyer une valeur particulière en cas d'échec.
 Par défaut, cette valeur est `None`.
 
 
@@ -218,7 +218,7 @@ on pourra faire :
 ### Fonction et absence d'argument
 
 La valeur `None` est souvent utilisée comme valeur par défaut
-associé à l'argument d'une fonction. Ne pas affecter (explicitement) de
+associée à l'argument d'une fonction. Ne pas affecter (explicitement) de
 valeur à cet argument revient à lui affecter la valeur `None`, ce que
 la fonction pourra détecter et gérer de façon appropriée.
 
@@ -286,7 +286,7 @@ FloatingPointError: divide by zero encountered in double_scalars
 ```
 
 Si à l'inverse vous pensez que $1.0 / 0.0$ est une opération "normale" qui
-doit renvoyer un "non-nombre" ($\bot$ ou `nan`), faites en sorte que le mécanisme
+doit renvoyer un "non-nombre" ($\bot$ c'est-à-dire `nan`), faites en sorte que le mécanisme
 de gestion des avertissements et erreurs de NumPy les ignore.
 
 ```python
@@ -301,17 +301,15 @@ vous pouvez invoquer `seterr` en conséquence :
 
 ```python
 >>> _ = np.seterr(overflow="raise")
->>> two = one + one
->>> two**10000
 >>> np.float64(2.0) ** 10000
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 FloatingPointError: overflow encountered in double_scalars
 ```
 
-
-On apprend ainsi qu'il y a 5 arguments, qui ont tous la valeur par défaut
-`None`. Les appels successifs que nous avons fait à `seterr`
+La documentation de `seterr` nous apprend que la fonction a 5 arguments, 
+qui ont tous la valeur par défaut `None`. 
+Les appels successifs que nous avons fait à `seterr`
 
 ```python
 np.seterr()
@@ -434,7 +432,7 @@ des valeur numériques non entières, comme $e$ ou $\pi$ :
 ```
 
 On peut convertir un nombre flottant en une approximation entière avec `int`,
-mais il ne garantit pas que l'on obtienne obtenir l'entier le plus proche.
+mais cela ne garantit pas que l'on obtienne l'entier le plus proche.
 Pour cela il faudra utiliser la fonction `round`.
 ```python
 >>> int(pi)
@@ -448,7 +446,7 @@ Pour cela il faudra utiliser la fonction `round`.
 ```
 
 Il est également possible d'obtenir des approximations "dirigées" à
-l'entier directement inférieur ou supérieure au nombre flottant.
+l'entier directement inférieur ou supérieur au nombre flottant.
 ```python 
 >>> import math
 >>> math.floor(pi)
@@ -459,7 +457,7 @@ l'entier directement inférieur ou supérieure au nombre flottant.
 
 Une caractéristique majeure des nombres flottants est qu'il sont une 
 représentation de précision finie des nombres réels et que les calculs
-effectués avec eux induisent des erreurs :
+effectués avec eux induisent donc (a priori) des erreurs :
 ```python
 >>> 0.1 + 0.2
 0.30000000000000004
