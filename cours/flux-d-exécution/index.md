@@ -2,7 +2,7 @@
 title: Flux d'exécution
 author: 
   - "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@mines-paristech.fr)" 
-affiliation: "MINES ParisTech, Université PSL"
+affiliation: "Mines Paris, Université PSL"
 license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 ---
 
@@ -39,8 +39,6 @@ En Python appartiennent à cette catégorie :
  4. Les **exceptions** (🇺🇸 **exceptions**)
 
 # What if?
-
-Exécution conditionnelle de code, "branching".
 
 ## Booléens
 
@@ -85,7 +83,7 @@ True
 False
 ```
 
-Si les objets sont d'un ordonnés (par exemple des entiers, des nombres
+Si les objets sont d'un type ordonné (par exemple des entiers, des nombres
 flottants, etc.), on peut également utiliser `<` (inférieur strictement à),
 `<=` (inférieur ou égal à), `>` (supérieur strictement à) et `>=` (supérieur
 ou égal à). 
@@ -139,7 +137,7 @@ Leur **identité** est testée avec le mot-clé `is` :
 x is y
 ```
 
-La négation de ces propriétés sont testées par `!=` et `is not` :
+La négation de ces propriétés est testée par `!=` et `is not` :
 
 
 ``` python
@@ -256,25 +254,26 @@ False
 False
 ```
 
-
-### Prédicats
-
-`any` et `all` qqpart?
-
 ### Priorités
 
 📖 [Référence du langage Python / Expressions / Priorité des opérateurs][precedence]
 
 [precedence]: https://docs.python.org/3/reference/expressions.html#operator-precedence
 
-**TODO:** expliquer priorités et "group left to right" ... sauf si ça chaine ?
-(cf doc)
+Certaines expressions booléennes semblent ambigües ; on pourrait a priori 
+interpréter l'expression `not x and y or z` de multiples façons,
+par exemple comme `(not x) and (y or z)` ou comme `not (x and (y or z))`.
+Pour lever cette ambiguité, Python défini une liste de priorité entre
+expressions ; du plus prioritaire au moins prioritaire, on a :
 
  1. Appel de fonction
  2. `in`, `not in`, `is`, `is not`, `<`, `<=`, `>`, `>=`, `!=`, `==`
  3. `not`
  4. `and`
  5. `or`
+
+ L'expression `not x and y or z` est donc interprétée comme
+ `((not x) and y) or z.`
 
 
 ### Conversion explicites
@@ -331,7 +330,7 @@ Pour tous les types standards listés ci-dessus :
 
 #### ℹ️ Valeur par défaut {.details .info}
 
-Pour tout les types, listés plus haut, on remarquera qu'il existe une unique 
+Pour tout les types listés plus haut, on remarquera qu'il existe une unique 
 valeur qui est en quelque sorte fausse ; toutes les autres valeurs sont en 
 quelque sorte vraies. 
 La valeur en question est celle que l'on obtient en appelant le constructeur 
@@ -356,13 +355,7 @@ set()
 >>> assert all(bool(T()) is False for T in types)
 ```
 
-### Conversion automatiques
-
-⚠️ and et or (et not ? si) ne font pas de conversion implicites, c'est plus subtil.
-
-Mais `not` et le contexte `while`, `if` oui.
-
-
+<!--
 
 #### ℹ️ TODO: conseils / bonnes pratiques ? {.details}
 
@@ -380,21 +373,50 @@ Faire preuve de discernement.
     implicite! Utiliser `.size` est le plus souvent ce que l'on veut. Sinon,
     utiliser `.any()` ou `.all()`.
 
+-->
+
 ## `If`
 
-  - if
+Le mot-clé `if` et les mots-clés associés `elif` et `else` permettent
+l'exécution conditionnelle de code.
 
-  - if-elif
+```python
+if condition_1:
+    ... # block 1
+elif condition_2:
+    ... # block 2
+elif condition_3:
+    ... # block 3
+...
+else:
+    ... #block n
+```
 
-  - if-else
+Les clauses `elif` et `else` sont optionnelles. Le mot-clé `elif` doit être
+compris comme un raccourci pour `else if` : le code ci-dessus est équivalent à :
 
-  - conversion implicite en booléen.
+```python
+if condition_1:
+    ... # block 1
+else: 
+    if condition_2:
+        ... # block 2
+    else:
+        if condition_3:
+            ... # block 3
+        ...
+        else:
+            ... #block n
+```
+Les expressions `condition_*`
+sont converties implicitement en booléens et detérminent quel sera le flux
+d'exécution.
 
 # Boucles
 
-## While
+## `While`
 
-Boucle while:
+La boucle `while` s'exécute tant que sa condition est (en quelque sorte) vraie :
 
 ``` python
 >>> numbers = [1, 2, 3]
@@ -409,7 +431,7 @@ Boucle while:
 
 ## `For`
 
-La boucle `for`
+La boucle `for` permet de parcourir tous les éléments d'une collection :
 
 ``` python
 >>> numbers = [1, 2, 3]
@@ -421,16 +443,7 @@ La boucle `for`
 3
 ```
 
-Iterable: collection (listes, n-uplets, ensembles, dictionnaires, etc.), iterateur ou plus généralement itérable.
-
-Ref: <https://docs.python.org/3/library/collections.abc.html#collections.abc.Sized>
-
-  - `for x in y`, types builtins
-
-  - itérable et appels explicites (ex sur un dict)
-
-
-
+On se référera à la section [itération et compréhension](../it%C3%A9ration-et-compr%C3%A9hension/index.html) pour plus de détails.
 
 ## Sortir des boucles
 
@@ -485,10 +498,24 @@ ok
 
 ## Fonctions
 
-Impact sur le flux de contrôle principalement, et *un peu, ad minimima* 
-sur les namespaces ? Bof, non. Par contre, parler de `return`
 
+Lorsqu'une fonction est appelée, son code est exécuté, puis l'exécution reprend
+le fil normal d'exécution.
 
+```python
+>>> def print_ho():
+...     print("Ho!")
+...
+>>> print("Hey!")
+>>> print_ho()
+>>> print("Let's go!)
+Hey!
+Ho!
+Let's go!
+```
+
+Ce principe s'applique récursivement (une fonction peut appeler des fonctions,
+qui peuvent elles-même appelées des fonctions, etc.)
 
 ## Exceptions
 
@@ -601,7 +628,7 @@ l'exception.
 
 ### Gestion des exceptions
 
-Les exceptions qui surviennent **attrapées**
+Les exceptions qui surviennent peuvent être **attrapées**
 (🇺🇸 **to catch an exception**) puis gérées comme on le souhaite 
 avant que celles-ci n'induisent l'arrêt du programme.
 
