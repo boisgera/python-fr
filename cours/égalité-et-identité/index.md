@@ -170,10 +170,47 @@ False
 
 ## Chaînes de caractères
 
+La comparaison des chaînes de caractères se passe la plupart du temps
+comme on s'y attend :
 
-    >>> "e\u0301"
-    'é'
-    >>> "é" == "é"
+```python
+>>> "Hello" == "Hello"
+True
+>>> "Hello" == "Halo"
+False
+```
+
+A ceci près que dans le standard unicode il y a parfois plusieurs façons
+d'obtenir visuellement le même caractère. Il y a ainsi un caractère 
+"e accent aigu"
+
+```python
+>>> "\xe9"
+'é'
+```
+
+mais aussi un symbole combinable "accent aigu" qu'on peut combiner à un "e" :
+
+```python
+>>> "e\u0301"
+'é'
+```
+
+Les deux séquences de code points sont différentes, donc les deux chaînes de
+caractères sont considérées comme différentes :
+
+```python
+>>> "\xe9" == "e\u0301"
+False
+```
+
+C'est toutefois beaucoup plus surprenant quand le test est effectué sous la
+forme suivante :
+
+```python
+>>> "é" == "é"
+False
+```
 
 # Identité
 
