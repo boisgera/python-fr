@@ -32,7 +32,7 @@ Python 🇫🇷
 
   - 📖 [Portée](https://boisgera.github.io/python-fr/cours/portée/index.html)
 
-  - 📖 [Egalité et identités](https://boisgera.github.io/python-fr/cours/égalité-et-identité/index.html)
+  - 📖 [Egalité et identité](https://boisgera.github.io/python-fr/cours/égalité-et-identité/index.html)
  
   - 📖 [Itération et compréhension](https://boisgera.github.io/python-fr/cours/itération-et-compréhension/index.html)
 
