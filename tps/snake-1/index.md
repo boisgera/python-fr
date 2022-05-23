@@ -199,7 +199,7 @@ Copiez ce code dans un fichier `snake.py` et exécutez-le :
 (snake) $ python snake.py
 ```
 
-⚠️ Pour quitter le programme tapez Control-P dans le terminal.
+⚠️ Pour quitter le programme tapez Control-C dans le terminal.
 
 
 ### Exercices
