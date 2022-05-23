@@ -104,7 +104,7 @@ objet à un conteneur (une liste, une chaîne de caractères, un ensemble, etc.)
 ``` python
 >>> 1 in [1, 2, 3]
 True
->>> 0 in [0, 1, 3]
+>>> 0 in [1, 2, 3]
 False
 >>> 1 not in [1, 2, 3]
 False
@@ -389,7 +389,7 @@ elif condition_3:
     ... # block 3
 ...
 else:
-    ... #block n
+    ... # block n
 ```
 
 Les clauses `elif` et `else` sont optionnelles. Le mot-clé `elif` doit être
@@ -406,7 +406,7 @@ else:
             ... # block 3
         ...
         else:
-            ... #block n
+            ... # block n
 ```
 Les expressions `condition_*`
 sont converties implicitement en booléens et detérminent quel sera le flux
@@ -454,8 +454,9 @@ soit pour interrompre définitivement la boucle, avec le mot-clé `break`.
 Par exemple:
 
 ``` python
->>> i = 0
+>>> i = -1
 >>> while i < 6:
+...     i += 1
 ...     if i % 2 == 0:  # i is even
 ...         continue
 ...     print(i)
