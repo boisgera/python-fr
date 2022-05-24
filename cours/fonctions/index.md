@@ -17,7 +17,7 @@ La **valeur de retour** d'une fonction est précédée du mot-clé `return`.
 
 ``` python
 def fibonacci(n):
-    "Return a list of n Fibonnaci numbers."
+    "Return a list of n Fibonacci numbers."
     result = []
     a, b = (0, 1)
     while len(result) < n:
@@ -37,11 +37,11 @@ paramètre l'**argument** `10` et récupérer le résultat :
 
 Les paramètres  d'une fonction peuvent être accompagné d'une **valeur par
 défaut**. On peut ainsi rajouter un second paramètre `start` à la fonction
-`fibonnaci` et lui associer la valeur par défaut `(0, 1)`.
+`fibonacci` et lui associer la valeur par défaut `(0, 1)`.
 
 ``` python
 def fibonacci(n, start=(0, 1)):
-    "Return a list of n Fibonnaci numbers."
+    "Return a list of n Fibonacci numbers."
     result = []
     a, b = start
     while len(result) < n:
@@ -78,7 +78,7 @@ où **nommés** (🇺🇸  : **keyword arguments**), auquel cas l'argument est
 affecté au paramètre du même nom. 
 
 Les arguments nommés sont souvent pratiques pour rendre le rôle de l'argument 
-plus clair. Ainsi ici le second argument de `fibonnaci`, nommé `start`, 
+plus clair. Ainsi ici le second argument de `fibonacci`, nommé `start`, 
 est une paire d'entiers qui fournit les deux valeurs initiales de la suite 
 de Fibonacci. Le rôle du code est sans doute plus évident si l'on utilise un 
 argument nommé :
@@ -169,7 +169,7 @@ def fibonacci(
     n: int, 
     start: tuple[int, int] = (0, 1)
 ) -> list[int]:
-    "Return a list of n Fibonnaci numbers."
+    "Return a list of n Fibonacci numbers."
     result : list[int] = []
     a, b = start
     while len(result) < n:
@@ -190,8 +190,8 @@ l'utilisation de [mypy](http://mypy-lang.org/) vous fournira :
 
 ``` bash
 $ mypy fib.py
-fibonnaci.py:13: error: Argument 1 to "fibonacci" has incompatible type "str"; expected "int"
-fibonnaci.py:13: error: Argument 2 to "fibonacci" has incompatible type "bool"; expected "Tuple[int, int]"
+fibonacci.py:13: error: Argument 1 to "fibonacci" has incompatible type "str"; expected "int"
+fibonacci.py:13: error: Argument 2 to "fibonacci" has incompatible type "bool"; expected "Tuple[int, int]"
 Found 2 errors in 1 file (checked 1 source file)
 ```
 
@@ -655,7 +655,7 @@ Usage :
 et `zip` en utilisant les fonctions génératrices.
 
   - Revoyez la définition de la fonction `fibonacci` pour en faire une fonction
-    génératrice, qui renvoie les nombres de Fibonnaci sous forme d'itérateur
+    génératrice, qui renvoie les nombres de Fibonacci sous forme d'itérateur
     plutôt que de liste. Faites en sorte que lorsque l'argument `n` n'est
     pas fourni, l'itérateur parcoure l'intégralité de la suite.
 
