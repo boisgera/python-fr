@@ -57,11 +57,10 @@ def load_state():
 # Helper Functions
 # ------------------------------------------------------------------------------
 def init():
-    global clock
     pygame.init()
     screen = pygame.display.set_mode([CELL_SIZE*WIDTH, CELL_SIZE*HEIGHT])
     clock = pygame.time.Clock()
-    return screen
+    return screen, clock
 
 def draw(screen):
     screen.fill(COLORS["background"])
