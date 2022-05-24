@@ -107,7 +107,7 @@
 <h1 class="title">Le modèle épidémiologique SIR</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
 Boisgérault</a>, MINES ParisTech</p>
-<p class="date">Vendredi 20 mai 2022</p>
+<p class="date">Mardi 24 mai 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -122,8 +122,8 @@ Boisgérault</a>, MINES ParisTech</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/95d3e46">
-          #95d3e46
+<a href="https://github.com/boisgera/python-fr/commit/70c77fe">
+          #70c77fe
         </a>
 </p>
 
@@ -531,6 +531,8 @@ ensuite les colonnes des valeurs (constantes dans notre modèle) <span class="ma
 correspondantes <code>beta</code>, <code>gamma</code> et
 <code>omega</code>. Afficher un résumé du tableau avant et après cet
 ajout.</p>
+<p>📖 : <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html"><code>DataFrame</code></a>
+(pandas)</p>
 <details>
 <summary>
 <h4 id="solution-6">✨ Solution</h4>
@@ -583,10 +585,17 @@ et <code>gamma</code>.</p></li>
 <li><p>L’épidémie a commencé le 1er janvier 2020. Créez une colonne
 <code>date</code> donnant le jour associé à chaque ligne de donnée, puis
 adoptez cette colonne comme index (plutôt que d’utiliser l’entier qui
-nous a servi jusqu’à présent).</p></li>
+nous a servi jusqu’à présent).</p>
+<p>📖 : <a href="https://numpy.org/doc/stable/reference/arrays.datetime.html"><code>datetime64</code></a>
+(NumPy), <a href="https://pandas.pydata.org/docs/reference/api/pandas.date_range.html"><code>daterange</code></a>,
+<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.set_index.html"><code>DataFrame.set_index</code></a>
+(pandas)</p></li>
 <li><p>Calculez le nombre de nouveaux infectés <span class="math inline">\(\beta I S/N\)</span> chaque jour et définissez une
 nouvelle colonne <code>T</code> comptabilisant le nombre total
-d’infectés depuis le début de l’épidémie.</p></li>
+d’infectés depuis le début de l’épidémie.</p>
+<p>📖 : <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.eval.html"><code>DataFrame.eval</code></a>,
+<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.cumsum.html"><code>Dataframe.cumsum</code></a>
+(pandas)</p></li>
 </ul>
 <details>
 <summary>

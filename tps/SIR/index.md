@@ -564,6 +564,8 @@ Afficher un résumé du tableau avant et après cet ajout.
 
 [pandas]: https://pandas.pydata.org/
 
+📖 : [`DataFrame`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html) (pandas)
+
 <details>
 <summary>
 #### ✨ Solution
@@ -628,9 +630,15 @@ des données qui y sont déjà présentes.
     cette colonne comme index (plutôt que d'utiliser l'entier qui nous a 
     servi jusqu'à présent).
 
+    📖 : [`datetime64`](https://numpy.org/doc/stable/reference/arrays.datetime.html) (NumPy),
+    [`daterange`](https://pandas.pydata.org/docs/reference/api/pandas.date_range.html),
+    [`DataFrame.set_index`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.set_index.html) (pandas)
+
   - Calculez le nombre de nouveaux infectés $\beta I S/N$ chaque jour et
     définissez une nouvelle colonne `T` comptabilisant le nombre total d'infectés
     depuis le début de l'épidémie.
+
+    📖 : [`DataFrame.eval`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.eval.html), [`Dataframe.cumsum`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.cumsum.html) (pandas)
 
 <details>
 <summary>
