@@ -258,7 +258,7 @@ déplaisant ...
 ```
 
 Tous les encodages ne permettent pas de décrire tous les caractères du standard
-Unicode (mais UTF-8, UTF-16 et UTF-16 le permettent).
+Unicode (mais UTF-8, UTF-16 et UTF-32 le permettent).
 
 ```python
 >>> "Sébastien".encode("ascii")
