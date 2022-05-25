@@ -216,7 +216,7 @@ def plot(t, y, **_):
 ## Configuration
 
 Après examen de vos résultats préliminaires, les spécialistes de la dynamique
-vous font par de réglages à effectuer sur la méthode du simulation.
+vous font part de réglages à effectuer sur la méthode du simulation.
 Leurs préconisations prennent la forme d'un fichier `options.py` à
 utiliser avec `solve_ivp` :
 
