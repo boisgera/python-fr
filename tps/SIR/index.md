@@ -775,7 +775,7 @@ date                                        ...
 
  4. Revenir à l'étape 2 en ajoutant `T` au jeu des variables sélectionnées.
 
- 5. Représentez les même variables avec la même méthode, mais uniquement sur
+ 5. Représentez les mêmes variables avec la même méthode, mais uniquement sur
     la première année de l'épidémie.
 
 ![](images/SIR-pandas-5.svg)
