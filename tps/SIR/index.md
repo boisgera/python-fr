@@ -838,7 +838,7 @@ date                                        ...
 #### 🚚 Export
 
 Exportez votre tableau pandas au formats CSV, puis ouvrez-le 
-LibreOffice, Google Sheets ou Excel (ou une application
+avec LibreOffice, Google Sheets ou Excel (ou une application
 équivalente de votre choix).
 
 ![](images/SIR-CSV.png)
