@@ -422,7 +422,7 @@ results = solve_ivp(
 )
 ```
 
-avec les même résultats que précédemment
+avec les mêmes résultats que précédemment
 
 </details>
 
