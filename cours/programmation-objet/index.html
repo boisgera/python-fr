@@ -107,7 +107,7 @@
 <h1 class="title">Programmation Orientée Objet</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
 Boisgérault</a>, MINES Paris, Université PSL</p>
-<p class="date">Mardi 17 mai 2022</p>
+<p class="date">Vendredi 27 mai 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -122,8 +122,8 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/42b43c7">
-          #42b43c7
+<a href="https://github.com/boisgera/python-fr/commit/776ed8e">
+          #776ed8e
         </a>
 </p>
 
@@ -152,7 +152,7 @@ complexes</a></li>
 </ul></li>
 <li><a href="#conception-de-types" id="toc-conception-de-types">Conception de types</a>
 <ul>
-<li><a href="#constructeur-attributs" id="toc-constructeur-attributs">Constructeur &amp; Attributs</a></li>
+<li><a href="#constructeur-et-attributs" id="toc-constructeur-et-attributs">Constructeur et attributs</a></li>
 <li><a href="#méthodes-1" id="toc-méthodes-1">Méthodes</a></li>
 <li><a href="#méthodes-magiques-1" id="toc-méthodes-magiques-1">Méthodes
 magiques</a></li>
@@ -160,7 +160,6 @@ magiques</a></li>
 privés</a></li>
 <li><a href="#propriétés" id="toc-propriétés">Propriétés</a></li>
 </ul></li>
-<li><a href="#objectification-examples" id="toc-objectification-examples">Objectification (Examples)</a></li>
 </ul>
 </nav></details>
 
@@ -172,16 +171,22 @@ convaincre que cette compétence sera très utile en Python, car :</p>
 <blockquote>
 <p>Tout ce qui peut être désigné par une variable est un objet !</p>
 </blockquote>
-<p>Techniquement : “est une <strong>instance</strong> du type
-<code>object</code>”.</p>
+<p>Techniquement :</p>
+<blockquote>
+<p>est une <strong>instance</strong> du <strong>type</strong>
+<code>object</code>.</p>
+</blockquote>
 <details>
 <summary>
 <h4 id="instance">Instance ?</h4>
 </summary>
-<p>Un terme à interpréter dans sa version anglo-saxonne où il peut
-signifier “an individual illustrative of a category”. On pourra se
-représenter un <strong>type</strong> comme une collection d’éléments :
-ses instances.</p>
+<p>Le terme “instance” est à interpréter dans son sens anglo-saxon :</p>
+<blockquote>
+<p>🇺🇸 an individual illustrative of a category</p>
+</blockquote>
+<p>(cf. <a class="uri" href="https://www.merriam-webster.com/dictionary/instance">https://www.merriam-webster.com/dictionary/instance</a>)</p>
+<p>On pourra donc considérer qu’un type est une catégorie d’objets ; ses
+instances sont alors les objets qui lui appartiennent.</p>
 <hr/>
 </details>
 <p>Entiers, booléens, chaînes de caractère, listes, sont donc des objets
@@ -213,7 +218,8 @@ True</code></pre>
 <p>mais comme entier est un sous-type d’objet</p>
 <pre class="python"><code>&gt;&gt;&gt; issubclass(int, object)
 True</code></pre>
-<p>tous les entiers sont aussi des objets.</p>
+<p>tous les entiers sont aussi des objets : les types peuvent être des
+catégories imbriquées les unes dans les autres.</p>
 <hr/>
 </details>
 <p>Bien que cela soit peut-être moins intuitif, des fonctions, des types
@@ -234,42 +240,42 @@ avec des objets.</p>
 complexes :</p>
 <pre class="python"><code>&gt;&gt;&gt; z = 0.5 + 1.5j</code></pre>
 <p>Il est bon de connaître cette syntaxe car c’est celle que Python
-utilisera pour représenter les nombres complexes:</p>
+utilisera pour représenter les nombres complexes :</p>
 <pre class="python"><code>&gt;&gt;&gt; z
 (0.5+1.5j)</code></pre>
-<p>Néanmoins tous les objets ne sont pas dotés d’une telle notation.
-Mais il existe une méthode alternative pour tous les objets : on peut
-appeler le type de l’objet que l’on souhaite instancier (comme s’il
-était une fonction) en lui passant les arguments nécessaires, ici partie
-réelle et imaginaire du nombre à construire. Le type de l’objet sert
-donc de <strong>constructeur</strong>.</p>
+<p>Tous les objets ne sont pas dotés d’une telle notation (dite
+<strong>litérale</strong>). Mais il existe une méthode alternative pour
+tous les objets : on peut appeler le type de l’objet que l’on souhaite
+instancier (comme s’il était une fonction) en lui passant les arguments
+nécessaires, ici partie réelle et imaginaire du nombre à construire. Le
+type de l’objet sert donc de <strong>constructeur</strong>.</p>
 <pre class="python"><code>&gt;&gt;&gt; z = complex(0.5, 1.5)
 &gt;&gt;&gt; z == 0.5+1.5j
 True</code></pre>
 <h3 id="attributs">Attributs</h3>
 <p>Un objet est une structure de données. Les données qu’il contient
-peuvent être rendus accessible sous forme d’<strong>attributs</strong>.
-Tous nombres complexes possèdent ainsi les attributs <code>real</code>
-et <code>imag</code> :</p>
+peuvent être rendues accessibles sous forme
+d’<strong>attributs</strong>. Tous les nombres complexes possèdent ainsi
+les attributs <code>real</code> et <code>imag</code> :</p>
 <pre class="python"><code>&gt;&gt;&gt; z.real
 0.5
 &gt;&gt;&gt; z.imag
 1.5</code></pre>
 <p>La syntaxe pour changer la valeur de l’attribut <code>real</code> du
 nombre <code>z</code> devrait être <code>z.real = ...</code>. Ici
-toutefois un tel assignement échoue parce que les nombres complexes sont
-(volontairement) immuables.</p>
+toutefois cette affectation échoue parce que les nombres complexes ont
+été conçus comme non-modifiables.</p>
 <pre class="python"><code>&gt;&gt;&gt; z.real = -0.5
 Traceback (most recent call last):
   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
 AttributeError: readonly attribute</code></pre>
 <h3 id="méthodes">Méthodes</h3>
 <p>Un nombre complexe possède un attribut <code>conjugate</code> dont la
-nature est un peu particulière, une <strong>méthode</strong> :</p>
-<pre class="python"><code>&gt;&gt;&gt; z.conjugate #doctest: +ELLIPSIS
+nature est un peu particulière. C’est une <strong>méthode</strong> :</p>
+<pre class="python"><code>&gt;&gt;&gt; z.conjugate # doctest: +ELLIPSIS
 &lt;built-in method conjugate of complex object at 0x...&gt;</code></pre>
-<p>Les méthodes, qui se comportent comme les fonctions, sont appelables
-:</p>
+<p>Les méthodes se comportent comme les fonctions : elles sont
+appelables.</p>
 <pre><code>&gt;&gt;&gt; callable(z.conjugate)
 True</code></pre>
 <p>Cette méthode est <strong>liée</strong> au nombre complexe
@@ -277,29 +283,30 @@ True</code></pre>
 contient pour produire un résultat, sans qu’il soit nécessaire de lui
 passer explicitement <code>z</code> comme argument. Ici,
 <code>z.conjugate()</code> renvoie le nombre complexe conjugé de
-<code>z</code>:</p>
+<code>z</code>.</p>
 <pre class="python"><code>&gt;&gt;&gt; z.conjugate()
 (0.5-1.5j)</code></pre>
 <p>La méthode <code>conjugate</code> est également disponible comme
-attribut du type <code>complex</code>:</p>
+attribut du type <code>complex</code>.</p>
 <pre class="python"><code>&gt;&gt;&gt; complex.conjugate
 &lt;method 'conjugate' of 'complex' objects&gt;</code></pre>
 <p>Elle n’est alors par liée à une instance particulière de nombre
 complexe ; il faudra donc lui fournir explicitement le nombre complexe à
-conjuguer en argument :</p>
+conjuguer en argument.</p>
 <pre class="python"><code>&gt;&gt;&gt; complex.conjugate(z)
 (0.5-1.5j)</code></pre>
 <h3 id="méthodes-magiques">Méthodes magiques</h3>
 <p>Sont <strong>magiques</strong> les méthodes d’un objet dont le nom
 commence et finit par un double soulignement <code>"__"</code>. Ces
 méthodes magiques sont rarement appelées directement par le programmeur,
-mais indirectement par Python lui-même.</p>
+mais le plus souvent indirectement par l’interpréteur Python
+lui-même.</p>
 <p>Les méthodes magiques du type <code>complex</code> permettent par
 exemple de faire des calculs avec des nombres complexes avec une syntaxe
 concise : s’il est possible de calculer</p>
 <pre class="python"><code>&gt;&gt;&gt; 1j + 1j * 1j
 (-1+1j)</code></pre>
-<p>c’est que le type complex comporte les méthodes magiques
+<p>c’est que le type <code>complex</code> comporte les méthodes magiques
 <code>__add__</code> et <code>__mul__</code>, appelées en cas d’addition
 et de multiplication respectivement. Le calcul ci-dessus est donc
 équivalent à :</p>
@@ -313,13 +320,13 @@ Python d’appeler lui-même les méthodes magiques – est sensiblement plus
 lisible !</p>
 <h1 id="conception-de-types">Conception de types</h1>
 <p>Notre objectif dans cette section va être de créer un type
-<code>Complex</code> qui va être une version simplifié du type intégré
+<code>Complex</code> qui va être une version simplifiée du type intégré
 <code>complex</code>. Nous allons pour cela définir une nouvelle
-<strong>classe</strong>; pour créer une classe minimale, sans
+<strong>classe</strong> d’objets ; pour créer une classe minimale, sans
 fonctionnalité spécifique, le code ci-dessous suffit :</p>
 <pre class="python"><code>class Complex:
     pass</code></pre>
-<p>A ce stade, il est certe possible d’instancier un “nombre
+<p>A ce stade, il est certes possible d’instancier un “nombre
 complexe”</p>
 <pre class="python"><code>&gt;&gt;&gt; z = Complex()</code></pre>
 <p>ayant le bon type</p>
@@ -341,7 +348,7 @@ AttributeError: 'Complex' object has no attribute 'conjugate'
 Traceback (most recent call last):
   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
 TypeError: unsupported operand type(s) for +: 'Complex' and 'Complex'</code></pre>
-<h2 id="constructeur-attributs">Constructeur &amp; Attributs</h2>
+<h2 id="constructeur-et-attributs">Constructeur et attributs</h2>
 <p>Pour gérer l’ajout des attributs <code>real</code> et
 <code>imag</code>, on pourrait définir une fonction</p>
 <pre class="python"><code>def Complex_init(z, real, imag):
@@ -358,9 +365,9 @@ ajouter les attributs souhaités :</p>
 <p>Possible oui, mais pas pratique ! En définissant directement la
 fonction précédente dans la classe <code>Complex</code>, et en la
 nommant <code>__init__</code>, on définit une méthode magique qui est le
-constructeur associé à la classe <code>Complex</code> et on s’évite cet
-usage maladroit.</p>
-<p>En adoptant la définition suivante de <code>Complex</code></p>
+constructeur associé à la classe <code>Complex</code> et on évite cette
+construction fastidieuse.</p>
+<p>En adoptant donc la définition suivante de <code>Complex</code></p>
 <pre class="python"><code>class Complex:
     def __init__(z, real, imag):
         z.real = real
@@ -385,7 +392,7 @@ de la classe que nous avions définie.</p>
 <h2 id="méthodes-1">Méthodes</h2>
 <p>L’ajout de méthodes à une classe suit le même schéma que le
 constructeur. Ainsi pour avoir une méthode <code>conjugate</code> qui
-retourne le conjugée d’une instance de nombre complexe, on peut
+retourne le conjugué d’une instance de nombre complexe, on peut
 faire</p>
 <pre class="python"><code>class Complex:
     def __init__(self, real, imag):
@@ -415,7 +422,7 @@ s’afficher proprement dans le terminal à ce stade :</p>
 &lt;__main__.Complex object at 0x...&gt;</code></pre>
 <p>C’est un problème que nous pouvons résoudre en définissant une
 méthode magique <code>__repr__</code>, chargée de construire une
-représentation adaptée des instances sous forme de chaîne de
+représentation adaptée des instances sous forme de chaînes de
 caractères.</p>
 <pre class="python"><code>class Complex:
     def __init__(self, real, imag):
@@ -447,7 +454,7 @@ de l’addition par exemple, on peut faire :</p>
 <pre class="python"><code>&gt;&gt;&gt; z = Complex(0.5, 1.5)
 &gt;&gt;&gt; z + z.conjugate()
 (1+0j)</code></pre>
-<p>A noter que pour ce type de méthodes, qui accepte deux instances de
+<p>A noter que pour ce type de méthodes, qui acceptent deux instances de
 la classe en argument, l’usage est d’utiliser les noms <code>self</code>
 et <code>other</code> et donc de préférer la définition suivante
 (équivalente) :</p>
@@ -468,11 +475,11 @@ et <code>other</code> et donc de préférer la définition suivante
 <h2 id="attributs-privés">Attributs privés</h2>
 <p>Tous les attributs d’un objet n’ont pas nécessairement vocation à
 être <strong>publics</strong> ; on peut vouloir des données
-<strong>privées</strong>, à usage interne, uniquement exploitable par
+<strong>privées</strong>, à usage interne, uniquement exploitables par
 les méthodes propres à un objet. La convention en Python est de préfixer
 le nom de tels attributs par un unique caractère de soulignement.</p>
 <p>Il est possible ensuite de contrôler au cas par cas la façon dont on
-autorise le monde extérieur à interager avec ces données. Par exemple,
+autorise le monde extérieur à interagir avec ces données. Par exemple,
 nous pouvons faire en sorte que notre nombre complexe s’assure que ses
 parties réelles et imaginaires soient des nombres flottants. A ce stade
 aucune sécurité de ce type n’est présente ; il est donc très facile (y
@@ -488,15 +495,15 @@ dédiées : des <strong>accesseurs</strong> (<strong>getters</strong>
 et/ou <strong>setters</strong>).</p>
 <p>Par exemple, nous pouvons faire en sorte que lorsque l’on souhaite
 fixer la valeur de la partie réelle ou imaginaire, on s’assure au
-préalable d’avoir bien affaire à un nombre flottant, où l’on génère
-immédiatemment une erreur circonstanciée. Nous pouvons même adapter le
-constructeur pour qu’il bénéficie de cette sécurité supplémentaire. Bien
-sûr comme nous avons rendus privés les parties réelles et imaginaires,
-il nous faudra fournir des fonctions d’accès en lecture pour que les
-utilisateurs externes des nombres complexes puissent les exploiter. En
-interne, il faudra adapter les méthodes pour qu’elles exploient les
-attributs privés ou les accesseurs, plutôt que les attributs publics qui
-ont été supprimés.</p>
+préalable d’avoir bien affaire à un nombre flottant et quand dans le cas
+contraure on génère immédiatemment une erreur circonstanciée. Nous
+pouvons même adapter le constructeur pour qu’il bénéficie de cette
+sécurité supplémentaire. Bien sûr comme nous avons rendus privés les
+parties réelles et imaginaires, il nous faudra fournir des fonctions
+d’accès en lecture pour que les utilisateurs externes des nombres
+complexes puissent les exploiter. En interne, il faudra adapter les
+méthodes pour qu’elles exploient les attributs privés ou les accesseurs,
+plutôt que les attributs publics qui ont été supprimés.</p>
 <pre class="python"><code>class Complex:
     def __init__(self, real, imag):
         self.set_real(real)
@@ -568,13 +575,13 @@ méthodes.</p>
 </details>
 <h2 id="propriétés">Propriétés</h2>
 <p>On pourra regretter la lourdeur syntaxique des accesseurs par rapport
-à l’accès à des attributs publiques. Heureusement il existe un mécanisme
+à l’accès à des attributs publics. Heureusement il existe un mécanisme
 qui offre la même interface syntaxique que l’accès à des attributs, mais
 la même sécurité que le passage par des accesseurs : les
 <strong>propriétés</strong>. Ce sont des attributs “virtuels” que l’on
 définit par leur getter et/ou leur setter. Ainsi, si l’on rajoute les
 propriétés <code>real</code> et <code>imag</code> à notre implémentation
-de la classe <code>Complex</code>,</p>
+de la classe <code>Complex</code></p>
 <pre class="python"><code>class Complex:
     def __init__(self, real, imag):
         self.set_real(real)
@@ -621,224 +628,5 @@ Traceback (most recent call last):
   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
   File "&lt;stdin&gt;", line 11, in set_real
 TypeError: 'Hello' is not a float</code></pre>
-<h1 id="objectification-examples">Objectification (Examples)</h1>
-<pre><code>class Snake:
-    def __init__(self, geometry, direction):
-        self.geometry = geometry
-        self.direction = direction
-    def __iter__(self):
-        return iter(self.geometry)
-    def __len__(self):
-        return len(self.geometry)
-    def __getitem__(self, index):
-        return self.geometry[index]
-    def __eq__(self, other):
-        return (isinstance(other, Snake) and self.geometry == other.geometry and self.direction == other.direction)
-    
-
-geometry = [(10, 15), (11, 15), (12, 15)]
-direction = (0, 1)
-snake = Snake(geometry, direction)
-
-snake
-
-for (x, y) in snake:
-    print(x, y)
-
-(10, 15) in snake
-
-len(snake)
-
-snake[0]
-
-geometry = [(10, 15), (11, 15), (12, 15)]
-direction = (0, 1)
-snake == Snake(geometry, direction)
-
-fruit = (10, 10)
-
-_state = None
-
-class GameState:
-    def __init__(self, snake, fruit):
-        self.snake = snake
-        self.fruit = fruit
-        
-    def save(self):
-        global _state
-        _state = (self.snake, self.fruit)
-        
-    def load(): # does not depend on self
-        snake = _state[0]
-        fruit = _state[1]
-        return GameState(snake, fruit)
-    
-    load = staticmethod(load)
-
-_state = None
-
-class GameState:
-    def __init__(self, snake, fruit):
-        self.snake = snake
-        self.fruit = fruit
-        
-    def save(self):
-        global _state
-        _state = (self.snake, self.fruit)
-
-    @staticmethod # decorator ; equivalent to load = staticmethod(load)
-    def load(): # does not depend on self
-        snake = _state[0]
-        fruit = _state[1]
-        return GameState(snake, fruit)
-
-state = GameState(snake, fruit)
-
-state.fruit = (12, 12)
-
-_state
-
-state.save()
-
-_state
-
-state.fruit = (0, 0)
-
-state2 = state.load()
-
-state = GameState.load()
-
-state.fruit
-
-Héritage
-
-_state = None
-
-class GameState2: # sans héritage
-    def __init__(self, snake, fruit, score):
-        self.snake = snake
-        self.fruit = fruit
-        self.score = score
-        
-    def save(self):
-        global _state
-        _state = (self.snake, self.fruit, self.score)
-
-    @staticmethod # decorator ; equivalent to load = staticmethod(load)
-    def load(): # does not depend on self
-        snake = _state[0]
-        fruit = _state[1]
-        score = _state[2]
-        return GameState2(snake, fruit, score)
-    
-
-class GameState2(GameState): # avec héritage: GameState2 dérive de GameState
-    def __init__(self, snake, fruit, score):
-        super().__init__(snake, fruit) # stocke snake et fruit en attributs
-        self.score = score
-    def save(self):
-        global _state
-        super().save() # _state == (snake, fruit)
-        #state_list = list(_state)
-        #state_list.append(self.score)
-        #_state = tuple(state_list)
-        # shorter:
-        _state = _state + (self.score,)
-    @staticmethod # decorator ; equivalent to load = staticmethod(load)
-    def load(): # does not depend on self
-        state1 = GameState.load()
-        snake = state1.snake
-        fruit = state1.fruit
-        score = _state[2]
-        return GameState2(snake, fruit, score)
-
-score = 12
-state = GameState2(snake, fruit, score)
-
-state.snake, state.fruit, state.score
-
-state.save()
-
-_state
-
-state2 = GameState2.load()
-
-state2.snake
-
-state2.fruit
-
-state2.score
-
-Accesseurs, Variables privées, etc.
-
-import copy
-
-class Snake:
-    def __init__(self, geometry, direction):
-        self._geometry = geometry
-        self._direction = direction
-    def get_geometry(self):
-        print("GET")
-        return copy.copy(self._geometry)
-    def set_geometry(self, geometry):
-        print("SET")
-        # TODO: ajout validation de geometry
-        self._geometry = copy.copy(geometry)
-    geometry = property(get_geometry, set_geometry)    
-        
-    def get_score(self):
-        return len(self)
-    score = property(get_score) # read-only, virtual property
-    
-        
-    def __iter__(self):
-        return iter(self.geometry)
-    def __len__(self):
-        return len(self.geometry)
-    def __getitem__(self, index):
-        return self.geometry[index]
-    def __eq__(self, other):
-        return (isinstance(other, Snake) and self.geometry == other.geometry and self.direction == other.direction)
-    
-class GameState:
-    def __init__(self, snake, fruit):
-        self.snake = snake
-        self.fruit = fruit
-
-geometry = [(10, 15), (11, 15), (12, 15)]
-direction = (0, 1)
-snake = Snake(geometry, direction)
-
-snake._geometry # ça marche mais _ indique que par convention, seules les méthodes Snake devraient accéder à cet attribut
-# attribut privé
-
-snake.get_geometry()
-
-geometry = snake.get_geometry()
-
-geometry[0] = None # pas de corruption de la variable snake._geometry grace à la copie !!!
-
-snake.get_geometry()
-
-snake.set_geometry([(0, 0), (0, 1)])
-
-snake.get_geometry()
-
-snake.geometry = [(3, 3)]
-
-snake.geometry
-
-snake.score
-
-snake.score = 999
-
----------------------------------------------------------------------------
-AttributeError                            Traceback (most recent call last)
-/tmp/ipykernel_34619/2459733161.py in &lt;module&gt;
-----&gt; 1 snake.score = 999
-
-AttributeError: can't set attribute
-
-help(copy)</code></pre>
 </body>
 </html>
