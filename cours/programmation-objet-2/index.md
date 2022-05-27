@@ -6,28 +6,11 @@ license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 date: auto
 ---
 
-# 🚧 TODO 🚧
-
-  - Polymorphism
-
-  - ~~Latent/structural ("duck") typing~~
-
-  - ~~Subtyping, inheritance~~ `issubclass`
-
-  - (Very) late dispatch
-
-  - Inheritance vs composition vs delegation
-
-
-# Introduction 
-
-🚧 TODO 🚧
-
-# Typage implicite
+# Typage implicite 🦆
 
 ## Etude de cas
 
-La fonction `copy_file` lit le contenu d'un objet fichier et l'écrit dans un autre.
+La fonction `copy_file` ci-dessous lit le contenu d'un objet fichier et l'écrit dans un autre :
 
 ```python
 def copy_file(input, output):
@@ -38,7 +21,7 @@ def copy_file(input, output):
 Créons un (tout petit) fichier binaire `image.png` sur notre disque dur
 
 ```python
->>> with open("image.png", mode="bw") as image_file:
+with open("image.png", mode="bw") as image_file:
 ...     image_file.write(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x01\x00\x00\x00\x01\x00\x01\x03\x00\x00\x00f\xbc:%\x00\x00\x00\x03PLTE\xb5\xd0\xd0c\x04\x16\xea\x00\x00\x00\x1fIDATh\x81\xed\xc1\x01\r\x00\x00\x00\xc2\xa0\xf7Om\x0e7\xa0\x00\x00\x00\x00\x00\x00\x00\x00\xbe\r!\x00\x00\x01\x9a`\xe1\xd5\x00\x00\x00\x00IEND\xaeB`\x82')
 ...
 ```
@@ -133,10 +116,6 @@ A ce stade, l'interpréteur Python n'est **pas** informé de ce contrat et
 ne fait rien de particulier pour assurer que l'engagement mutuel soit
 respecté. Il conviendra donc au développeur de la fonction de documenter
 ce protocole et à son utilisateur de lire et de le respecter.
-
-## Protocoles standards
-
-🚧 TODO 🚧
 
 ## Vérification statique
 
@@ -251,7 +230,8 @@ Nous allons essayer de nous doter d'une nouvelle classe de nombres complexes,
 sans modifier le code source de `Complex`, mais en exploitant ses fonctionnalités
 au maximum.
 
-Pour cela, nous allons dériver la class `Complex2` de la classe `Complex`.
+Pour cela, nous allons **dériver** la classe `Complex2` de la classe `Complex` ;
+la nouvelle classe **héritera** du comportement de la classe précédente.
 Au minimum, cela signifie une déclaration de la forme
 
 ```python
@@ -293,7 +273,16 @@ On a même
 True
 ```
 
-Seuls changements visibles, on a désormais
+En conséquence, on pourra **substituer** une instance de la classe
+`Complex2` à une fonction qui attend une instance de la classe `Complex`.
+La fonction en question est dit **polymorphique** : elle fonctionne avec un
+type d'objet donné, mais également avec des types dérivés conçus par
+le programmeur.
+
+
+Le seuls changements visibles entre `Complex` et `Complex2` sont les 
+tests qui demandent explicitement le type de l'objet complexe `z` et le
+test `isinstance(z, Complex2)`.
 
 ```python
 >>> type(z) is Complex
@@ -335,8 +324,8 @@ allons attendre un peu pour le corriger, nous serons bientôt mieux placés
 pour corriger le problème.
 
 En attendant, nous allons faire en sorte que notre constructeur soit un peu
-plus polyvalent ; nous aimerions bien pouvoir construire un nouvel objet
-complex à partir de tout objet qui possède des attributs numériques
+plus polyvalent ; nous aimerions bien pouvoir construire un nombre complexe
+à partir de tout objet qui possède des attributs numériques
 `real` et `imag`, par exemple, un nombre complexe intégré, instance de
 la class `complex`. Avec la classe `Complex`, cela ne marche pas :
 
@@ -385,7 +374,7 @@ class Complex2(Complex):
         return Complex2(real, imag)
 ```
 
-On notera que les deux dernières lignes du constructeurs sont un copié-collé
+On notera que les deux dernières lignes du constructeurs sont un copier-coller
 du code du constructeur parent. Autant faire appel directement à celui-ci !
 On pourra au choix utiliser la syntaxe explicite 
 `Complex.__init__(self, real, imag)` ou la construction `super()`
@@ -419,9 +408,10 @@ Désormais, le constructeur de `Complex2` accepte les arguments complexes :
 (0.5+1.5j)
 ```
 
-Il est temps de revenir à notre subtil bug. En héritant la méthode `__add__`
-de la classe parent `Complex`, on va malheureusement toujours obtenir une
-instance de `Complex` quand on additionne des instances de `Complex2`.
+Il est temps de revenir au subtil bug que nous avons évoqué. 
+En héritant la méthode `__add__` de la classe parent `Complex`, 
+on va malheureusement toujours obtenir une instance de `Complex` 
+quand on additionne des instances de `Complex2`.
 
 ```python
 >>> z = Complex2(0.5, 1.5)
@@ -431,7 +421,7 @@ instance de `Complex` quand on additionne des instances de `Complex2`.
 ```
 
 Il est possible de corriger cela directement en réimplémentant `__add__`
-dans la class dérivée
+dans la classe dérivée
 
 ```python
 class Complex2(Complex):
@@ -528,7 +518,7 @@ class Complex2(Complex):
 ## `pathlib`
 
 Le module de la bibliothèque Python standard [`pathlib`] fournit des classes
-de chemins représentant les fichiers et répertoire d'un système de fichiers.
+de chemins représentant les fichiers et répertoires d'un système de fichiers.
 Plus précisément
 
 [`pathlib`]: https://docs.python.org/fr/3/library/pathlib.html
@@ -541,7 +531,7 @@ de désigner des fichiers mais sans accéder au système de fichier proprement d
 Les instances de `Path` -- qui dérive de `PurePath` -- le permettent.
 
 Les classes de chemin sont de plus distinguées selon que le système de fichier
-soit Windows ou Posix (Linux et MacOS), mais on ne s'en préoccupera pas trop.
+soit Windows ou Posix (Linux et MacOS), mais on ne s'en préoccupera pas ici.
 
 Par exemple, sur ma machine (Linux), je peux désigner la racine du système
 de fichier par un chemin pur et l'utiliser pour construire le chemin (pur)

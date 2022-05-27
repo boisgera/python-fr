@@ -107,7 +107,7 @@
 <h1 class="title">Programmation Orientée Objet 2</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
 Boisgérault</a>, MINES Paris, Université PSL</p>
-<p class="date">Mercredi 18 mai 2022</p>
+<p class="date">Vendredi 27 mai 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -122,8 +122,8 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/3dda5cc">
-          #3dda5cc
+<a href="https://github.com/boisgera/python-fr/commit/a346678">
+          #a346678
         </a>
 </p>
 
@@ -142,14 +142,11 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 </summary>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#todo" id="toc-todo">🚧 TODO 🚧</a></li>
-<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
 <li><a href="#typage-implicite" id="toc-typage-implicite">Typage
-implicite</a>
+implicite 🦆</a>
 <ul>
 <li><a href="#etude-de-cas" id="toc-etude-de-cas">Etude de cas</a></li>
 <li><a href="#protocoles" id="toc-protocoles">Protocoles</a></li>
-<li><a href="#protocoles-standards" id="toc-protocoles-standards">Protocoles standards</a></li>
 <li><a href="#vérification-statique" id="toc-vérification-statique">Vérification statique</a></li>
 </ul></li>
 <li><a href="#héritage" id="toc-héritage">Héritage</a></li>
@@ -163,27 +160,16 @@ implicite</a>
 </nav></details>
 
 
-<h1 id="todo">🚧 TODO 🚧</h1>
-<ul>
-<li><p>Polymorphism</p></li>
-<li><p><del>Latent/structural (“duck”) typing</del></p></li>
-<li><p><del>Subtyping, inheritance</del>
-<code>issubclass</code></p></li>
-<li><p>(Very) late dispatch</p></li>
-<li><p>Inheritance vs composition vs delegation</p></li>
-</ul>
-<h1 id="introduction">Introduction</h1>
-<p>🚧 TODO 🚧</p>
-<h1 id="typage-implicite">Typage implicite</h1>
+<h1 id="typage-implicite">Typage implicite 🦆</h1>
 <h2 id="etude-de-cas">Etude de cas</h2>
-<p>La fonction <code>copy_file</code> lit le contenu d’un objet fichier
-et l’écrit dans un autre.</p>
+<p>La fonction <code>copy_file</code> ci-dessous lit le contenu d’un
+objet fichier et l’écrit dans un autre :</p>
 <pre class="python"><code>def copy_file(input, output):
     data = input.read()
     output.write(data)</code></pre>
 <p>Créons un (tout petit) fichier binaire <code>image.png</code> sur
 notre disque dur</p>
-<pre class="python"><code>&gt;&gt;&gt; with open("image.png", mode="bw") as image_file:
+<pre class="python"><code>with open("image.png", mode="bw") as image_file:
 ...     image_file.write(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x01\x00\x00\x00\x01\x00\x01\x03\x00\x00\x00f\xbc:%\x00\x00\x00\x03PLTE\xb5\xd0\xd0c\x04\x16\xea\x00\x00\x00\x1fIDATh\x81\xed\xc1\x01\r\x00\x00\x00\xc2\xa0\xf7Om\x0e7\xa0\x00\x00\x00\x00\x00\x00\x00\x00\xbe\r!\x00\x00\x01\x9a`\xe1\xd5\x00\x00\x00\x00IEND\xaeB`\x82')
 ...</code></pre>
 <p>puis exploitons <code>copy_file</code> pour en créer un copie nommée
@@ -256,8 +242,6 @@ de ce contrat et ne fait rien de particulier pour assurer que
 l’engagement mutuel soit respecté. Il conviendra donc au développeur de
 la fonction de documenter ce protocole et à son utilisateur de lire et
 de le respecter.</p>
-<h2 id="protocoles-standards">Protocoles standards</h2>
-<p>🚧 TODO 🚧</p>
 <h2 id="vérification-statique">Vérification statique</h2>
 <p>Il existe des outils qui permettent de formaliser (partiellement) les
 contrats sur lesquels reposent vos programmes, par exemple <a href="http://mypy-lang.org/">mypy</a>.</p>
@@ -339,9 +323,10 @@ complexes, <code>Complex2</code> dont les instances auront un
 comportement qui nous convient mieux, sans modifier le code source de
 <code>Complex</code>, mais en exploitant ses fonctionnalités au
 maximum.</p>
-<p>Pour cela, nous allons dériver la class <code>Complex2</code> de la
-classe <code>Complex</code>. Au minimum, cela signifie une déclaration
-de la forme</p>
+<p>Pour cela, nous allons <strong>dériver</strong> la classe
+<code>Complex2</code> de la classe <code>Complex</code> ; la nouvelle
+classe <strong>héritera</strong> du comportement de la classe
+précédente. Au minimum, cela signifie une déclaration de la forme</p>
 <pre class="python"><code>class Complex2(Complex):
     pass</code></pre>
 <p>A ce stade, pour l’essentiel, pas de changement dans le comportement
@@ -371,7 +356,16 @@ TypeError: 'Hello' is not a float
 <p>On a même</p>
 <pre class="python"><code>&gt;&gt;&gt; isinstance(z, Complex)
 True</code></pre>
-<p>Seuls changements visibles, on a désormais</p>
+<p>En conséquence, on pourra <strong>substituer</strong> une instance de
+la classe <code>Complex2</code> à une fonction qui attend une instance
+de la classe <code>Complex</code>. La fonction en question est dit
+<strong>polymorphique</strong> : elle fonctionne avec un type d’objet
+donné, mais également avec des types dérivés conçus par le
+programmeur.</p>
+<p>Le seuls changements visibles entre <code>Complex</code> et
+<code>Complex2</code> sont les tests qui demandent explicitement le type
+de l’objet complexe <code>z</code> et le test
+<code>isinstance(z, Complex2)</code>.</p>
 <pre class="python"><code>&gt;&gt;&gt; type(z) is Complex
 False
 &gt;&gt;&gt; type(z) is Complex2
@@ -400,7 +394,7 @@ nous allons attendre un peu pour le corriger, nous serons bientôt mieux
 placés pour corriger le problème.</p>
 <p>En attendant, nous allons faire en sorte que notre constructeur soit
 un peu plus polyvalent ; nous aimerions bien pouvoir construire un
-nouvel objet complex à partir de tout objet qui possède des attributs
+nombre complexe à partir de tout objet qui possède des attributs
 numériques <code>real</code> et <code>imag</code>, par exemple, un
 nombre complexe intégré, instance de la class <code>complex</code>. Avec
 la classe <code>Complex</code>, cela ne marche pas :</p>
@@ -439,7 +433,7 @@ réelle et le second comme partie imaginaire.</p>
         imag = r1*i2 + r2*i1
         return Complex2(real, imag)</code></pre>
 <p>On notera que les deux dernières lignes du constructeurs sont un
-copié-collé du code du constructeur parent. Autant faire appel
+copier-coller du code du constructeur parent. Autant faire appel
 directement à celui-ci ! On pourra au choix utiliser la syntaxe
 explicite <code>Complex.__init__(self, real, imag)</code> ou la
 construction <code>super()</code> comme ci-dessous :</p>
@@ -464,16 +458,17 @@ arguments complexes :</p>
 (0.5+1.5j)
 &gt;&gt;&gt; Complex2(Complex(0.5, 1.5))
 (0.5+1.5j)</code></pre>
-<p>Il est temps de revenir à notre subtil bug. En héritant la méthode
-<code>__add__</code> de la classe parent <code>Complex</code>, on va
-malheureusement toujours obtenir une instance de <code>Complex</code>
-quand on additionne des instances de <code>Complex2</code>.</p>
+<p>Il est temps de revenir au subtil bug que nous avons évoqué. En
+héritant la méthode <code>__add__</code> de la classe parent
+<code>Complex</code>, on va malheureusement toujours obtenir une
+instance de <code>Complex</code> quand on additionne des instances de
+<code>Complex2</code>.</p>
 <pre class="python"><code>&gt;&gt;&gt; z = Complex2(0.5, 1.5)
 &gt;&gt;&gt; w = z + z
 &gt;&gt;&gt; type(w)
 &lt;class '__main__.Complex'&gt;</code></pre>
 <p>Il est possible de corriger cela directement en réimplémentant
-<code>__add__</code> dans la class dérivée</p>
+<code>__add__</code> dans la classe dérivée</p>
 <pre class="python"><code>class Complex2(Complex):
     def __init__(self, real_or_complex, imag=None):
         try:
@@ -552,7 +547,7 @@ utiliser un code qui va adapter le type de la valeur renvoyée au type de
 <h1 id="la-bibliothèque-standard">La bibliothèque standard</h1>
 <h2 id="pathlib"><code>pathlib</code></h2>
 <p>Le module de la bibliothèque Python standard <a href="https://docs.python.org/fr/3/library/pathlib.html"><code>pathlib</code></a>
-fournit des classes de chemins représentant les fichiers et répertoire
+fournit des classes de chemins représentant les fichiers et répertoires
 d’un système de fichiers. Plus précisément</p>
 <blockquote>
 <p>Les classes de chemins sont divisées en chemins purs, qui fournissent
@@ -566,7 +561,7 @@ fichier proprement dit. Les instances de <code>Path</code> – qui dérive
 de <code>PurePath</code> – le permettent.</p>
 <p>Les classes de chemin sont de plus distinguées selon que le système
 de fichier soit Windows ou Posix (Linux et MacOS), mais on ne s’en
-préoccupera pas trop.</p>
+préoccupera pas ici.</p>
 <p>Par exemple, sur ma machine (Linux), je peux désigner la racine du
 système de fichier par un chemin pur et l’utiliser pour construire le
 chemin (pur) vers le répertoire racine d’hypothétiques utilisateurs
@@ -605,7 +600,7 @@ True</code></pre>
 instances de <code>Path</code> peuvent être utilisées partout où les
 instances de <code>PurePath</code> feraient l’affaire.</p>
 <h2 id="random"><code>random</code></h2>
-<h3 id="introduction-1">Introduction</h3>
+<h3 id="introduction">Introduction</h3>
 <p>Le module de la bibliothèque Python standard <a href="https://docs.python.org/fr/3/library/random.html"><code>random</code></a>
 permet de générer des nombres pseudo-aléatoires.</p>
 <pre class="python"><code>&gt;&gt;&gt; import random</code></pre>
