@@ -2,26 +2,29 @@
 import sys
 
 # Third-party Libraries
-import pygame as pg
+import pygame
+
+# Local
+from constants import *
 
 
 class Game:
-    def __init__(self, size=(640, 480), fps=1, caption=""):
-        pg.init()
-        self.screen = pg.display.set_mode(size)
-        self.clock = pg.time.Clock()
+    def __init__(self, size=(WIDTH*CELL_SIZE, HEIGHT*CELL_SIZE), fps=FPS, caption=""):
+        pygame.init()
+        self.screen = pygame.display.set_mode(size)
+        self.clock = pygame.time.Clock()
         self.fps = fps
         self.caption = caption
 
     def start(self):
         while True:
-            self.clock.tick(self.fps)
-            events = pg.event.get()
+            events = pygame.event.get()
             self.process_events(events)
-
             self.draw()
-            pg.display.set_caption(self.caption)
-            pg.display.update()
+            pygame.display.update()
+            pygame.display.set_caption(self.caption)
+
+            self.clock.tick(self.fps)
 
     def process_events(self, events):
         raise NotImplementedError()
@@ -30,5 +33,5 @@ class Game:
         raise NotImplementedError()
 
     def quit(self, error=None):
-        pg.quit()
+        pygame.quit()
         sys.exit(error)

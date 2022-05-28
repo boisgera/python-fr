@@ -106,7 +106,7 @@
 <h1 class="title">Le retour du retour du serpent</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
 Boisgérault</a>, MINES Paris – PSL</p>
-<p class="date">Vendredi 27 mai 2022</p>
+<p class="date">Samedi 28 mai 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -121,8 +121,8 @@ Boisgérault</a>, MINES Paris – PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/a346678">
-          #a346678
+<a href="https://github.com/boisgera/python-fr/commit/ceca30e">
+          #ceca30e
         </a>
 </p>
 
@@ -159,12 +159,160 @@ automatique</a></li>
 
 
 <h1 id="introduction">🕹️ Introduction</h1>
-<p>Nous allons remanier (à nouveau !) le jeu <a href="../snake-2/solutions/snake-v2.4.py">🐍 snake.py</a>, en exploitant
+<p>Nous allons remanier (à nouveau !) notre programme <a href="../snake-2/solutions/snake-v2.4.py">🐍 snake.py</a>, en exploitant
 une conception orientée objet. Nous tenterons de rendre son code plus
 robuste / réutilisable / compréhensible / maintenable. Nous tâcherons
 ensuite de tirer les bénéfices de cette réorganisation en développant –
 avec le minimum d’effort de développement – un 🤖 bot qui assistera le
 joueur dans la poursuite du high-score.</p>
+<details>
+<summary>
+<strong>📄 Snake version 2</strong>
+</summary>
+<pre class="python"><code># Python Standard Library
+import random
+import sys
+
+# Pygame
+import pygame
+
+# Setup
+# ------------------------------------------------------------
+WIDTH = 30
+HEIGHT = 30
+CELL_SIZE = 20
+FPS = 1.0
+COLORS = {
+    "background": [255, 255, 255],
+    "snake": [0, 0, 0],
+    "fruit": [255, 0, 0]
+}
+UP = [0, -1]
+DOWN = [0, 1]
+LEFT = [-1, 0]
+RIGHT = [1, 0]
+SNAPSHOT="snapshot.py"
+
+# State
+# ------------------------------------------------------------
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = DOWN
+fruit = [10, 10]
+score = 0
+
+def save_state():
+    state = {
+        "snake": snake,
+        "direction": direction,
+        "fruit": fruit,
+        "score": score
+    }
+    with open(SNAPSHOT, mode="w") as file:
+        file.write(repr(state))
+
+def load_state():
+    global snake, direction, fruit, score
+    with open(SNAPSHOT, mode="r", encoding="utf-8") as file:
+        data = file.read()
+    state = eval(data)
+    snake = state["snake"]
+    direction = state["direction"]
+    fruit = state["fruit"]
+    score = state["score"]    
+
+
+# Helper Functions
+# ------------------------------------------------------------
+def init():
+    pygame.init()
+    screen = pygame.display.set_mode([CELL_SIZE*WIDTH, CELL_SIZE*HEIGHT])
+    clock = pygame.time.Clock()
+    return screen, clock
+
+def draw(screen):
+    screen.fill(COLORS["background"])
+    for x, y in snake:
+        rect = [x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE]
+        pygame.draw.rect(screen, COLORS["snake"], rect)
+    rect = [fruit[0]*CELL_SIZE, fruit[1]*CELL_SIZE, CELL_SIZE, CELL_SIZE]
+    pygame.draw.rect(screen, COLORS["fruit"], rect)  
+    pygame.display.set_caption(f"Score : {score}")
+
+def set_direction(d):
+    def action():
+        global direction
+        direction = d
+    return action
+
+def move_snake():
+    global snake, score, fruit
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0], 
+      head[1] + direction[1]
+    ]
+    if new_head in snake:
+        sys.exit()
+    elif new_head[0] &lt; 0 or new_head[0] &gt;= WIDTH:
+        sys.exit()
+    elif new_head[1] &lt; 0 or new_head[1] &gt;= HEIGHT:
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, WIDTH-1), 
+            random.randint(0, HEIGHT-1)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+
+# Event Management
+# ------------------------------------------------------------
+KEY_BINDINGS = {
+    "q": sys.exit,
+    "up": set_direction(UP),
+    "down": set_direction(DOWN),
+    "left": set_direction(LEFT),
+    "right": set_direction(RIGHT),
+    "s": save_state,
+    "l": load_state,
+}
+
+KEY_EVENT_HANDLER = {pygame.key.key_code(k): v for k, v in KEY_BINDINGS.items()}
+
+def handle_events(events):
+    for event in events:
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            event_handler = KEY_EVENT_HANDLER.get(event.key)
+            if event_handler:
+                event_handler()
+
+def wait_for_next_frame(clock):
+    clock.tick(FPS)
+
+# Main Loop
+# ------------------------------------------------------------
+try:
+    load_state()
+except FileNotFoundError:
+    pass
+
+screen, clock = init()
+while True:
+    events = pygame.event.get()
+    handle_events(events)
+    move_snake()
+    draw(screen)
+    pygame.display.update()
+    wait_for_next_frame(clock)</code></pre>
+</details>
 <h1 id="validation">✔️ Validation</h1>
 <p>Quelles sont les valeurs admissibles pour la direction du serpent ?
 Implémenter une fonction <code>check_direction</code> qui prenne en
@@ -186,20 +334,66 @@ entrainer la fin immédiate du jeu.</p></li>
 <code>check_geometry</code> qui prenne en argument une géométrie de
 serpent, ne renvoie rien si elle est valide et lève l’exception
 appropriée dans le cas contraire.</p>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>def check_direction(direction):
+    valid_directions = list(DIRECTIONS.values())
+    if (
+        not isinstance(direction, list)
+        or len(direction) != 2
+        or not isinstance(direction[0], int)
+        or not isinstance(direction[1], int)
+    ):
+        raise TypeError(f"{direction} is not a pair of integers")
+    elif direction not in valid_directions:
+        raise ValueError(f"{direction} is not in {valid_directions}")
+
+
+def is_in_scope(tile):
+    x, y = tile
+    return 0 &lt;= x &lt; WIDTH and 0 &lt;= y &lt; HEIGHT
+
+
+def check_geometry(geometry):
+    if not all(
+        isinstance(item, list)
+        and len(item) == 2
+        and isinstance(item[0], int)
+        and isinstance(item[1], int)
+        for item in geometry
+    ):
+        raise TypeError("all geometry items should be pairs of integers")
+    if not geometry:
+        raise ValueError("empty geometry")
+    for i, item in enumerate(geometry[:-1]):
+        next_item = geometry[i + 1]
+        diff = (next_item[0] - item[0], next_item[1] - item[1])
+        if abs(diff[0]) + abs(diff[1]) != 1:
+            raise ValueError("non-connected snake geometry")
+    if not all(is_in_scope(item) for item in geometry):
+        raise SystemExit("snake out of bounds")
+
+    for i, elt in enumerate(geometry):
+        if elt in geometry[i+1:]:
+            # at least one repeated item
+            raise SystemExit("snake self-collision")</code></pre>
+</details>
 <h1 id="un-type-snake">🐍 Un type <code>Snake</code></h1>
 <p>Implémenter une classe <code>Snake</code> encapsulant la géométrie et
 la direction du serpent :</p>
-<pre><code>&gt;&gt;&gt; geometry = [(10, 15), (11, 15), (12, 15)]
-&gt;&gt;&gt; direction = (0, 1)
+<pre class="python"><code>&gt;&gt;&gt; geometry = [[10, 15], [11, 15], [12, 15]]
+&gt;&gt;&gt; direction = [0, 1]
 &gt;&gt;&gt; snake = Snake(geometry, direction)</code></pre>
-<p>Le constructeur de <code>Snake</code> doit valider la géométrie et la
-direction (ou lever une exception). Stocker les arguments
-<code>geometry</code> et <code>direction</code> comme les attributs de
-même nom de l’instance snake.</p>
-<pre><code>&gt;&gt;&gt; snake.geometry
-[(10, 15), (11, 15), (12, 15)]
+<p>Le constructeur de <code>Snake</code> doit vérifier que la géométrie
+et la direction ou générer une erreur si cela n’est pas le cas. Stockez
+les arguments <code>geometry</code> et <code>direction</code> comme les
+attributs de même nom de l’instance snake.</p>
+<pre class="python"><code>&gt;&gt;&gt; snake.geometry
+[[10, 15], [11, 15], [12, 15]]
 &gt;&gt;&gt; snake.direction
-(0, 1)</code></pre>
+[0, 1]</code></pre>
 <p>A-t’on la garantie que ces attributs restent valides quel que soit
 l’usage que le programmeur fasse de l’instance <code>snake</code> dans
 son code ? Faire disparaître les attributs publics <code>geometry</code>
@@ -208,19 +402,64 @@ et <code>direction</code> au profit d’attributs privés
 méthodes <code>get_direction</code> et <code>set_direction</code>
 permettant d’accéder à l’attribut <code>_direction</code> en assurant sa
 validité</p>
-<pre><code>&gt;&gt;&gt; snake.get_direction()
-(0, 1)
-&gt;&gt;&gt; snake.set_direction((0, -1))
+<pre class="python"><code>&gt;&gt;&gt; snake.get_direction()
+[0, 1]
+&gt;&gt;&gt; snake.set_direction([0, -1])
 &gt;&gt;&gt; snake.get_direction()
-(0, -1)</code></pre>
-<p>La même stratégie peut-être s’appliquer au cas de l’attribut
-<code>_geometry</code> ou doit-elle être modifiée pour garantir la
-validité de cet attribut privé dans le temps ? Si c’est le cas, comment
-?</p>
-<p>Enfin, associer aux accesseurs <code>get_direction</code>,
+[0, -1]</code></pre>
+<p>⚠️ <strong>Encapsulation.</strong> Assurez-vous que
+<code>set_direction</code> soit bien la seule façon de modifier la
+direction du serpent. En particulier, vérifiez que l’on a bien le
+comportement ci-dessous :</p>
+<pre class="python"><code>&gt;&gt;&gt; direction = snake.get_direction()
+&gt;&gt;&gt; direction
+[0, 1]
+&gt;&gt;&gt; direction[0] = 999
+&gt;&gt;&gt; snake.get_direction()
+[0, 1]</code></pre>
+<p>Même chose pour <code>set_geometry</code>.</p>
+<p>Enfin, associez aux accesseurs <code>get_direction</code>,
 <code>set_direction</code>, <code>get_geometry</code> et
 <code>set_geometry</code> des propriétés <code>geometry</code> et
 <code>direction</code> et adapter le code client en conséquence.</p>
+<p>Développez une propriété <code>head</code>, accessible uniquement en
+lecture, renvoyant la tête du serpent.</p>
+<pre class="python"><code>&gt;&gt;&gt; snake.head
+[12, 15]</code></pre>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>import copy
+
+class Snake:
+    def __init__(self, geometry, direction):
+        self.direction = direction
+        self.geometry = geometry
+
+    def get_direction(self):
+        return copy.deepcopy(self._direction)
+
+    def set_direction(self, direction):
+        check_direction(direction)
+        self._direction = copy.deepcopy(direction)
+
+    direction = property(get_direction, set_direction)
+
+    def get_geometry(self):
+        return copy.deepcopy(self._geometry)
+
+    def set_geometry(self, geometry):
+        check_geometry(geometry)
+        self._geometry = copy.deepcopy(geometry)
+
+    geometry = property(get_geometry, set_geometry)
+
+    def get_head(self):
+        return self.geometry[-1]
+
+    head = property(get_head)</code></pre>
+</details>
 <h1 id="en-mouvement">🏃 En mouvement</h1>
 <p>Introduire une méthode <code>move</code> dans la classe
 <code>Snake</code> qui va mettre à jour la géométrie du serpent en
@@ -233,10 +472,11 @@ que le comportement du jeu reste identique.</p>
 <p>Définir une classe <code>State</code> représentant l’état à un
 instant donné du programme. On souhaite pouvoir initialiser cet état par
 un code de la forme</p>
-<pre class="python"><code>state = State(
-    snake=Snake([(10, 15), (11, 15), (12, 15)], DIRECTIONS["RIGHT"]), 
-    fruit=(10, 10)
-)</code></pre>
+<pre class="python"><code>snake = Snake(
+    geometry=[[10, 15], [11, 15], [12, 15]], 
+    direction=DIRECTIONS["RIGHT"]
+) 
+state = State(snake=snake, fruit=[10, 10])</code></pre>
 <p>et que l’instance <code>state</code> expose les attributs
 <code>snake</code> et <code>fruit</code> (en lecture et en
 écriture).</p>
