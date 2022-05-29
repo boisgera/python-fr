@@ -155,19 +155,99 @@ def wait_for_next_frame(clock):
 
 # Main Loop
 # ------------------------------------------------------------
-try:
-    load_state()
-except FileNotFoundError:
-    pass
+if __name__ == "__main__":
+    screen, clock = init()
+    while True:
+        events = pygame.event.get()
+        handle_events(events)
+        move_snake()
+        draw(screen)
+        pygame.display.update()
+        wait_for_next_frame(clock)
+```
+</details>
 
-screen, clock = init()
-while True:
-    events = pygame.event.get()
-    handle_events(events)
-    move_snake()
-    draw(screen)
-    pygame.display.update()
-    wait_for_next_frame(clock)
+
+🧱 Constantes
+================================================================================
+
+
+🧹 **Nettoyage de printemps !** 
+Déplacez la définition des constantes du programme 
+(`WIDTH`, `HEIGHT`, `CELL_SIZE`, etc.) dans un fichier `constants.py`,
+puis les importer dans `snake.py` avec :
+
+``` python
+from constants import *
+```
+
+🐍 Un type `Snake`
+================================================================================
+
+Implémenter une classe `Snake` encapsulant la géométrie et la direction du
+serpent. On veut pouvoir l'instancier comme suit :
+
+```python
+>>> geometry = [[10, 15], [11, 15], [12, 15]]
+>>> direction = [0, 1]
+>>> snake = Snake(geometry, direction)
+```
+
+Stockez les arguments `geometry` et `direction` comme les attributs 
+de même nom de l'instance snake.
+
+```python
+>>> snake.geometry
+[[10, 15], [11, 15], [12, 15]]
+>>> snake.direction
+[0, 1]
+```
+
+Développez une propriété `head`, accessible uniquement en lecture,
+renvoyant la tête du serpent.
+
+```python
+>>> snake.head
+[12, 15]
+```
+
+⚠️ **Encapsulation.** Non seulement on veut que l'attribut `head` du serpent 
+ne puisse pas être réaffecté :
+
+```python
+>>> snake.head = [0, 7]
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: can't set attribute
+```
+
+mais on veut également qu'une modification de la tête récupérée par 
+`snake.head` n'ait pas d'incidence sur l'état du serpent :
+
+```python
+>>> head = snake.head
+>>> head[0] = 0
+>>> head[1] = 7
+>>> snake.head
+[12, 15]
+```
+
+<details>
+<summary>
+**✨ Solution**
+</summary>
+```python
+import copy
+
+class Snake:
+    def __init__(self, geometry, direction):
+        self.direction = direction
+        self.geometry = geometry
+
+    def get_head(self):
+        return copy.copy(self.geometry[-1])
+
+    head = property(get_head)
 ```
 </details>
 
@@ -193,22 +273,26 @@ implémenter une fonction `check_geometry` qui prenne en argument une
 géométrie de serpent, ne renvoie rien si elle est valide et lève 
 l'exception appropriée dans le cas contraire.
 
+
 <details>
 <summary>
 **✨ Solution**
 </summary>
 ```python
 def check_direction(direction):
-    valid_directions = list(DIRECTIONS.values())
+    try:
+        direction = list(direction)
+    except TypeError:
+        error = f"{direction} is not list-like"
+        raise TypeError(error)
     if (
-        not isinstance(direction, list)
-        or len(direction) != 2
+        len(direction) != 2
         or not isinstance(direction[0], int)
         or not isinstance(direction[1], int)
     ):
         raise TypeError(f"{direction} is not a pair of integers")
-    elif direction not in valid_directions:
-        raise ValueError(f"{direction} is not in {valid_directions}")
+    elif direction not in DIRECTIONS:
+        raise ValueError(f"{direction} is not in {DIRECTIONS}")
 
 
 def is_in_scope(tile):
@@ -217,60 +301,46 @@ def is_in_scope(tile):
 
 
 def check_geometry(geometry):
+    try:
+        geometry = list(geometry)
+    except TypeError:
+        error = f"{geometry} is not list-like"
+        raise TypeError(error)
+    try:
+        geometry = [list(item) for item in geometry]
+    except TypeError:
+        error = f"{item} is not list-like"
+        raise TypeError(error)
     if not all(
-        isinstance(item, list)
-        and len(item) == 2
-        and isinstance(item[0], int)
-        and isinstance(item[1], int)
+        len(item) == 2 and isinstance(item[0], int) and isinstance(item[1], int)
         for item in geometry
     ):
         raise TypeError("all geometry items should be pairs of integers")
+
     if not geometry:
         raise ValueError("empty geometry")
+
     for i, item in enumerate(geometry[:-1]):
         next_item = geometry[i + 1]
         diff = (next_item[0] - item[0], next_item[1] - item[1])
         if abs(diff[0]) + abs(diff[1]) != 1:
             raise ValueError("non-connected snake geometry")
+
     if not all(is_in_scope(item) for item in geometry):
         raise SystemExit("snake out of bounds")
 
     for i, elt in enumerate(geometry):
-        if elt in geometry[i+1:]:
+        if elt in geometry[i + 1 :]:
             # at least one repeated item
             raise SystemExit("snake self-collision")
 ```
 </details>
 
 
-🐍 Un type `Snake`
-================================================================================
-
-Implémenter une classe `Snake` encapsulant la géométrie et la direction du
-serpent :
-
-```python
->>> geometry = [[10, 15], [11, 15], [12, 15]]
->>> direction = [0, 1]
->>> snake = Snake(geometry, direction)
-```
-
-Le constructeur de `Snake` doit vérifier que la géométrie et la direction
-ou générer une erreur si cela n'est pas le cas. 
-Stockez les arguments `geometry` et `direction` comme les attributs 
-de même nom de l'instance snake.
-
-```python
->>> snake.geometry
-[[10, 15], [11, 15], [12, 15]]
->>> snake.direction
-[0, 1]
-```
-
 A-t'on la garantie que ces attributs restent valides quel que soit l'usage
-que le programmeur fasse de l'instance `snake` dans son code ? Faire
+que le programmeur fasse de l'instance `snake` dans son code ? Faites
 disparaître les attributs publics `geometry` et `direction` au profit
-d'attributs privés `_geometry` et `_direction`, puis développer des
+d'attributs privés `_geometry` et `_direction`, puis développez des
 méthodes `get_direction` et `set_direction` permettant d'accéder à l'attribut
 `_direction` en assurant sa validité 
 
@@ -298,24 +368,13 @@ vérifiez que l'on a bien le comportement ci-dessous :
 Même chose pour `set_geometry`.
 
 Enfin, associez aux accesseurs `get_direction`, `set_direction`, 
-`get_geometry` et `set_geometry` des propriétés `geometry` et `direction`
-et adapter le code client en conséquence.
-
-Développez une propriété `head`, accessible uniquement en lecture,
-renvoyant la tête du serpent.
-
-```python
->>> snake.head
-[12, 15]
-```
+`get_geometry` et `set_geometry` des propriétés `geometry` et `direction`.
 
 <details>
 <summary>
 **✨ Solution**
 </summary>
 ```python
-import copy
-
 class Snake:
     def __init__(self, geometry, direction):
         self.direction = direction
@@ -344,8 +403,8 @@ class Snake:
 
     head = property(get_head)
 ```
-</details>
 
+</details>
 
 🏃 En mouvement
 ================================================================================
@@ -354,9 +413,29 @@ Introduire une méthode `move` dans la classe `Snake` qui va mettre à jour
 la géométrie du serpent en tenant compte de la direction courante du serpent
 et de la position des fruits (à remettre à jour le cas échéant).
 
-Adapter la boucle générale du programme  [🐍 snake.py](../snake-2/solutions/snake-v2.4.py) 
-pour intégrer les développements de la classe `Snake`. Vérifier en y jouant que le comportement du jeu reste identique.
+Adapter la boucle générale du programme pour intégrer les développements de la 
+classe `Snake`. Vérifier en y jouant que le comportement du jeu reste identique.
 
+<details>
+<summary>
+**✨ Solution**
+</summary>
+```python
+class Snake:
+    ...
+
+    def move(self):
+        global fruit
+        head = self.head
+        new_head = [head[0] + self.direction[0], head[1] + self.direction[1]]
+        if new_head == fruit:
+            state.score += 1
+            self.geometry = self.geometry + [new_head]
+            fruit = [random.randint(0, WIDTH - 1), random.randint(0, HEIGHT - 1)]
+        else:
+            self.geometry = self.geometry[1:] + [new_head]
+```
+</details>
 
 🗃️ Etat du jeu
 ================================================================================
@@ -378,24 +457,104 @@ et en écriture).
 Adapter le reste du code en conséquence. A-t'on encore besoin du mot-clé `global` ?
 Pourquoi ?
 
-Quelle autre type de fonctionnalité pourrait être prise en charge par la classe
-`State` ?
-
-🧱 Constantes
-================================================================================
+Faites en sorte que la classe `Snake` prenne en charge la sauvegarde et le
+chargement de l'état du jeu.
 
 
-🧹 **Nettoyage de printemps !** 
-Déplacer la définition des constantes du programme 
-(`W, H, X, ...`) dans un fichier à part, `constants.py`,
-puis les importer dans `snake.py` avec :
+<details>
+<summary>
+**✨ Solution**
+</summary>
+```python
+# Game State
+# ------------------------------------------------------------------------------
+class Snake:
+    def __init__(self, geometry, direction):
+        self.direction = direction
+        self.geometry = geometry
 
-``` python
-from constants import *
+    def get_direction(self):
+        return copy.deepcopy(self._direction)
+
+    def set_direction(self, direction):
+        check_direction(direction)
+        self._direction = copy.deepcopy(direction)
+
+    direction = property(get_direction, set_direction)
+
+    def get_geometry(self):
+        return copy.deepcopy(self._geometry)
+
+    def set_geometry(self, geometry):
+        check_geometry(geometry)
+        self._geometry = copy.deepcopy(geometry)
+
+    geometry = property(get_geometry, set_geometry)
+
+    def get_head(self):
+        return self.geometry[-1]
+
+    head = property(get_head)
+
+    def move(self):
+        head = self.head
+        new_head = [head[0] + self.direction[0], head[1] + self.direction[1]]
+        if new_head == state.fruit:
+            state.score += 1
+            self.geometry = self.geometry + [new_head]
+            state.fruit = [random.randint(0, WIDTH - 1), random.randint(0, HEIGHT - 1)]
+        else:
+            self.geometry = self.geometry[1:] + [new_head]
+
+class State:
+    def __init__(self, snake, fruit, score=0):
+        self.snake = snake
+        self.fruit = fruit
+        self.score = score
+
+    def save(self):
+        state = {
+            "snake": self.snake.geometry,
+            "direction": self.snake.direction,
+            "fruit": self.fruit,
+            "score": self.score,
+        }
+        with open(SNAPSHOT, mode="w") as file:
+            file.write(repr(state))
+
+    def load(self):
+        with open(SNAPSHOT, mode="r", encoding="utf-8") as file:
+            data = file.read()
+        state = eval(data)
+        self.state.geometry = state["snake"]
+        self.direction = state["direction"]
+        self.fruit = state["fruit"]
+        self.score = state["score"]
+
+state = State(snake=Snake([[10, 15], [11, 15], [12, 15]], RIGHT,), fruit=[10, 10])
+
+# Event Management
+# ------------------------------------------------------------------------------
+def set_direction(direction):
+    def action():
+        state.snake.direction = direction
+
+    return action
+
+
+KEY_BINDINGS = {
+    "q": sys.exit,
+    "up": set_direction(UP),
+    "down": set_direction(DOWN),
+    "left": set_direction(LEFT),
+    "right": set_direction(RIGHT),
+    "s": state.save,
+    "l": state.load,
+}
+
+KEY_EVENT_HANDLER = {pygame.key.key_code(k): v for k, v in KEY_BINDINGS.items()}
 ```
-
-📄 Solution : [constants.py](solutions/constants.py)
-
+</details>
 
 ⚙️ Moteur de jeu
 ================================================================================
@@ -410,42 +569,91 @@ la récupération des évènements, etc.
 
 On souhaite pouvoir exploiter cette classe générique en définissant une
 classe `SnakeGame` qui en dérive et qui régit le jeu du serpent. 
-`SnakeGame` sera définie de la façon suivante (fichier complet : 📄 [snake.py](solutions/snake.py)) :
+La classe `SnakeGame` sera définie de la façon suivante :
 
 ``` python
 from game import Game
 
 class SnakeGame(Game):
     def process_events(self, events):
-        handle_events(events)
-        move_snake()
+        for event in events:
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                event_handler = KEY_EVENT_HANDLER.get(event.key)
+                if event_handler:
+                    event_handler()
+        state.snake.move()
+
     def draw(self):
-        draw(self.screen)
+        screen = self.screen
+        self.caption = f"Score: {state.score}"
+        draw_background(screen)
+        draw_snake(screen, state.snake)
+        draw_fruit(screen, state.fruit)
 ```
 
 Lorsque l'on invoque la commande `python snake.py`, le code suivant sera exécuté :
 
 ``` python
-snake_game = SnakeGame(size=(X * W, Y * H), fps=FPS)
+snake_game = SnakeGame()
 snake_game.start()
 ```
 
+Développez la classe `Game` (dans le fichier `game.py`) en conséquence !
 
-Développer la classe `Game` en conséquence !
+<details>
+<summary>
+**✨ Solution : `game.py`**
+</summary>
+```python
+# Python Standard Library
+import sys
 
-📄 Solution : [game.py](solutions/game.py)
+# Third-party Libraries
+import pygame
 
+# Local
+from constants import *
+
+class Game:
+    def __init__(
+        self, size=(WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE), fps=FPS, caption=""
+    ):
+        self.size = size
+        self.fps = fps
+        self.caption = caption
+
+    def start(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode(self.size)
+        self.clock = pygame.time.Clock()
+        while True:
+            events = pygame.event.get()
+            self.process_events(events)
+            self.draw()
+            pygame.display.update()
+            pygame.display.set_caption(self.caption)
+            self.clock.tick(self.fps)
+
+    def process_events(self, events):
+        raise NotImplementedError()
+
+    def draw(self):
+        raise NotImplementedError()
+```
+</details>
 
 🤖 Pilote automatique
 ================================================================================
 
 
-On souhaite faciliter la vie du joueur: lorsque celui-ci ne presse aucune touche
-pendant une frame, votre programme devra prendre une décision à sa place pour
-le rapprocher du fruit, en évitant de créer trop de collisions (au minimum:
+On souhaite faciliter la vie du joueur : lorsque celui-ci ne presse aucune touche
+entre deux frames successives, votre programme devra prendre une décision à sa place pour
+le rapprocher du fruit, en évitant de créer trop de collisions (au minimum :
 en ne faisant jamais un demi-tour).
 
-Développer une classe 🤖 `AutoSnakeGame` qui prenne en charge cette 
+Développez une classe 🤖 `AutoSnakeGame` qui prenne en charge cette 
 fonctionnalité quand on lance le jeu avec la commande `python autosnake.py`.
 
 ``` python
@@ -459,8 +667,48 @@ from snake import state, SnakeGame
 class AutoSnakeGame(SnakeGame):
     pass # TODO!
 
-snake_game = AutoSnakeGame(size=(X * W, Y * H), fps=FPS)
-snake_game.start()
+if __name__ == "__main__":
+    snake_game = AutoSnakeGame()
+    snake_game.start()
 ```
 
-📄 Solution : [autosnake.py](solutions/autosnake.py)
+<details>
+<summary>
+**✨ Solution : `autosnake.py`**
+</summary>
+```python
+
+# Third-Party Libraries
+import pygame as pg
+
+# Local Modules
+from constants import *
+from snake import state, SnakeGame
+
+class AutoSnakeGame(SnakeGame):
+    def process_events(self, events):
+        if not events:
+            snake = state.snake
+            snake_head = snake.head
+            direction = snake.direction
+            fruit = state.fruit
+            aim = [fruit[0] - snake_head[0], fruit[1] - snake_head[1]]
+            key = None
+            if aim[0] > 0 and direction != LEFT:
+                key = pg.K_RIGHT
+            elif aim[0] < 0 and direction != RIGHT:
+                key = pg.K_LEFT
+            elif aim[1] > 0 and direction != UP:
+                key = pg.K_DOWN
+            elif aim[1] < 0 and direction != DOWN:
+                key = pg.K_UP
+            if key is not None:
+                event = pg.event.Event(pg.KEYDOWN, key=key)
+                events.append(event)
+        super().process_events(events)
+
+
+if __name__ == "__main__":
+    snake_game = AutoSnakeGame()
+    snake_game.start()
+```
