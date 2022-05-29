@@ -8,7 +8,7 @@ Python 🇫🇷
 
   - 📖 [Le retour du serpent](https://boisgera.github.io/python-fr/tps/snake-2/index.html)
 
-  - 📖 [Le retour du retour du serpent (🚧 en travaux 🚧)](https://boisgera.github.io/python-fr/tps/snake-3/index.html)
+  - 📖 [Le retour du retour du serpent](https://boisgera.github.io/python-fr/tps/snake-3/index.html)
 
 
 🦠 Modèles épidémologiques
@@ -40,7 +40,7 @@ Python 🇫🇷
 
   - 📖 [Programmation objet 1](https://boisgera.github.io/python-fr/cours/programmation-objet/index.html)
 
-  - 📖 [Programmation objet 2 (🚧 en travaux 🚧)](https://boisgera.github.io/python-fr/cours/programmation-objet-2/index.html)
+  - 📖 [Programmation objet 2](https://boisgera.github.io/python-fr/cours/programmation-objet-2/index.html)
 
 
 --------------------------------------------------------------------------------
