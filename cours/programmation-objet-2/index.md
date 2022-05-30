@@ -802,7 +802,7 @@ _doctest_OutputChecker = doctest.OutputChecker
 
 class OutputChecker(_doctest_OutputChecker):
     def check_output(self, want, got, optionflags):
-        if "🐛" in got:
+        if "🐛" in want:
             return True
         else:
             return super().check_output(want, got, optionflags)
