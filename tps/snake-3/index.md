@@ -446,7 +446,7 @@ On souhaite pouvoir initialiser cet état par un code de la forme
 ``` python
 snake = Snake(
     geometry=[[10, 15], [11, 15], [12, 15]], 
-    direction=DIRECTIONS["RIGHT"]
+    direction=RIGHT
 ) 
 state = State(snake=snake, fruit=[10, 10])
 ```
