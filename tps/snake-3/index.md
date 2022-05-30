@@ -448,10 +448,10 @@ snake = Snake(
     geometry=[[10, 15], [11, 15], [12, 15]], 
     direction=RIGHT
 ) 
-state = State(snake=snake, fruit=[10, 10])
+state = State(snake=snake, fruit=[10, 10], score=0)
 ```
 
-et que l'instance `state` expose les attributs `snake` et `fruit` (en lecture
+et que l'instance `state` expose les attributs `snake`, `fruit` et `score` (en lecture
 et en écriture). 
 
 Adapter le reste du code en conséquence. A-t'on encore besoin du mot-clé `global` ?
