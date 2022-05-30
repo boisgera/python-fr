@@ -1,0 +1,26 @@
+<script src="https://cdn.jsdelivr.net/pyodide/v0.19.1/full/pyodide.js">
+</script>
+<script>
+    function ready() {
+        return new Promise(function(resolve, reject) {
+            document.addEventListener("DOMContentLoaded", resolve);
+        });
+    }
+    async function main(){
+        await ready()
+        pyodide = await loadPyodide({
+          indexURL : "https://cdn.jsdelivr.net/pyodide/v0.19.1/full/"
+        });
+        pyodide.runPython(`
+        import sys
+        print(sys.version)
+        print("kdlskdmldksds")
+        `);
+    }
+    main();
+
+    // Ideas: 
+    //   - doctest (check) the code examples
+    //   - add some playing console to the code examples
+    //   - etc.
+</script>

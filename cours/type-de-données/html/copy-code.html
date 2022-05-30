@@ -1,0 +1,70 @@
+<script>
+
+    function filterConsole(text) {
+        let lines = text.split("\n");
+
+        console.log(lines);
+
+        let pythonConsole = lines && lines[0].startsWith(">>>");
+        if (!pythonConsole) {
+            return text + "\n\n";
+        } else {
+            let newLines = [];
+            for (let line of lines) {
+                if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                    newLines.push(line.slice(4));
+                } else if (line.startsWith("...")){
+                    newLines.push(line.slice(3));
+                }
+
+            }
+            return newLines.join("\n") + "\n";
+        }
+
+    }
+
+    document.addEventListener("DOMContentLoaded", (event) => {
+        let codeBlocks = document.querySelectorAll("pre.python")
+        for (let codeBlock of codeBlocks) {
+
+            let button = document.createElement("button")
+            let icon = document.createElement("img");
+            button.appendChild(icon)
+            codeBlock.insertBefore(button, codeBlock.firstChild);
+
+            icon.setAttribute("src", "icons/copy.svg");
+            icon.setAttribute("style", "opacity: 0.5;")
+            button.addEventListener('click', (event) => {
+                let text = button.nextElementSibling.textContent;
+                text = filterConsole(text);
+                navigator.clipboard.writeText(text);
+            });
+
+            codeBlock.setAttribute("style", "position: relative");
+            button.setAttribute("style", 
+            "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+            codeBlock.addEventListener("mouseover", (event) => {
+                button.style.setProperty("transition", "opacity 0.1s ease-out");
+                button.style.setProperty("opacity", "1.0");
+            });
+
+            codeBlock.addEventListener("mouseout", (event) => {
+                button.style.setProperty("transition", "opacity 0.75s ease-out");
+                button.style.setProperty("opacity", "0.0");
+            });
+
+            button.addEventListener("mouseover", (event) => {
+                icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                icon.style.setProperty("opacity", "0.75");
+            })
+
+            button.addEventListener("mouseout", (event) => {
+                icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                icon.style.setProperty("opacity", "0.5");
+            })
+
+
+        }
+    });    
+</script>

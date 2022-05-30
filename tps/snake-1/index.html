@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
+          }
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault, Mines Paris, Université PSL" name="author"/>
+<title>Le serpent</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le serpent</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
+Boisgérault</a>, Mines Paris, Université PSL</p>
+<p class="date">Monday 30 may 2022</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/583f7ea">
+          #583f7ea
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/edit.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/edit/master/tps/snake-1/index.md">
+          Edition
+        </a>
+</p>
+</header>
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#prérequis" id="toc-prérequis">Prérequis</a></li>
+<li><a href="#avec-visual-studio-code" id="toc-avec-visual-studio-code">Avec Visual Studio Code</a></li>
+<li><a href="#code-de-démarrage" id="toc-code-de-démarrage">Code de
+démarrage</a></li>
+<li><a href="#événements" id="toc-événements">Événements</a></li>
+<li><a href="#le-damier" id="toc-le-damier">Le damier</a></li>
+<li><a href="#un-serpent-fixe" id="toc-un-serpent-fixe">Un serpent
+fixe</a></li>
+<li><a href="#un-serpent-qui-bouge" id="toc-un-serpent-qui-bouge">Un
+serpent qui bouge</a></li>
+<li><a href="#le-fruit" id="toc-le-fruit">Le fruit</a></li>
+<li><a href="#épilogue" id="toc-épilogue">Épilogue</a></li>
+</ul>
+</nav></details>
+
+
+<hr/>
+<p>🙏 Projet original par Aurélien Noce (<a href="https://github.com/ushu"><span class="citation" data-cites="ushu">@ushu</span></a>).</p>
+<hr/>
+<h2 id="introduction">Introduction</h2>
+<p>Ce TP vous propose de développer un petit jeu en Python. Il constitue
+une introduction à la conception et à la réalisation d’un programme
+complet.</p>
+<p>Son sujet est un classique du jeu vidéo : le 🐍 <a href="https://fr.wikipedia.org/wiki/Snake_(genre_de_jeu_vid%C3%A9o)">snake</a>.
+Si vous ne connaissez pas son principe, prenez un moment pour découvrir
+<a href="http://slither.io/">slither.io</a>, qui en est est une version
+moderne … et complexe !</p>
+<p>Notre objectif sera plus modeste (et plus proche des versions
+anciennes du jeu) : nous réaliserons plusieurs versions d’un
+<strong>programme qui marche</strong> (et pas un programme parfait) dont
+les fonctionnalités s’enrichiront à chaque nouvelle étape.</p>
+<h2 id="prérequis">Prérequis</h2>
+<p>⚠️ Ce qui suit suppose que vous avez installé Python avec
+<code>conda</code> et que vous avez un terminal <code>bash</code>
+fonctionnel sur votre ordinateur.</p>
+<p>Commencez par créer un environnement nommé <code>snake</code>, dédié
+au TP et contenant Python 3.9</p>
+<pre class="bash"><code>(base) $ conda create -n snake python=3.9</code></pre>
+<p>Puis activez-le</p>
+<pre class="bash"><code>(base) $ conda activate snake</code></pre>
+<p>Vous devriez alors avoir une nouvelle invite de commmande :</p>
+<pre><code>(snake) $</code></pre>
+<details>
+<summary>
+<strong>Dépannage 🛠️</strong>
+</summary>
+<hr/>
+<p>Si vous ne voyez pas l’invite de commande <code>(snake) $</code>
+alors</p>
+<ol type="1">
+<li><p>exécutez la commande</p>
+<pre class="bash"><code>$ conda init bash</code></pre>
+<p>puis</p></li>
+<li><p>créez un nouveau terminal.</p></li>
+</ol>
+<hr/>
+</details>
+<p>Installez ensuite le module <code>pygame</code> avec <code>pip</code>
+dans cet environnement :</p>
+<pre class="bash"><code>(snake) $ pip install pygame</code></pre>
+<p>Pour tester votre installation, lancez le programme d’exemple :</p>
+<pre class="bash"><code>(snake) $ python -m pygame.examples.aliens</code></pre>
+<h2 id="avec-visual-studio-code">Avec Visual Studio Code</h2>
+<p><strong>Suggestion #1.</strong>  Installez l’<a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">extension
+de VS Code pour Python</a>.</p>
+<p><strong>Suggestion #2.</strong> Indiquez à VS Code (et pas uniquement
+au terminal) qu’on souhaite travailler dans l’environnement conda
+<code>snake</code> : cliquez dans la bannière du bas la zone qui indique
+le Python courant.</p>
+<!--
+**Suggestion #3.** Pour lancer le programme directement depuis VS Code :
+
+- ouvrir la palette de commandes
+  - `⇧ ⌘ P` Shift-Command-P (mac)
+  - `⇧ ⌃ P` Shift-Control-P (windows)
+- chercher la fonction *Toggle Integrated Terminal*
+  - mémoriser le raccourci clavier
+  - qui est Control-backtick sur Mac (le backtick c'est `)
+-->
+<!--
+Premiers pas avec PyGame
+--------------------------------------------------------------------------------
+
+(factor out ? Indep doc? *Maybe*, given that the set of learning objectives
+is autonomous)
+
+Prérequis :
+
+  - `dir` / `help` / usage doc en ligne
+
+
+Objectifs :
+
+  - import de module (bases)
+
+  - sous-modules (principes et énumération)
+
+  - concepts propres à pygame :
+  
+      - initialisation
+
+      - modules & classes : display, time, Surface
+
+      - display: création de "surface" (window / screen), taille
+
+      - flux d'exécution et disparition de la surface !
+
+      - time & delay
+
+      - tracé sur une surface. N'apparaît pas !!!
+
+      - display: update
+
+
+``` python
+import pygame
+pygame.init()
+
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 255, 0)
+
+SCREEN_SIZE = (300, 300)
+
+screen = pygame.display.set_mode(SCREEN_SIZE)
+
+screen.fill(GREEN)
+
+pygame.display.update()
+
+pygame.time.delay(3000)
+```
+
+-->
+<h2 id="code-de-démarrage">Code de démarrage</h2>
+<p>Notre point de départ : un arrière-plan dont la couleur varie
+aléatoirement.</p>
+<pre class="python"><code>import random
+import pygame
+
+pygame.init()
+screen = pygame.display.set_mode([300, 300])
+clock = pygame.time.Clock()
+
+while True:
+    red = random.randint(0, 255)
+    green = random.randint(0, 255)
+    blue = random.randint(0, 255)
+    color = [red, green, blue]
+    screen.fill(color)
+    pygame.display.update()
+    clock.tick(1.0)</code></pre>
+<p>Copiez ce code dans un fichier <code>snake.py</code> et
+exécutez-le :</p>
+<pre class="sh"><code>(snake) $ python snake.py</code></pre>
+<p>⚠️ Pour quitter le programme tapez Control-C dans le terminal.</p>
+<h3 id="exercices">Exercices</h3>
+<ul>
+<li><p>🗔 <strong>Fenêtre.</strong> Agrandissez la fenêtre du jeu –
+initialement 300x300 – pour adopter une taille de votre choix.</p></li>
+<li><p>⏲️ <strong>Horloge.</strong> Dans l’appel à la fonction
+<code>clock.tick</code>,</p>
+<ul>
+<li><p>remplacez l’argument <code>1.0</code> par <code>0.2</code> (puis
+exécutez le programme),</p></li>
+<li><p>procédez de même avec <code>5.0</code>,</p></li>
+<li><p>puis supprimez (ou commentez) l’appel à
+<code>clock.tick</code>.</p></li>
+</ul>
+<p>Que se passe-t’il dans chaque cas ? A votre avis, quel est le rôle de
+la fonction <code>clock.tick</code> et de son argument ?</p></li>
+<li><p>🖌️ <strong>Affichage.</strong> Que se passe-t’il si l’on commente
+la ligne <code>pygame.display.update()</code> ? Savez-vous expliquer ce
+phénomène ?</p></li>
+<li><p>🎨 <strong>Couleurs.</strong> Faites en sorte que les couleurs
+qui s’affichent soient toujours aléatoires, mais uniquement parmi des
+nuances de bleu.</p>
+<details>
+<summary>
+<p><strong>Code RGB ℹ️</strong></p>
+</summary>
+<hr/>
+<p>La couleur d’un pixel est décrite par son <a href="https://fr.wikipedia.org/wiki/Rouge_vert_bleu">code RGB</a> : un
+triplet d’entiers compris entre 0 et 255 qui déterminent l’intensité des
+composantes rouge, verte et bleue de la couleur. On a par exemple :</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">R</th>
+<th style="text-align: center;">G</th>
+<th style="text-align: center;">B</th>
+<th style="text-align: center;">Couleur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">255</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">🟥</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">255</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">🟩</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">255</td>
+<td style="text-align: center;">🟦</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">255</td>
+<td style="text-align: center;">255</td>
+<td style="text-align: center;">255</td>
+<td style="text-align: center;">⬜</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">⬛</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">128</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">🟫</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">255</td>
+<td style="text-align: center;">128</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">🟧</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">255</td>
+<td style="text-align: center;">255</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">🟨</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">106</td>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">173</td>
+<td style="text-align: center;">🟪</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</details></li>
+</ul>
+<h2 id="événements">Événements</h2>
+<p>Pygame permet de spécifier comment réagir aux actions de
+l’utilisateur, par exemple son utilisation du clavier ou de la
+souris.</p>
+<p>Nous pouvons ainsi faire en sorte de forcer l’arrêt du programme
+lorsque l’utilisateur clique sur le bouton de fermeture de la fenêtre ou
+appuie sur la touche Q :</p>
+<pre class="python"><code>import random
+import sys
+import pygame
+
+pygame.init()
+screen = pygame.display.set_mode([300, 300])
+clock = pygame.time.Clock()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+              sys.exit()
+    red = random.randint(0, 255)
+    green = random.randint(0, 255)
+    blue = random.randint(0, 255)
+    color = [red, green, blue]
+    screen.fill(color)
+    pygame.display.update()
+    clock.tick(1.0)</code></pre>
+<p>Modifier ce programme pour que lorsque l’utilisateur presse les
+flêches de son clavier, le programme affiche (avec la fonction
+<code>print</code>) les caractères <code>←</code>, <code>↑</code>,
+<code>→</code> ou <code>↓</code> dans le terminal.</p>
+<p>🗝️ Le code renvoyé par la flêche vers le haut est
+<code>pygame.K_UP</code> par exemple.</p>
+<h2 id="le-damier">Le damier</h2>
+<p>Nous allons commencer par construire notre plateau de jeu ainsi :</p>
+<ul>
+<li><p>le plateau de jeu est découpé en 30x30 cases,</p></li>
+<li><p>chaque case fait 20 pixels de côté.</p></li>
+</ul>
+<p>Pour vérifier la validité de ce plateau de jeu, écrivez un programme
+qui dessine un damier :</p>
+<p><img src="images/damier.png"/></p>
+<p>🗝️ Vous pouvez utiliser la méthode <a href="https://www.pygame.org/docs/ref/draw.html#pygame.draw.rect"><code>pygame.draw.rect</code></a>
+:</p>
+<pre class="python"><code>x = 100
+y = 100
+width = 30
+height = 30
+rect = [x, y, width, height]
+red = 255
+green = 0
+blue = 0
+color = [red, green, blue]
+pygame.draw.rect(screen, color, rect)</code></pre>
+<h2 id="un-serpent-fixe">Un serpent fixe</h2>
+<p>L’étape suivante est de dessiner le serpent, comme une suite de
+segments représentés par des rectangles colorés. On veut dessiner le
+serpent aux coordonnées suivantes :</p>
+<pre class="python"><code>snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]</code></pre>
+<p>pour obtenir un schéma comme suit ; disons pour fixer les idées que
+dans ce cas de figure <code>[10, 15]</code> est la queue et
+<code>[12, 15]</code> est la tête :</p>
+<p><img src="images/serpent.png"/></p>
+<details>
+<summary>
+<strong>Solution</strong>
+</summary>
+<pre class="python"><code>import sys
+import pygame
+
+white = [255, 255, 255]
+black = [0, 0, 0]
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+
+pygame.init()
+screen = pygame.display.set_mode([20*30, 20*30])
+clock = pygame.time.Clock()
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+              sys.exit()
+    screen.fill(white)
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, black, rect)    
+    pygame.display.update()
+    clock.tick(1.0)</code></pre>
+</details>
+<h2 id="un-serpent-qui-bouge">Un serpent qui bouge</h2>
+<p>Ensuite, nous allons faire bouger le serpent :</p>
+<ul>
+<li><p>nous créons un vecteur de “direction”, par exemple</p>
+<pre class="python"><code>direction = [1, 0]</code></pre></li>
+<li><p>à chaque itération de la boucle, nous pouvons déplacer le serpent
+dans cette direction en “ajoutant” ce vecteur à la position de la tête
+du serpent</p></li>
+</ul>
+<p><img src="images/serpent-bouge.gif"/></p>
+<p>Une fois que le serpent bouge, ajouter les commandes pour se déplacer
+dans les 4 directions, en appuyant sur les touches de direction du
+clavier.</p>
+<p>Aussi on peut commencer à envisager d’accélérer un peu le jeu à ce
+stade …</p>
+<p><strong>Bonus.</strong> Faites en sorte que le serpent ne puisse pas
+faire demi-tour.</p>
+<details>
+<summary>
+<strong>Solution</strong>
+</summary>
+<pre class="python"><code>import sys
+import pygame
+
+white = [255, 255, 255]
+black = [0, 0, 0]
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+
+pygame.init()
+screen = pygame.display.set_mode([20*30, 20*30])
+clock = pygame.time.Clock()
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+              sys.exit()
+            if event.key == pygame.K_UP:
+                direction = [0.0, -1.0]
+            elif event.key == pygame.K_LEFT:
+                direction = [-1.0, 0.0]
+            elif event.key == pygame.K_DOWN:
+                direction = [0.0, 1.0]
+            elif event.key == pygame.K_RIGHT:
+                direction = [1.0, 0.0]
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0], 
+      head[1] + direction[1]
+    ]
+    snake = snake[1:] + [new_head]
+    screen.fill(white)
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, black, rect)  
+    pygame.display.update()
+    clock.tick(1.0)</code></pre>
+</details>
+<h2 id="le-fruit">Le fruit</h2>
+<p>Il faut maintenant faire manger notre serpent. On va procéder comme
+suit:</p>
+<ul>
+<li><p>on a toujours la position du serpent dans une variable
+<code>snake</code> :</p></li>
+<li><p>on génère un “fruit”, dans une position aléatoire</p>
+<pre class="python"><code>fruit = [10, 10]</code></pre></li>
+<li><p>quand la tête du serpent mange le fruit, on place un nouveau
+fruit à une position aléatoire et on allonge le serpent d’une case</p>
+<p><img src="images/manger.gif"/></p></li>
+</ul>
+<details>
+<summary>
+<strong>Solution</strong>
+</summary>
+<pre class="python"><code>import random
+import sys
+import pygame
+
+white = [255, 255, 255]
+black = [0, 0, 0]
+red = [255, 0, 0]
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+fruit = [10, 10]
+
+pygame.init()
+screen = pygame.display.set_mode([20*30, 20*30])
+clock = pygame.time.Clock()
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+              sys.exit()
+            if event.key == pygame.K_UP:
+                direction = [0.0, -1.0]
+            elif event.key == pygame.K_LEFT:
+                direction = [-1.0, 0.0]
+            elif event.key == pygame.K_DOWN:
+                direction = [0.0, 1.0]
+            elif event.key == pygame.K_RIGHT:
+                direction = [1.0, 0.0]
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0], 
+      head[1] + direction[1]
+    ]
+    if new_head == fruit:
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29), 
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+    screen.fill(white)
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, black, rect)
+    rect = [fruit[0]*20, fruit[1]*20, 20, 20]
+    pygame.draw.rect(screen, red, rect)  
+    pygame.display.update()
+    clock.tick(1.0)</code></pre>
+</details>
+<h2 id="épilogue">Épilogue</h2>
+<p>Il nous reste deux petits changements pour avoir un serpent
+complètement fonctionnel :</p>
+<ul>
+<li><p>Il faut détecter si le serpent se mord la queue, ou touche un des
+murs, ce qui est une condition d’échec.</p></li>
+<li><p>Enfin on peut afficher le score. La façon la plus simple de
+procéder est de changer le titre de la fenêtre, avec la fonction
+<code>set_caption</code> :</p>
+<pre class="python"><code>score = 0
+pygame.display.set_caption(f"Score : {score}")</code></pre></li>
+</ul>
+<p><img src="images/score.png"/></p>
+<details>
+<summary>
+<strong>Solution</strong>
+</summary>
+<pre class="python"><code>import random
+import sys
+import pygame
+
+white = [255, 255, 255]
+black = [0, 0, 0]
+red = [255, 0, 0]
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+fruit = [10, 10]
+score = 0
+
+pygame.init()
+screen = pygame.display.set_mode([20*30, 20*30])
+clock = pygame.time.Clock()
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+              sys.exit()
+            if event.key == pygame.K_UP:
+                direction = [0.0, -1.0]
+            elif event.key == pygame.K_LEFT:
+                direction = [-1.0, 0.0]
+            elif event.key == pygame.K_DOWN:
+                direction = [0.0, 1.0]
+            elif event.key == pygame.K_RIGHT:
+                direction = [1.0, 0.0]
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0], 
+      head[1] + direction[1]
+    ]
+    if new_head in snake:
+        sys.exit()
+    elif new_head[0] &lt; 0 or new_head[0] &gt;= 30:
+        sys.exit()
+    elif new_head[1] &lt; 0 or new_head[1] &gt;= 30:
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29), 
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+    screen.fill(white)
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, black, rect)
+    rect = [fruit[0]*20, fruit[1]*20, 20, 20]
+    pygame.draw.rect(screen, red, rect)  
+    pygame.display.update()
+    pygame.display.set_caption(f"Score: {score}")
+    clock.tick(1.0)</code></pre>
+</details>
+</body>
+</html>

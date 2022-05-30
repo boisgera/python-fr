@@ -1,0 +1,28 @@
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", (event) => {
+  let body = document.getElementsByTagName("body")[0];
+  body.style.setProperty("position", "relative")
+  let header = document.getElementsByTagName("header")[0];
+  header.setAttribute("id", "hero-header");
+  header.style.setProperty("position", "absolute")
+  header.style.setProperty("top", "0")
+  header.style.setProperty("left", "0")
+  header.style.setProperty("width", "100vw")
+
+  VANTA.WAVES({
+    el: "#hero-header",
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    //minHeight: 200.00,
+    //minWidth: 200.00,
+    scale: 1.00,
+    scaleMobile: 1.00,
+    color: 0xa2a2a2
+  });
+
+});
+</script>

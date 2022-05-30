@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
+          }
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault, MINES Paris – PSL" name="author"/>
+<title>Le retour du serpent</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le retour du serpent</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
+Boisgérault</a>, MINES Paris – PSL</p>
+<p class="date">Monday 30 may 2022</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/583f7ea">
+          #583f7ea
+        </a>
+</p>
+</header>
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#espaces-commentaires" id="toc-espaces-commentaires">Espaces &amp; commentaires</a></li>
+<li><a href="#configuration-constantes" id="toc-configuration-constantes">Configuration &amp;
+constantes</a></li>
+<li><a href="#structuration-en-fonctions" id="toc-structuration-en-fonctions">Structuration en fonctions</a></li>
+<li><a href="#sauvegarde-restauration-de-létat-du-jeu" id="toc-sauvegarde-restauration-de-létat-du-jeu">Sauvegarde &amp;
+restauration de l’état du jeu</a></li>
+<li><a href="#gestion-configurable-des-événements" id="toc-gestion-configurable-des-événements">Gestion configurable des
+événements</a></li>
+</ul>
+</nav></details>
+
+
+<h2 id="introduction">Introduction</h2>
+<p>Ce TP vous propose de poursuivre le développement du jeu du
+serpent.</p>
+<p>Nous allons lui ajouter quelques fonctionnalités, mais surtout avant
+cela, nous allons faire le ménage ! C’est-à-dire, structurer le code
+existant (à fonctionnalité constante) en utilisant quelques “bonnes
+pratiques” qui rendront (espérons-le !) notre code plus lisible, plus
+facile à maintenir et à faire évoluer par la suite … avant qu’il ne soit
+trop tard !</p>
+<p>ℹ️ <strong>Mini-lexique</strong> :</p>
+<ul>
+<li><p>🍝 <strong><a href="https://fr.wikipedia.org/wiki/Programmation_spaghetti">Code
+spaghetti</a></strong> (🇺🇸 <strong>spaghetti code</strong>)</p></li>
+<li><p>💸 <strong><a href="https://fr.wikipedia.org/wiki/Dette_technique">Dette
+technique</a></strong> (🇺🇸 <strong>technical debt</strong>)</p></li>
+<li><p>♻️ <strong><a href="https://fr.wikipedia.org/wiki/R%C3%A9usinage_de_code">Réusinage</a></strong>
+(🇺🇸 <strong>refactoring</strong>)</p></li>
+</ul>
+<h1 id="espaces-commentaires">Espaces &amp; commentaires</h1>
+<p>Il serait pertinent d’utiliser des commentaires et quelques lignes
+blanches pour mettre en évidence des “sections” dans le code, des
+groupements d’instructions qui ont un rôle bien défini.</p>
+<p>Définir de telles sections ; on suggère par défaut les labels
+suivants en commentaire :</p>
+<ul>
+<li><p>Setup, State, Init, Main Loop,</p></li>
+<li><p>Handle Events, Move the snake, Draw &amp; update the screen, Time
+management</p></li>
+</ul>
+<details>
+<summary>
+<strong>Solution</strong>
+</summary>
+<a href="solutions/snake-v2.0.py">📁 <code>snake.py</code></a>
+</details>
+<h1 id="configuration-constantes">Configuration &amp; constantes</h1>
+<p>En Python, l’usage est de désigner les grandeurs constantes par des
+noms en majuscules (ici dans la section “Setup”). Un des intérêts
+d’avoir explicitement une section où l’on déclare les constantes et que
+l’on évite d’avoir à dupliquer leur valeur “en dur” dans le code et que
+si ultérieurement on est amené à changer leur valeur, il suffira de le
+faire à un seul endroit.</p>
+<ul>
+<li><p>Définir les constantes entières</p>
+<pre class="python"><code>WIDTH = 30
+HEIGHT = 30
+CELL_SIZE = 20</code></pre>
+<p>et les utiliser pour faire disparaître les valeurs associées codées
+“en dur” dans le code.</p></li>
+<li><p>Même chose avec</p>
+<pre class="python"><code>FPS = 1.0 # frames per second</code></pre></li>
+<li><p>Plutôt que de coder en dur les couleurs dans le code, on va
+définir un thème de couleurs, qui désignera les couleurs choises par
+leur rôle dans l’application :</p>
+<pre class="python"><code>COLORS = {
+    "background": [255, 255, 255],
+    "snake": [0, 0, 0],
+    "fruit": [255, 0, 0]
+}</code></pre>
+<p>Modifier le code pour exploiter le dictionnaire
+<code>COLORS</code>.</p></li>
+<li><p>Vous avez peut-être remarqué que le système de coordonnées de
+pygame, qui fait pointer l’axe des ordonnées vers le bas est un peu
+perturbant et donc un risque d’erreur. Pour abstraire ce détail
+bas-niveau de notre code, on définit des constantes directionnelles.</p>
+<pre class="python"><code>UP = [0, -1]
+DOWN = [0, 1]
+LEFT = [-1, 0]
+RIGHT = [1, 0]</code></pre>
+<p>Adapter le code pour les exploiter.</p></li>
+</ul>
+<details>
+<summary>
+<strong>Solution</strong>
+</summary>
+<a href="solutions/snake-v2.1.py">📁 <code>snake.py</code></a>
+</details>
+<h1 id="structuration-en-fonctions">Structuration en fonctions</h1>
+<p>Les commentaires, c’est bien ! Ce qui est encore mieux, c’est d’avoir
+un code tellement explicite qu’on n’en a (presque) plus besoin.</p>
+<p>On souhaite dans cette étape remplacer le gros de notre code actuel
+par le code suivant, court et explicite :</p>
+<pre class="python"><code>screen, clock = init()
+while True:
+    events = pygame.event.get()
+    handle_events(events)
+    move_snake()
+    draw(screen)
+    pygame.display.update()
+    wait_for_next_frame(clock)</code></pre>
+<ul>
+<li><p>Extraire du code existant des fonctions <code>init</code> et
+<code>wait_for_next_frame</code> et les exploiter.</p></li>
+<li><p>Extraire une fonction <code>draw</code> du code existant et
+l’exploiter.</p></li>
+<li><p>Extraire du code existant des fonctions
+<code>handle_events</code> et <code>move_snake()</code> et les
+exploiter.</p></li>
+</ul>
+<details>
+<summary>
+<strong>Solution</strong>
+</summary>
+<a href="solutions/snake-v2.2.py">📁 <code>snake.py</code></a>
+</details>
+<h1 id="sauvegarde-restauration-de-létat-du-jeu">Sauvegarde &amp;
+restauration de l’état du jeu</h1>
+<p>L’état du jeu à un instant donné est capturé par les variables
+<code>snake</code>, <code>direction</code>, <code>fruit</code> et
+<code>score</code>.</p>
+<ul>
+<li><p>Définissez des fonctions <code>save_state</code> et
+<code>load_state</code> (sans argument ni valeur de retour) qui
+permettent respectivement de sauver l’état courant dans un fichier (par
+exemple “snaphot.py” ; vous pouvez adapter l’extension du fichier selon
+le format de sauvgarde que vous utilisez) et de remplacer l’état courant
+par l’état stocké dans ce fichier.</p></li>
+<li><p>Faites en sorte que l’état courant soit sauvegardé lorsque l’on
+appuie sur la touche “S” et que le programme charge l’état sauvegardé au
+démarrage si le fichier de sauvegarde existe.</p></li>
+</ul>
+<details>
+<summary>
+<strong>Solution</strong>
+</summary>
+<a href="solutions/snake-v2.3.py">📁 <code>snake.py</code></a>
+</details>
+<h1 id="gestion-configurable-des-événements">Gestion configurable des
+événements</h1>
+<p>Le code de gestion des évènements commence à ressembler à du
+spaghetti … On souhaiterait remplacer ce code qui grossit à chaque fois
+que l’on rajoute une fonctionnalité par une fonction générique</p>
+<pre class="python"><code>def handle_events(events):
+    for event in events:
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            event_handler = KEY_EVENT_HANDLER.get(event.key)
+            if event_handler:
+                event_handler()</code></pre>
+<p>qui exploite une <strong>configuration clavier</strong> (🇺🇸
+<strong>key bindings</strong>) configurable, décrivant l’association
+entre la touche sélectionnée et l’action correspondante :</p>
+<pre class="python"><code>KEY_BINDINGS = {
+    "q": sys.exit,
+    "s": save_state,
+    ...
+}</code></pre>
+<ul>
+<li><p>Rajouter une fonction de chargement de l’état sauvegardé quand on
+appuie sur la touche “L”.</p></li>
+<li><p>Définir toutes les actions à gérer sous forme de fonction sans
+argument (comme <code>sys.exit</code>, <code>save_state</code>,
+<code>load_state</code>).</p></li>
+<li><p>Compléter le dictionnaire <code>KEY_BINDINGS</code>, puis
+l’exploiter pour construire le dictionnaire
+<code>KEY_EVENT_HANDLER</code> qui va associer à chaque code clavier
+Pygame l’action correspondante.</p>
+<p>🗝️ Indication: <a href="https://www.pygame.org/docs/ref/key.html#pygame.key.key_code">📖
+<code>pygame.key.keycode</code></a></p></li>
+<li><p>Remplacer la fonction actuelle de gestion des événements par sa
+version générique.</p></li>
+</ul>
+<details>
+<summary>
+<strong>Solution</strong>
+</summary>
+<a href="solutions/snake-v2.4.py">📁 <code>snake.py</code></a>
+</details>
+</body>
+</html>

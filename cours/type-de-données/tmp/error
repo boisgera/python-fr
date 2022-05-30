@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/boisgera/VOYAGER/ENS/INFORMATIQUE/UE12/python-advanced-companion/cours/flux-d-exécution/tmp/main.py", line 2, in <module>
+    1 / 0
+ZeroDivisionError: division by zero

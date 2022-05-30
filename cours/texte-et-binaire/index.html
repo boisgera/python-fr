@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
+          }
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault" name="author"/>
+<title>Texte et binaire</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Texte et binaire</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
+Boisgérault</a></p>
+<p class="date">Monday 30 may 2022</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/583f7ea">
+          #583f7ea
+        </a>
+</p>
+</header>
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#chaînes-de-caractères" id="toc-chaînes-de-caractères">Chaînes de caractères</a></li>
+<li><a href="#données-binaires" id="toc-données-binaires">Données
+binaires</a></li>
+<li><a href="#encodage-de-texte" id="toc-encodage-de-texte">Encodage de
+texte</a></li>
+<li><a href="#fichiers" id="toc-fichiers">Fichiers</a></li>
+</ul>
+</nav></details>
+
+
+<h2 id="chaînes-de-caractères">Chaînes de caractères</h2>
+<p>Les chaînes de caractères Python sont définies comme des suites de
+caractères <a href="https://fr.wikipedia.org/wiki/Unicode">Unicode</a>
+délimités par les caractères <code>'</code> ou <code>"</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; s = "Hello world! 👋"
+&gt;&gt;&gt; s
+'Hello world! 👋'</code></pre>
+<p>Le choix de la 🇺🇸 <strong>simple quote</strong> ou de la 🇺🇸
+<strong>double quote</strong> est la plupart du temps indifférent.
+Préférez la double quote quand votre texte comporte des simples quotes
+(ou apostrophes) et réciproquement :</p>
+<pre class="python"><code>&gt;&gt;&gt; 'Je n'ai pas compris!'
+  File "&lt;stdin&gt;", line 1
+    'Je n'ai pas compris!'
+          ^
+SyntaxError: invalid syntax
+&gt;&gt;&gt; "J'ai compris!"
+"J'ai compris!"
+</code></pre>
+<p>Les caractères précédés d’un slash (<code>\</code>) sont interprétés
+comme des <strong>séquences d’échappement</strong> (🇺🇸 <strong>escape
+sequences</strong>) et non pas litéralement. Ainsi <code>"\n"</code> est
+un retour à la ligne, <code>"\t"</code> une tabulation</p>
+<pre class="python"><code>&gt;&gt;&gt; print("a\nb")
+a
+b
+&gt;&gt;&gt; print("a\tb")
+a   b</code></pre>
+<p><code>\\</code> un slash (et oui !), <code>\'</code> une simple quote
+et <code>\"</code> une double quote,</p>
+<pre class="python"><code>&gt;&gt;&gt; print("\\")
+\
+&gt;&gt;&gt; print('J\'ai compris!')
+J'ai compris!</code></pre>
+<p>etc.</p>
+<p>Un caractère Unicode est caractérisé par un 🇺🇸 <a href="https://en.wikipedia.org/wiki/Code_point"><strong>code
+point</strong></a>, un entier le plus souvent représenté sous la forme
+“U+????????” où les <code>?</code> sont des caractères hécadécimaux ; ce
+qui se traduit en Python par <code>\U????????</code>. Par exemple :</p>
+<pre class="python"><code>&gt;&gt;&gt; ord("a")
+97
+&gt;&gt;&gt; hex(97)
+'0x61'
+&gt;&gt;&gt; "\U00000061"
+'a'</code></pre>
+<p>Lorsqu’il suffit de quatre ou deux caractères hexadécimaux pour
+décrire le code point, on peut utiliser les syntaxes <code>\u????</code>
+ou <code>\x??</code> qui sont plus compactes</p>
+<pre class="python"><code>&gt;&gt;&gt; "\u0061"
+'a'
+&gt;&gt;&gt; "\x61"
+'a'</code></pre>
+<p>Les émojis par exemple nécessitent la syntaxe la plus longue :</p>
+<pre><code>&gt;&gt;&gt; "smiley: \U0001f600"
+'smiley: 😀'
+&gt;&gt;&gt; 
+&gt;&gt;&gt; "pile of poo: \U0001f4a9"
+'pile of poo: 💩'</code></pre>
+<p>Le chaînes de caractères se comportement également comme des
+collections (immuables) de caractères … même s’il n’existe pas de type
+“caractère” ! (Un “caractère” est en fait représenté comme une chaîne de
+caractères de longueur 1.)</p>
+<pre class="python"><code>&gt;&gt;&gt; s = "Hello world! 👋"
+&gt;&gt;&gt; len(s)
+14
+&gt;&gt;&gt; s[0]
+'H'
+&gt;&gt;&gt; s[-1]
+'👋'
+&gt;&gt;&gt; s[0:5]
+'Hello'
+&gt;&gt;&gt; s[:5] + s[5:]
+'Hello world! 👋'
+&gt;&gt;&gt; for c in s:
+...     print(c) 
+... 
+H
+e
+l
+l
+o
+ 
+w
+o
+r
+l
+d
+!
+ 
+👋
+&gt;&gt;&gt; list(s)
+['H', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', '!', ' ', '👋']</code></pre>
+<p>Les <strong>f-strings</strong> permettent d’insérer au sein de
+chaînes de caractères des chaînes de caractères stockées dans des
+variables</p>
+<pre class="python"><code>&gt;&gt;&gt; target = "world"
+&gt;&gt;&gt; emoji = "👋"
+&gt;&gt;&gt; f"Hello {target} {emoji}"
+'Hello world 👋'</code></pre>
+<p>ou bien des données qui peuvent être représentées comme des chaînes
+de caractères, ou bien même des expressions qui s’évaluent en de tels
+objets</p>
+<pre class="python"><code>&gt;&gt;&gt; f"1+1 = {1+1}"
+'1+1 = 2'</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; ok = True
+&gt;&gt;&gt; f"Annie are you ok? {'yep' if ok else 'nope'}."
+'Annie are you ok? yep.'
+&gt;&gt;&gt; ok = False
+&gt;&gt;&gt; f"Annie are you ok? {'yep' if ok else 'nope'}."
+'Annie are you ok? nope.'</code></pre>
+<h1 id="données-binaires">Données binaires</h1>
+<p>les <strong>octets</strong> Python (🇺🇸 <strong>bytes</strong>) sont
+des suites de valeurs entières comprises entre 0 et 255 qui représentent
+des données binaires arbitraires. Elle sont le plus fréquemment
+représentées sous une forme analogue aux chaînes de caractères, mais
+préfixées par un <code>b</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; b"Hello world!"
+b'Hello world!'</code></pre>
+<p>Néanmoins, seul les caractères ASCII sont autorisés</p>
+<pre class="python"><code>&gt;&gt;&gt; b"Hello world! 👋"
+  File "&lt;stdin&gt;", line 1
+SyntaxError: bytes can only contain ASCII literal characters.</code></pre>
+<p>Pour décrire des octets qui ne correspondent pas à des caractères
+ASCII, on peut utiliser la <strong>syntaxe d’échappement</strong> (🇺🇸
+<strong>escape sequence</strong>) <code>\x??</code> ou les
+<code>?</code> représentent un caractère hexadécimal.</p>
+<pre class="python"><code>&gt;&gt;&gt; b"Hello world! \xf0\x9f\x91\x8b"
+b'Hello world! \xf0\x9f\x91\x8b'</code></pre>
+<p>Il est aussi possible d’utiliser la syntaxe d’échappement à la place
+des caractères ASCII</p>
+<pre class="python"><code>&gt;&gt;&gt; b"\x48\x65\x6C\x6c\x6f\x20\x77\x6f\x72\x6c\x64\x21\x20\xf0\x9f\x91\x8b"
+b'Hello world! \xf0\x9f\x91\x8b'</code></pre>
+<p>Les octets peuvent aussi être manipulés comme des listes (mais
+immuables !) d’entiers compris entre 0 et 255</p>
+<pre class="python"><code>&gt;&gt;&gt; data = b"Hello world! \xf0\x9f\x91\x8b"
+&gt;&gt;&gt; data[0]
+72
+&gt;&gt;&gt; data[0] = 100
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: 'bytes' object does not support item assignment
+&gt;&gt;&gt; list(data)
+[72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33, 32, 240, 159, 145, 139]</code></pre>
+<p>D’ailleurs on peut les créer à partir d’une telle liste</p>
+<pre class="python"><code>&gt;&gt;&gt; bytes([72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33, 32, 240, 159, 145, 139])
+b'Hello world! \xf0\x9f\x91\x8b'</code></pre>
+<h1 id="encodage-de-texte">Encodage de texte</h1>
+<p>Pour être stocké dans un fichier ou transmis sur le réseau, une
+chaîne de caractères doit être convertie en données binaires. Il existe
+plusieurs méthodes pour opérer cette conversion, qu’on appelle un
+<strong>encodage</strong> (🇺🇸 <strong>encoding</strong>). L’encodage
+UTF-8 est un bon choix par défaut (notamment, parce qu’il est compatible
+avec le vénérable encodage ASCII mais qu’il sait gérer tous les
+caractères Unicode).</p>
+<pre class="python"><code>&gt;&gt;&gt; "Hello world! 👋".encode("utf-8")
+b'Hello world! \xf0\x9f\x91\x8b'</code></pre>
+<p>Il existe d’autres encodages, comme UTF-16, qui produisent des
+binaires différents.</p>
+<pre class="python"><code>&gt;&gt;&gt; "Hello world! 👋".encode("utf-16")
+b'\xff\xfeH\x00e\x00l\x00l\x00o\x00 \x00w\x00o\x00r\x00l\x00d\x00!\x00 \x00=\xd8K\xdc'</code></pre>
+<p>L’opération inverse est le <strong>décodage</strong> (🇺🇸
+<strong>decoding</strong>) des données binaires en chaînes de
+caractères</p>
+<pre class="python"><code>&gt;&gt;&gt; b'Hello world! \xf0\x9f\x91\x8b'.decode("utf-8")
+'Hello world! 👋'</code></pre>
+<p>Vous noterez qu’il faut savoir quel encodage a été utilisé pour
+décoder correcter les données binaires. Si l’on se trompe, le résultat
+peut être déplaisant …</p>
+<pre class="python"><code>&gt;&gt;&gt; "Sébastien".encode("utf-8").decode("cp1252")
+'SÃ©bastien'</code></pre>
+<p>Tous les encodages ne permettent pas de décrire tous les caractères
+du standard Unicode (mais UTF-8, UTF-16 et UTF-32 le permettent).</p>
+<pre class="python"><code>&gt;&gt;&gt; "Sébastien".encode("ascii")
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+UnicodeEncodeError: 'ascii' codec can't encode character '\xe9' in position 1: ordinal not in range(128)
+&gt;&gt;&gt; "Sébastien".encode("cp1252")
+b'S\xe9bastien'
+&gt;&gt;&gt; "Hello world! 👋".encode("cp1252")
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+  File "/home/boisgera/miniconda3/envs/python-fr/lib/python3.9/encodings/cp1252.py", line 12, in encode
+    return codecs.charmap_encode(input,errors,encoding_table)
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f44b' in position 13: character maps to &lt;undefined&gt;</code></pre>
+<h1 id="fichiers">Fichiers</h1>
+<p>Pour ouvrir un fichier afin d’y écrire du texte, vous pouvez utiliser
+le mode <code>"w"</code> (pour “write”)</p>
+<pre class="python"><code>&gt;&gt;&gt; file = open("texte.txt", mode="w")
+&gt;&gt;&gt; file.write("Hello world! 👋")</code></pre>
+<p>mais cela n’est pas nécessairement une bonne idée, car Python va
+alors décider par lui-même de l’encodage utilisé pour convertir votre
+texte en données binaires. Il va pour cela utiliser l’encodage déclaré
+par votre environnement (et encore, si tout va bien …). Sur ma machine,
+coup de chance, il s’agit d’UTF-8, et ce choix me convient</p>
+<pre class="python"><code>&gt;&gt;&gt; import locale
+&gt;&gt;&gt; locale.getpreferredencoding(False)
+'UTF-8'</code></pre>
+<p>mais rien ne dit que ce soit la même chose sur votre machine. Si nous
+devons ensuite partager les fichiers texte avec d’autres personne, il
+faut être en mesure de savoir comment ils sont encodés, ou mieux encore,
+de choisir quel encodage est utilisé. Le plus sage consiste à spécifier
+systématiquement et explicitement quel encodage vous souhaitez
+utiliser.</p>
+<pre class="python"><code>&gt;&gt;&gt; file = open("texte.txt", mode="w", encoding="utf-8")
+&gt;&gt;&gt; file.write("Hello world! 👋")</code></pre>
+<p>C’est aussi une bonne habitude de fermer le fichier après usage<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<pre class="python"><code>&gt;&gt;&gt; file = open("texte.txt", mode="w", encoding="utf-8")
+&gt;&gt;&gt; file.write("Hello world! 👋")
+&gt;&gt;&gt; file.close()</code></pre>
+<p>Pour autant, si vous insérez du code Python entre l’ouverture et la
+fermeture du fichier et que ce code peut échouer (par exemple, s’il n’y
+a plus de place sur votre disque dur pour écrire
+<code>"Hello world! 👋"</code>), l’instruction de fermeture du fichier
+ne sera jamais exécutée. Une version plus robuste consisterait à fermer
+le fichier dans tous les cas (erreur ou non), ce qui peut être fait de
+la façon suivante :</p>
+<pre class="python"><code>&gt;&gt;&gt; file = open("texte.txt", mode="w", encoding="utf-8")
+&gt;&gt;&gt; try:
+...     file.write("Hello world! 👋")
+... finally:
+...     file.close()
+...</code></pre>
+<p>… mais c’est un peu lourd ! Heureusement pour nous, il existe une
+construction plus compacte qui offre les mêmes garanties :</p>
+<pre class="python"><code>&gt;&gt;&gt; with open("texte.txt", mode="w", encoding="utf-8") as file:
+...     file.write("Hello world! 👋")
+...</code></pre>
+<p>L’écriture dans un fichier, se fait de façon analogue avec le mode
+<code>"r"</code> (pour “read”).</p>
+<pre class="python"><code>&gt;&gt;&gt; with open("texte.txt", mode="r", encoding="utf-8") as file:
+...     print(file.read())
+...
+Hello world! 👋</code></pre>
+<p>Enfin, sachez que le mode <code>"r"</code> est interprété comme
+<code>"rt"</code> (et <code>"w"</code> comme <code>"wt"</code>), ou
+<code>"t"</code> signifie “texte” : la fonction <code>open</code> sait
+alors qu’elle doit lire ou écrire du texte. On peut donc être tout à
+fait explicite en écrivant :</p>
+<pre class="python"><code>&gt;&gt;&gt; with open("texte.txt", mode="rt", encoding="utf-8") as file:
+...     print(file.read())
+...
+Hello world! 👋</code></pre>
+<p>Mais, si vous voulez accéder à des données qui ne sont pas du
+<strong>texte en clair</strong> (🇺🇸 <strong>plain text</strong>) comme
+une image ou un document PDF, ou bien du texte que vous décoderez
+vous-même, utilisez le mode “binaire” <code>"b"</code> (en lecture comme
+en écriture) :</p>
+<pre class="python"><code>&gt;&gt;&gt; with open("texte.txt", mode="rb") as file:
+...     data = file.read()
+...     print(f"{type(data) = }")
+...     text = data.decode("utf-8")
+...     print(text)
+...
+type(data) = &lt;class 'bytes'&gt;
+Hello world! 👋</code></pre>
+<section class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr/>
+<ol>
+<li id="fn1" role="doc-endnote"><p>Il est possible que l’écriture dans
+le fichier soit temporisée et n’ait lieu qu’à la fermeture du fichier.
+Il est aussi possible que l’ouverture du fichier “bloque” aux autres
+processus l’accès au même fichier, etc.<a class="footnote-back" href="#fnref1" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>

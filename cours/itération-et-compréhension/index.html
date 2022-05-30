@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
+          }
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault" name="author"/>
+<title>Itération &amp; compréhension</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Itération &amp; compréhension</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
+Boisgérault</a></p>
+<p class="date">Monday, 30 may 2022</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/583f7ea">
+          #583f7ea
+        </a>
+</p>
+</header>
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#itération" id="toc-itération">Itération</a></li>
+<li><a href="#itérables-classiques" id="toc-itérables-classiques">Itérables classiques</a></li>
+<li><a href="#compréhensions" id="toc-compréhensions">Compréhensions</a></li>
+<li><a href="#expressions-génératrices" id="toc-expressions-génératrices">Expressions génératrices</a></li>
+</ul>
+</nav></details>
+
+
+<h1 id="itération">Itération</h1>
+<p>On appelle <strong>itération</strong> (🇺🇸 <strong>iteration</strong>)
+le processus qui consiste à obtenir les éléments d’une collection les
+uns après les autres. C’est par example ce qui est à l’oeuvre dans une
+boucle for</p>
+<pre class="python"><code>for i in [1, 2, 3]:
+    print(i)</code></pre>
+<p>ou dans les expressions</p>
+<pre class="python"><code>&gt;&gt;&gt; s = set([1, 2, 3])</code></pre>
+<p>et</p>
+<pre class="python"><code>&gt;&gt;&gt; m = max([0, 1, -1, 2, -2])</code></pre>
+<p>Le point de départ est toujours un objet <strong>itérable</strong>
+(🇺🇸 <strong>iterable</strong>), c’est-à-dire capable de produire à la
+demande des <strong>itérateurs</strong> (🇺🇸 <strong>iterators</strong>),
+qui génèrent les élements désirés.</p>
+<p>Le protocole qui permet d’exploiter itérables et itérateurs exploite
+les fonctions <code>iter</code> et <code>next</code> selon le schéma
+suivant :</p>
+<pre class="python"><code>&gt;&gt;&gt; iterable = [1, 2, 3]
+&gt;&gt;&gt; iterator = iter(iterable)
+&gt;&gt;&gt; next(iterator)
+1
+&gt;&gt;&gt; next(iterator)
+2
+&gt;&gt;&gt; next(iterator)
+3
+&gt;&gt;&gt; next(iterator)
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+StopIteration</code></pre>
+<p>Notez que l’itérateur ci-dessus “épuise” progressivement l’itérable
+dont il est issu, jusqu’à générer une erreur ; il n’est alors plus
+utilisable pour parcourir la liste. Mais il est bien sûr d’en produire
+un nouveau avec la fonction <code>iter</code> et l’itérable de
+départ.</p>
+<p>La boucle for envisagée plus haut exploite ce protocole. Elle est en
+fait équivalente au code suivant :</p>
+<pre class="python"><code>iterator = iter([1, 2, 3])
+while True:
+    try:
+        i = next(iterator)
+        print(i)
+    except StopIteration:
+        break</code></pre>
+<p>⚠️ Ne pas modifier une collection pendant son itération ! Le résultat
+serait indéfini.</p>
+<p>Au lieu d’itérer la liste <code>l</code> dont on retire
+progressivement les éléments</p>
+<pre class="python"><code>l = [1, 2, 3]
+for i in l:
+    print(i)
+    l.remove(i)</code></pre>
+<p>on préférera en itérer une copie</p>
+<pre class="python"><code>l = [1, 2, 3]
+for i in l.copy():
+    print(i)
+    l.remove(i)</code></pre>
+<h1 id="itérables-classiques">Itérables classiques</h1>
+<p>Sont itérables en particulier :</p>
+<ul>
+<li><p>les listes</p></li>
+<li><p>les ensembles</p></li>
+<li><p>les dictionnaires</p></li>
+<li><p>les chaînes de caractères</p></li>
+<li><p>les fichiers</p></li>
+<li><p>etc.</p></li>
+</ul>
+<p>Il existe également des fonctions produisant des itérables, en
+particulier</p>
+<ul>
+<li><p><code>range</code></p></li>
+<li><p><code>enumerate</code></p></li>
+<li><p><code>zip</code></p></li>
+</ul>
+<p>Démonstration !</p>
+<pre class="python"><code>&gt;&gt;&gt; range(10)
+range(0, 10)
+&gt;&gt;&gt; for i in range(10):
+...     print(i)
+... 
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; enumerate([6, 7, 8]) # doctest: +ELLIPSIS
+&lt;enumerate object at 0x...&gt;
+&gt;&gt;&gt; for i, number in enumerate([6, 7, 8]):
+...     print(i, number)
+... 
+0 6
+1 7
+2 8</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; l1 = [1, 2, 3]
+&gt;&gt;&gt; l2 = [4, 8, 16]
+&gt;&gt;&gt; for item in zip(l1, l2):
+...     print(item)
+... 
+(1, 4)
+(2, 8)
+(3, 16)</code></pre>
+<h1 id="compréhensions">Compréhensions</h1>
+<p>Les <strong>listes en compréhension</strong> ou pour faire court les
+<strong>compréhensions</strong> (🇺🇸 <strong>list comprehensions /
+comprehensions</strong>) sont une alternative plus compacte aux boucles
+pour construire des listes.</p>
+<p>Par exemple, pour construire la liste des carrés des entiers de la
+liste :</p>
+<pre class="python"><code>integers = [1, 2, 3]</code></pre>
+<p>on peut soit utiliser une boucle for :</p>
+<pre class="python"><code>&gt;&gt;&gt; squares = []
+&gt;&gt;&gt; for i in integers:
+...     square = i * i
+...     squares.append(square)
+...
+&gt;&gt;&gt; squares
+[1, 4, 9]</code></pre>
+<p>soit utiliser la compréhension</p>
+<pre class="python"><code>&gt;&gt;&gt; [i*i for i in integers]
+&gt;&gt;&gt;
+[1, 4, 9]</code></pre>
+<p>Il est également possible de sélectionner les éléments que l’on
+conserve :</p>
+<pre class="python"><code>&gt;&gt;&gt; def is_even(i):
+...     return i % 2 == 0
+...
+&gt;&gt;&gt; integers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+&gt;&gt;&gt; [i for i in integers if is_even(i)]
+[0, 2, 4, 6, 8]</code></pre>
+<p>Les ensembles et les dictionnaires ont également leur compréhensions
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; {i*i for i in [0, 1, 2, 3] if i != 0}
+{1, 4, 9}
+&gt;&gt;&gt; {i: i*i for i in [0, 1, 2, 3] if i != 0}
+{1: 1, 2: 4, 3: 9}</code></pre>
+<h1 id="expressions-génératrices">Expressions génératrices</h1>
+<p>Le calcul</p>
+<pre class="python"><code>&gt;&gt;&gt; max([i*i for i in range(10)])
+81</code></pre>
+<p>a nécessité d’allouer la liste <code>[x*x for x in range(10)]</code>
+alors même que <code>range(10)</code> est un itérable paresseux, qui ne
+produit de valeurs qu’au fur et à mesure, sans nécessiter une telle
+allocation de mémoire.</p>
+<p>On pourrait calculer le maximum nous-même en étant plus économe</p>
+<pre class="python"><code>&gt;&gt;&gt; square_max = -1
+&gt;&gt;&gt; for i in range(10):
+...     square = i*i
+...     if square &gt; square_max:
+...         square_max = square
+&gt;&gt;&gt; square_max
+81  </code></pre>
+<p>mais la construction suivante, qui utilise une <strong>expression
+génératrice</strong> (🇺🇸 <strong>generation expression</strong>) est
+très similaire à notre code initial mais n’a pas l’inconvénient de
+celui-ci</p>
+<pre class="python"><code>&gt;&gt;&gt; max((x*x for x in range(10)))
+81</code></pre>
+<p>L’expression <code>(x*x for x in range(10))</code> est un itérable
+qui produit ses valeurs au fur et à mesure. Dans le contexte
+d’utilisation ci-dessus, on peut même faire l’économie des parenthèses
+décrivant l’expression et se contenter d’écrire</p>
+<pre class="python"><code>&gt;&gt;&gt; max(x*x for x in range(10))
+81</code></pre>
+<p>Cela n’est toutefois pas vrai dans tous les contextes ; on a
+ainsi</p>
+<pre class="python"><code>&gt;&gt;&gt; x*x for x in range(10)
+  File "&lt;stdin&gt;", line 1
+    x*x for x in range(10)
+        ^
+SyntaxError: invalid syntax</code></pre>
+<p>mais</p>
+<pre class="python"><code>&gt;&gt;&gt; (x*x for x in range(10)) # doctest: +ELLIPSIS
+&lt;generator object &lt;genexpr&gt; at 0x...&gt;</code></pre>
+</body>
+</html>

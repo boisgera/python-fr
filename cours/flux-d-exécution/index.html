@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Sébastien Boisgérault" />
+  <title>Flux d’exécution</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+  <!--
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet">
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let h3 = document.createElement("h3");
+          h3.innerHTML = "Table des matières";
+          let toc = document.getElementById("TOC");
+          toc.prepend(h3);
+      });    
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let elts = document.querySelectorAll('body > :not(header):not(nav)');
+          let headers = [...elts].filter(elt =>  
+              ["H1", "H2", "H3", "H4", "H5", "H6"].includes(elt.tagName)
+          )
+          for (let header of headers) {
+              let anchor = document.createElement("a");
+              anchor.setAttribute("href", `#${header.id}`);
+              anchor.setAttribute("style", "text-decoration: None;");
+              anchor.innerHTML = header.outerHTML;
+              header.replaceWith(anchor);
+          }
+      });    
+  </script>
+  <script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+  <script>
+
+  function copyAttributes(source, target) {
+    return Array.from(source.attributes).forEach(attribute => {
+      target.setAttribute(
+        attribute.nodeName,
+        attribute.nodeValue,
+      );
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", (event) => {
+      let details = document.querySelectorAll("section.details")
+      details.forEach((elt) => {
+          let details = document.createElement("details");
+          details.innerHTML = elt.innerHTML;
+          copyAttributes(elt, details)
+          elt.replaceWith(details);
+          let header = details.querySelector("h1, h2, h3, h4")
+          let summary = document.createElement("summary")
+          summary.appendChild(header.cloneNode(true))
+          header.replaceWith(summary)
+      })
+  })
+
+  </script>
+  <script>
+      // TODO: replace with clickable 📖, store inside (invis) the content ?
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let button = document.createElement("button");
+              let clone = elt.cloneNode(true);
+              clone.style.setProperty("display", "none");
+              button.appendChild(clone);
+              elt.replaceWith(button);
+
+              button.style.setProperty("height", "4.5em");
+              button.style.setProperty("width", "100%");
+
+              // button.style.setProperty("overflow", "hidden");
+
+              button.style.setProperty("position", "relative");
+              button.style.setProperty("border", "none");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              
+              /*
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              */
+
+              let icon = document.createElement("img");
+              button.appendChild(icon);
+              // button.style.setProperty("border", "none");
+              // button.style.setProperty("background", "none");
+              // button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              // button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  button.replaceWith(elt)
+
+              });
+
+
+              button.addEventListener('mouseover', (event) => {
+                  button.style.setProperty("cursor", "pointer");
+              });
+              
+              button.addEventListener('mouseout', (event) => {
+                  button.style.setProperty("cursor", "auto");
+              });
+
+      /*
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let wrapper = document.createElement("div");
+              let clone = elt.cloneNode(true);
+              wrapper.appendChild(clone);
+              elt.replaceWith(wrapper);
+
+              wrapper.style.setProperty("height", "4.5em");
+              wrapper.style.setProperty("overflow", "hidden");
+              wrapper.style.setProperty("position", "relative");
+              wrapper.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+
+              let button = document.createElement("div");
+              wrapper.appendChild(button);
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              
+              let icon = document.createElement("img");
+              let button = document.createElement("button");
+              button.appendChild(icon);
+              button.style.setProperty("border", "none");
+              button.style.setProperty("background", "none");
+              button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  wrapper.replaceWith(elt)
+
+              });
+
+
+  */
+          }
+      });    
+  </script>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Flux d’exécution</h1>
+<p class="author">👤 <a
+href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
+Boisgérault</a></p>
+<p class="affiliation">🏦 Mines Paris, Université PSL</p>
+<p class="license">⚖️ <a
+href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#what-if" id="toc-what-if">What if?</a>
+<ul>
+<li><a href="#booléens" id="toc-booléens">Booléens</a>
+<ul>
+<li><a href="#logique" id="toc-logique">Logique</a></li>
+<li><a href="#comparaison" id="toc-comparaison">Comparaison</a></li>
+<li><a href="#appartenance" id="toc-appartenance">Appartenance</a></li>
+<li><a href="#egalité-et-identité" id="toc-egalité-et-identité">Egalité
+et identité</a></li>
+<li><a href="#priorités" id="toc-priorités">Priorités</a></li>
+<li><a href="#conversion-explicites"
+id="toc-conversion-explicites">Conversion explicites</a></li>
+</ul></li>
+<li><a href="#if" id="toc-if"><code>If</code></a></li>
+</ul></li>
+<li><a href="#boucles" id="toc-boucles">Boucles</a>
+<ul>
+<li><a href="#while" id="toc-while"><code>While</code></a></li>
+<li><a href="#for" id="toc-for"><code>For</code></a></li>
+<li><a href="#sortir-des-boucles" id="toc-sortir-des-boucles">Sortir des
+boucles</a></li>
+<li><a href="#fonctions" id="toc-fonctions">Fonctions</a></li>
+<li><a href="#exceptions" id="toc-exceptions">Exceptions</a>
+<ul>
+<li><a href="#erreurs" id="toc-erreurs">Erreurs</a></li>
+<li><a href="#conséquences-dune-exception"
+id="toc-conséquences-dune-exception">Conséquences d’une
+exception</a></li>
+<li><a href="#gestion-des-exceptions"
+id="toc-gestion-des-exceptions">Gestion des exceptions</a></li>
+<li><a href="#lever-une-exception" id="toc-lever-une-exception">Lever
+une exception</a></li>
+<li><a href="#exceptions-contrôle-de-flux"
+id="toc-exceptions-contrôle-de-flux">Exceptions &amp; contrôle de
+flux</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="introduction">Introduction</h1>
+<p>Par défaut, un programme informatique exécute les instructions dans
+l’ordre qu’on lui fournit, ligne après ligne, puis s’arrếte une fois la
+dernière instruction exécutée.</p>
+<pre class="python"><code># file: main.py
+print(&quot;Hey!&quot;)
+print(&quot;Ho!)
+print(&quot;Let&#39;s go!)</code></pre>
+<pre class="bash"><code>$ python main.py
+Hey!
+Ho!
+Let&#39;s go!</code></pre>
+<p>Toutefois, des constructions de <strong>branchement</strong> (🇺🇸
+<strong>branching</strong>), permettent de contrôler ce flux d’exécution
+si nécessaire. En Python appartiennent à cette catégorie :</p>
+<ol type="1">
+<li><p>L’<strong>exécution conditionnelle</strong> (🇺🇸
+<strong>conditional execution</strong>)</p></li>
+<li><p>Les <strong>boucles</strong> (🇺🇸 <strong>loops</strong>)</p></li>
+<li><p>Les <strong>appels de fonction</strong> (🇺🇸 <strong>function
+calls</strong>)</p></li>
+<li><p>Les <strong>exceptions</strong> (🇺🇸
+<strong>exceptions</strong>)</p></li>
+</ol>
+<h1 id="what-if">What if?</h1>
+<h2 id="booléens">Booléens</h2>
+<p>Le type booléen <code>bool</code> peut prendre deux valeurs :
+<code>False</code> et <code>True</code>.</p>
+<h3 id="logique">Logique</h3>
+<p>Les opérateurs logiques “non” (<span
+class="math inline">\(\neg\)</span>), “et” (<span
+class="math inline">\(\wedge\)</span>) et “ou” (<span
+class="math inline">\(\vee\)</span>) sont désignés en Python par les
+mot-clés <code>not</code>, <code>and</code> et <code>or</code> et
+s’évaluent comme suit :</p>
+<table>
+<thead>
+<tr class="header">
+<th>Symbole</th>
+<th>Opérateur</th>
+<th style="text-align: left;">Expression</th>
+<th></th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\neg\)</span></td>
+<td><code>not</code></td>
+<td style="text-align: left;"><code>not False</code></td>
+<td><span class="math inline">\(\to\)</span></td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\neg\)</span></td>
+<td><code>not</code></td>
+<td style="text-align: left;"><code>not True</code></td>
+<td><span class="math inline">\(\to\)</span></td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\wedge\)</span></td>
+<td><code>and</code></td>
+<td style="text-align: left;"><code>False and False</code></td>
+<td><span class="math inline">\(\to\)</span></td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\wedge\)</span></td>
+<td><code>and</code></td>
+<td style="text-align: left;"><code>False and True</code></td>
+<td><span class="math inline">\(\to\)</span></td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\wedge\)</span></td>
+<td><code>and</code></td>
+<td style="text-align: left;"><code>True and False</code></td>
+<td><span class="math inline">\(\to\)</span></td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\wedge\)</span></td>
+<td><code>and</code></td>
+<td style="text-align: left;"><code>True and True</code></td>
+<td><span class="math inline">\(\to\)</span></td>
+<td><code>True</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\vee\)</span></td>
+<td><code>or</code></td>
+<td style="text-align: left;"><code>False or False</code></td>
+<td><span class="math inline">\(\to\)</span></td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\vee\)</span></td>
+<td><code>or</code></td>
+<td style="text-align: left;"><code>False or True</code></td>
+<td><span class="math inline">\(\to\)</span></td>
+<td><code>True</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\vee\)</span></td>
+<td><code>or</code></td>
+<td style="text-align: left;"><code>True or False</code></td>
+<td><span class="math inline">\(\to\)</span></td>
+<td><code>True</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\vee\)</span></td>
+<td><code>or</code></td>
+<td style="text-align: left;"><code>True or True</code></td>
+<td><span class="math inline">\(\to\)</span></td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="comparaison">Comparaison</h3>
+<p>Les objets Python peuvent être comparés au moyen des opérateurs
+<code>==</code> (égal) et <code>!=</code> (différents).</p>
+<pre class="python"><code>&gt;&gt;&gt; 0 == 0
+True
+&gt;&gt;&gt; 0 == 1
+False
+&gt;&gt;&gt; &quot;A&quot; == &quot;A&quot;
+True
+&gt;&gt;&gt; &quot;A&quot; == &quot;B&quot;
+False
+&gt;&gt;&gt; [1, 2, 3] == [1, 2, 3]
+True
+&gt;&gt;&gt; [1, 2, 3] == [4, 5, 6]
+False</code></pre>
+<p>Si les objets sont d’un type ordonné (par exemple des entiers, des
+nombres flottants, etc.), on peut également utiliser <code>&lt;</code>
+(inférieur strictement à), <code>&lt;=</code> (inférieur ou égal à),
+<code>&gt;</code> (supérieur strictement à) et <code>&gt;=</code>
+(supérieur ou égal à).</p>
+<p>L’ordre considéré dépend du type de l’objet ; par exemple pour les
+chaînes de caractère, c’est l’ordre lexicographique qui est utilisé
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; &quot;ABC&quot; &lt; &quot;XYZ&quot;
+True</code></pre>
+<h3 id="appartenance">Appartenance</h3>
+<p>Les opérateurs <code>in</code> et <code>not in</code> permettent de
+tester l’appartenance d’un objet à un conteneur (une liste, une chaîne
+de caractères, un ensemble, etc.) :</p>
+<pre class="python"><code>&gt;&gt;&gt; 1 in [1, 2, 3]
+True
+&gt;&gt;&gt; 0 in [1, 2, 3]
+False
+&gt;&gt;&gt; 1 not in [1, 2, 3]
+False
+&gt;&gt;&gt; 0 not in [1, 2, 3]
+True</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; 1 in set([1, 2, 3])
+True
+&gt;&gt;&gt; 0 in set()
+False
+&gt;&gt;&gt; &quot;Hello&quot; in &quot;Hello world!&quot;
+True
+&gt;&gt;&gt; &quot;x&quot; in {&quot;x&quot;: 0.0, &quot;y&quot;: 1.0}
+True</code></pre>
+<h3 id="egalité-et-identité">Egalité et identité</h3>
+<p>L’<strong>égalité</strong> de <code>x</code> et <code>y</code> est
+testée par l’opérateur <code>==</code> :</p>
+<pre class="python"><code>x == y</code></pre>
+<p>Leur <strong>identité</strong> est testée avec le mot-clé
+<code>is</code> :</p>
+<pre class="python"><code>x is y</code></pre>
+<p>La négation de ces propriétés est testée par <code>!=</code> et
+<code>is not</code> :</p>
+<pre class="python"><code>x != y</code></pre>
+<pre class="python"><code>x is not y</code></pre>
+<section id="ℹ-terminologie" class="details div-details">
+<h4 class="details">ℹ️ Terminologie</h4>
+<ul>
+<li><p>On pourra utiliser le terme <strong>est égal à</strong> pour
+affirmer l’égalité entre objets et tout simplement <strong>est</strong>
+pour affirmer qu’ils ont la même identité (utiliser le terme “identique”
+serait ici un contre-sens).</p></li>
+<li><p>L’égalité entre objets est parfois appelée <strong>égalité
+structurelle</strong> et l’identité entre objets <strong>égalité
+référentielle</strong>.</p></li>
+</ul>
+</section>
+<h4 id="section"></h4>
+<p>L’identité <code>x is y</code> signifie que les variables
+<code>x</code> et <code>y</code> réfèrent au même objet Python : les
+données sont à la même adresse en mémoire. Une copie parfaite d’un objet
+aura donc une identité différente de l’originale, alors qu’il sera
+considéré égal à l’original. Par contre, si deux objets sont identiques
+(au sens de : ont la même identité, sont un seul est unique objet),
+alors ils sont nécessairement égaux.</p>
+<h4 id="section-1"></h4>
+<p>A titre d’exemple, considérons les trois listes <code>a</code>,
+<code>b</code> et <code>c</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; a = [1, 2, 3]
+&gt;&gt;&gt; b = [1, 2, 3]
+&gt;&gt;&gt; c = b</code></pre>
+<p>Les listes <code>a</code> et <code>b</code> sont égales, ainsi que
+<code>b</code> et <code>c</code>, mais ne sont pas identiques, elles ne
+désignent pas le même objet (en mémoire) ; les variables <code>b</code>
+et <code>c</code> par contre désignent le même objet :</p>
+<pre class="python"><code>&gt;&gt;&gt; a == b
+True
+&gt;&gt;&gt; b == c
+True
+&gt;&gt;&gt; a is b
+False
+&gt;&gt;&gt; b is c
+True</code></pre>
+<p>On peut s’assurer que les variables <code>b</code> et <code>c</code>
+désignent le même objet en évaluant l’<strong>identifiant</strong> de
+ces objets (un entier) avec la fonction <code>id</code> :</p>
+<pre><code>&gt;&gt;&gt; id(a)
+140636096399680
+&gt;&gt;&gt; id(b)
+140636098130688
+&gt;&gt;&gt; id(c)
+140636098130688
+&gt;&gt;&gt; id(a) == id(b)
+False
+&gt;&gt;&gt; id(b) == id(c)
+True</code></pre>
+<p>Une conséquence importante de cette distinction : les modifications
+de la liste (désignée par) <code>b</code> vont impacter la liste
+<code>c</code> (qui est le même objet), mais pas la liste <code>a</code>
+(qui est un objet distinct) :</p>
+<pre class="python"><code>&gt;&gt;&gt; b.append(4)
+&gt;&gt;&gt; b
+[1, 2, 3, 4]
+&gt;&gt;&gt; c
+[1, 2, 3, 4]
+&gt;&gt;&gt; a
+[1, 2, 3]</code></pre>
+<section id="x-is-not-y-neq-x-is-not-y" class="details div-details">
+<h4 class="details">⚠️ <code>x is not y</code> <span
+class="math inline">\(\neq\)</span> <code>x is (not y)</code></h4>
+<p>Bien qu’étant composé de deux mot-clés séparés par un espace,
+<code>is not</code> est un opérateur en tant que tel. L’expression
+<code>x is not y</code> est équivalente à <code>not (x is y)</code> …
+mais plus lisible ! Si l’on a besoin d’utiliser <code>is</code> et
+<code>not</code> comme des opérateurs distincts, pour signifier
+<code>x is (not y)</code>, il conviendra de garder les parenthèses.
+Ainsi, avec</p>
+<pre class="python"><code>&gt;&gt;&gt; x = 1
+&gt;&gt;&gt; y = True</code></pre>
+<p>on a</p>
+<pre><code>&gt;&gt;&gt; x is not y
+True
+&gt;&gt;&gt; x is y
+False
+&gt;&gt;&gt; not (x is y)
+True</code></pre>
+<p>mais</p>
+<pre class="python"><code>&gt;&gt;&gt; not y
+False
+&gt;&gt;&gt; x is (not y)
+False</code></pre>
+</section>
+<h3 id="priorités">Priorités</h3>
+<p>📖 <a
+href="https://docs.python.org/3/reference/expressions.html#operator-precedence">Référence
+du langage Python / Expressions / Priorité des opérateurs</a></p>
+<p>Certaines expressions booléennes semblent ambigües ; on pourrait a
+priori interpréter l’expression <code>not x and y or z</code> de
+multiples façons, par exemple comme <code>(not x) and (y or z)</code> ou
+comme <code>not (x and (y or z))</code>. Pour lever cette ambiguité,
+Python défini une liste de priorité entre expressions ; du plus
+prioritaire au moins prioritaire, on a :</p>
+<ol type="1">
+<li>Appel de fonction</li>
+<li><code>in</code>, <code>not in</code>, <code>is</code>,
+<code>is not</code>, <code>&lt;</code>, <code>&lt;=</code>,
+<code>&gt;</code>, <code>&gt;=</code>, <code>!=</code>,
+<code>==</code></li>
+<li><code>not</code></li>
+<li><code>and</code></li>
+<li><code>or</code></li>
+</ol>
+<p>L’expression <code>not x and y or z</code> est donc interprétée comme
+<code>((not x) and y) or z.</code></p>
+<h3 id="conversion-explicites">Conversion explicites</h3>
+<h4 id="valeur-booléenne">🏷️ Valeur booléenne</h4>
+<p>On dira qu’une valeur <code>x</code> est :</p>
+<ul>
+<li><p><strong>en quelque sorte fausse</strong> (🇺🇸 <em>false-ish</em>)
+si <code>bool(x)</code> est <code>False</code>,</p></li>
+<li><p><strong>en quelque sorte vraie</strong> (🇺🇸 <em>true-ish</em>) si
+<code>bool(x)</code> est <code>True</code>.</p></li>
+</ul>
+<h4 id="section-2"></h4>
+<p>La table de conversion ci-dessus vaut pour les types les plus communs
+:</p>
+<table>
+<thead>
+<tr class="header">
+<th><code>type(x)</code></th>
+<th><code>bool(x) is False</code></th>
+<th><code>bool(x) is True</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>type(None)</code></td>
+<td>Toujours</td>
+<td>Jamais</td>
+</tr>
+<tr class="even">
+<td><code>bool</code></td>
+<td><code>x == False</code></td>
+<td><code>x != True</code></td>
+</tr>
+<tr class="odd">
+<td><code>int</code></td>
+<td><code>x == 0</code></td>
+<td><code>x != 0</code></td>
+</tr>
+<tr class="even">
+<td><code>float</code></td>
+<td><code>x == 0.0</code></td>
+<td><code>x != 0.0</code></td>
+</tr>
+<tr class="odd">
+<td><code>complex</code></td>
+<td><code>x == 0.0j</code></td>
+<td><code>x != 0.0j</code></td>
+</tr>
+<tr class="even">
+<td><code>str</code></td>
+<td><code>x == ""</code></td>
+<td><code>x != ""</code></td>
+</tr>
+<tr class="odd">
+<td><code>bytes</code></td>
+<td><code>x == b""</code></td>
+<td><code>x != b""</code></td>
+</tr>
+<tr class="even">
+<td><code>tuple</code></td>
+<td><code>x == ()</code></td>
+<td><code>x != ()</code></td>
+</tr>
+<tr class="odd">
+<td><code>list</code></td>
+<td><code>x == []</code></td>
+<td><code>x != []</code></td>
+</tr>
+<tr class="even">
+<td><code>set</code></td>
+<td><code>x == set()</code></td>
+<td><code>x != set()</code></td>
+</tr>
+<tr class="odd">
+<td><code>dict</code></td>
+<td><code>x == {}</code></td>
+<td><code>x != {}</code></td>
+</tr>
+</tbody>
+</table>
+<section id="ℹ-nombres-collections" class="details info div-details">
+<h4 class="details info">ℹ️ Nombres &amp; collections</h4>
+<p>Pour tous les types standards listés ci-dessus :</p>
+<ul>
+<li><p><code>None</code> (la seule instance du type associé !) est en
+quelque sorte faux :</p>
+<pre class="python"><code>&gt;&gt;&gt; bool(None)
+False</code></pre></li>
+<li><p>Si <code>x</code> est numérique (<code>bool</code>,
+<code>int</code>, <code>float</code>, <code>complex</code>), il est en
+quelque sorte vrai si et seulement s’il est non-nul :</p>
+<pre class="python"><code>bool(x) == (x == 0)</code></pre></li>
+<li><p>Si <code>x</code> est une collection (<code>str</code>,
+<code>bytes</code>, <code>tuple</code>, <code>list</code>,
+<code>set</code>, <code>dict</code>), il est en quelque sorte vrai si et
+seulement s’il est vide :</p>
+<pre class="python"><code>bool(x) == (len(x) == 0)</code></pre></li>
+</ul>
+</section>
+<section id="ℹ-valeur-par-défaut" class="details info div-details">
+<h4 class="details info">ℹ️ Valeur par défaut</h4>
+<p>Pour tout les types listés plus haut, on remarquera qu’il existe une
+unique valeur qui est en quelque sorte fausse ; toutes les autres
+valeurs sont en quelque sorte vraies. La valeur en question est celle
+que l’on obtient en appelant le constructeur du type sans argument :</p>
+<pre class="python"><code>&gt;&gt;&gt; types = [type(None), bool, int, float, complex, str, bytes, tuple, list, set, dict]
+&gt;&gt;&gt; for T in types:
+...     val = T()
+...     print(repr(val))
+... 
+False
+0
+0.0
+0j
+&#39;&#39;
+b&#39;&#39;
+()
+[]
+{}
+set()
+&gt;&gt;&gt; assert all(bool(T()) is False for T in types)</code></pre>
+<!--
+
+#### ℹ️ TODO: conseils / bonnes pratiques ? {.details}
+
+du type éviter `if x is True`, `if todos == []` ou `if len(todos) > 0`.
+Dans d'autres cas, être plus explicite (ex: `xml.etree` ou `numpy`) ?
+Faire preuve de discernement.
+
+#### TODO:
+
+  - objets, par défaut ? `True` (sinon, à setter à `None`)
+
+  - exploration autres types : files (tjs `True`), numpy arrays, xml element, etc. ?
+    Array intéressant: pas obligé d'être convertible ; mélange de warnings,
+    erreurs, et qui marche. Plus simple de ne pas se fier à la conversion
+    implicite! Utiliser `.size` est le plus souvent ce que l'on veut. Sinon,
+    utiliser `.any()` ou `.all()`.
+
+-->
+</section>
+<h2 id="if"><code>If</code></h2>
+<p>Le mot-clé <code>if</code> et les mots-clés associés
+<code>elif</code> et <code>else</code> permettent l’exécution
+conditionnelle de code.</p>
+<pre class="python"><code>if condition_1:
+    ... # block 1
+elif condition_2:
+    ... # block 2
+elif condition_3:
+    ... # block 3
+...
+else:
+    ... # block n</code></pre>
+<p>Les clauses <code>elif</code> et <code>else</code> sont optionnelles.
+Le mot-clé <code>elif</code> doit être compris comme un raccourci pour
+<code>else if</code> : le code ci-dessus est équivalent à :</p>
+<pre class="python"><code>if condition_1:
+    ... # block 1
+else: 
+    if condition_2:
+        ... # block 2
+    else:
+        if condition_3:
+            ... # block 3
+        ...
+        else:
+            ... # block n</code></pre>
+<p>Les expressions <code>condition_*</code> sont converties
+implicitement en booléens et detérminent quel sera le flux
+d’exécution.</p>
+<h1 id="boucles">Boucles</h1>
+<h2 id="while"><code>While</code></h2>
+<p>La boucle <code>while</code> s’exécute tant que sa condition est (en
+quelque sorte) vraie :</p>
+<pre class="python"><code>&gt;&gt;&gt; numbers = [1, 2, 3]
+&gt;&gt;&gt; while numbers:
+...     number = numbers.pop(0)
+...     print(number)
+...
+1
+2
+3</code></pre>
+<h2 id="for"><code>For</code></h2>
+<p>La boucle <code>for</code> permet de parcourir tous les éléments
+d’une collection :</p>
+<pre class="python"><code>&gt;&gt;&gt; numbers = [1, 2, 3]
+&gt;&gt;&gt; for number in numbers:
+...     print(number)
+...
+1
+2
+3</code></pre>
+<p>On se référera à la section <a
+href="../it%C3%A9ration-et-compr%C3%A9hension/index.html">itération et
+compréhension</a> pour plus de détails.</p>
+<h2 id="sortir-des-boucles">Sortir des boucles</h2>
+<p>L’exécution des boucles <code>while</code> et <code>for</code>
+peuvent être interrompue, soit pour accéder directement à l’itération
+suivante, avec le mot-clé <code>continue</code>, soit pour interrompre
+définitivement la boucle, avec le mot-clé <code>break</code>.</p>
+<p>Par exemple:</p>
+<pre class="python"><code>&gt;&gt;&gt; i = -1
+&gt;&gt;&gt; while i &lt; 6:
+...     i += 1
+...     if i % 2 == 0:  # i is even
+...         continue
+...     print(i)
+...
+1
+3
+5</code></pre>
+<p>et</p>
+<pre class="python"><code>&gt;&gt;&gt; i = 0
+&gt;&gt;&gt; while True:
+...     if i &gt;= 3:
+...         break
+...     print(i)
+...     i += 1
+...
+0
+1
+2</code></pre>
+<p>La même mécanique s’applique au boucles <code>for</code>. A noter la
+clause optionnelle <code>else</code> associée au boucles for, qui n’est
+exécutée que si aucun <code>break</code> n’a eu lieu.</p>
+<pre class="python"><code>&gt;&gt;&gt; for i in [1, 2, 3]:
+...     print(i)
+... else:
+...     print(&quot;ok&quot;)
+...
+1
+2
+3
+ok</code></pre>
+<h2 id="fonctions">Fonctions</h2>
+<p>Lorsqu’une fonction est appelée, son code est exécuté, puis
+l’exécution reprend le fil normal d’exécution.</p>
+<pre class="python"><code>&gt;&gt;&gt; def print_ho():
+...     print(&quot;Ho!&quot;)
+...
+&gt;&gt;&gt; print(&quot;Hey!&quot;)
+&gt;&gt;&gt; print_ho()
+&gt;&gt;&gt; print(&quot;Let&#39;s go!)
+Hey!
+Ho!
+Let&#39;s go!</code></pre>
+<p>Ce principe s’applique récursivement (une fonction peut appeler des
+fonctions, qui peuvent elles-même appelées des fonctions, etc.)</p>
+<h2 id="exceptions">Exceptions</h2>
+<h3 id="erreurs">Erreurs</h3>
+<p>En cas d’opération invalide, Python génère une erreur ; par exemple
+si vous divisez <span class="math inline">\(1\)</span> par <span
+class="math inline">\(0\)</span>, calculez <span
+class="math inline">\(\sqrt{-1}\)</span> ou évaluez la valeur absolue
+d’une liste vide, vous observez les messages suivants :</p>
+<pre class="python"><code>&gt;&gt;&gt; 1.0 / 0.0
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+ZeroDivisionError: float division by zero</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; import math
+&gt;&gt;&gt; math.sqrt(-1)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+ValueError: math domain error</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; abs([])
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+TypeError: bad operand type for abs(): &#39;list&#39;</code></pre>
+<p>Techniquement, Python génère une erreur en <strong>levant une
+exception</strong>. En mode interactif, l’exception se manifeste par
+l’affichage suivant :</p>
+<ul>
+<li><p>un <strong>traceback</strong> pointant vers l’origine de l’erreur
+:</p>
+<p><code>File "&lt;stdin&gt;", line 1, in &lt;module&gt;</code></p>
+<p>(ici assez peu instructif il faut bien l’avouer.)</p></li>
+<li><p>un <strong>type</strong> d’exception :</p>
+<ul>
+<li><p><code>ZeroDivisionError</code>,</p></li>
+<li><p><code>ValueError</code> et</p></li>
+<li><p><code>TypeError</code>.</p></li>
+</ul></li>
+<li><p>un <strong>message</strong> explicatif :</p>
+<ul>
+<li><p><code>"division by zero"</code>,</p></li>
+<li><p><code>"math domain error"</code>,</p></li>
+<li><p><code>"bad operand type for abs(): 'list'"</code></p></li>
+</ul></li>
+</ul>
+<h3 id="conséquences-dune-exception">Conséquences d’une exception</h3>
+<p>Lorsqu’une exception est générée en mode interactif (REPL Python,
+notebook Jupyter, etc.), l’environnement gère l’exception ; il vous
+signale qu’une exception s’est produite, mais vous pouvez continuer à
+taper des commandes.</p>
+<p>En revanche dans l’exécution classique d’un programme Python
+classique, en l’absence de gestion spécifique de l’exception, la
+survenue d’une exception interrompt brutalement le programme. Par
+exemple, l’exécution du programme Python</p>
+<pre class="python"><code># file: main.py
+print(&quot;Hello&quot;)
+1 / 0
+print(&quot;world!&quot;)</code></pre>
+<p>conduit à l’affichage suivant</p>
+<pre class="bash"><code>$ python main.py
+Hello
+Traceback (most recent call last):
+  File &quot;main.py&quot;, line 3, in &lt;module&gt;
+    1 / 0
+ZeroDivisionError: division by zero</code></pre>
+<section id="terminal-erreurs" class="details div-details">
+<h4 class="details">🖥️ Terminal &amp; erreurs</h4>
+<p>Si l’on veut être plus précis : la chaîne de caractère
+<code>"Hello"</code> est affiché sur le flux de sortie standard, le
+message d’erreur est dirigé vers le flux d’erreur standard (numéro 2) et
+un code d’erreur (différent de 0, qui correspond à une exécution sans
+erreur du programme) est émis :</p>
+<pre class="bash"><code>$ python main.py 2&gt;error.txt
+Hello
+$ echo $?
+1
+$ cat error.txt
+Traceback (most recent call last):
+  File &quot;main.py&quot;, line 3, in &lt;module&gt;
+    1 / 0
+ZeroDivisionError: division by zero</code></pre>
+</section>
+<h4 id="section-3"></h4>
+<p>En tout état de cause, la chaîne de caractères <code>"world!"</code>
+ne sera jamais affichée. Le flux d’exécution linéaire classique est donc
+perturbé par la survenue de l’exception.</p>
+<h3 id="gestion-des-exceptions">Gestion des exceptions</h3>
+<p>Les exceptions qui surviennent peuvent être
+<strong>attrapées</strong> (🇺🇸 <strong>to catch an exception</strong>)
+puis gérées comme on le souhaite avant que celles-ci n’induisent l’arrêt
+du programme.</p>
+<p>Par exemple :</p>
+<pre class="python"><code>&gt;&gt;&gt; def ratio(numerator, denominator):
+...     try:
+...         return numerator / denominator
+...     except ZeroDivisionError as error:
+...         message = &quot;denominator is equal to zero.&quot;
+...         raise ValueError(message) from error
+...
+&gt;&gt;&gt; ratio(640, 480)
+1.3333333333333333
+&gt;&gt;&gt; ratio(640, 0)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 3, in ratio
+ZeroDivisionError: division by zero
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 6, in ratio
+ValueError: denominator is equal to zero.</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; import math
+&gt;&gt;&gt; x = 4
+&gt;&gt;&gt; try:
+...     r = math.sqrt(x)
+... except ValueError:
+...     r = math.sqrt(-x)
+...
+&gt;&gt;&gt; r
+2.0</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; xs = [0.0, 1.0, -1.0, &quot;Hello!&quot;, [], 1.0j, None, 42]
+&gt;&gt;&gt; abs_xs = []
+&gt;&gt;&gt; for x in xs:
+...     try:
+...         abs_xs.append(abs(x))
+...     except TypeError:
+...         abs_xs.append(None)
+...
+&gt;&gt;&gt; abs_xs
+[0.0, 1.0, 1.0, None, None, 1.0, None, 42]
+</code></pre>
+<h3 id="lever-une-exception">Lever une exception</h3>
+<p>On peut générer ou <strong>lever</strong> une exception (🇺🇸
+<strong>to raise an exception</strong>) au moyen du mot-clé
+<code>raise</code>.</p>
+<h4 id="simulation">Simulation</h4>
+<p>Par exemple, pour reproduire les erreurs que l’on a rencontré jusqu’à
+présent :</p>
+<pre class="python"><code>&gt;&gt;&gt; # 1 / 0
+&gt;&gt;&gt; raise ZeroDivisionError(&quot;float division by zero&quot;)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+ZeroDivisionError: float division by zero</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; # math.sqrt(-1)
+&gt;&gt;&gt; raise ValueError(&quot;math domain error&quot;)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+ValueError: math domain error</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; # abs([])
+&gt;&gt;&gt; raise TypeError(&quot;bad operand type for abs(): &#39;list&#39;&quot;)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+TypeError: bad operand type for abs(): &#39;list&#39;</code></pre>
+<h4 id="un-example-plus-réaliste">Un example plus réaliste</h4>
+<p>On peut rapidemeent définir une fonction factorielle :</p>
+<pre class="python"><code>import math
+
+def factorial(n):
+    integers = range(1, n+1) # 1, 2, 3, ..., n (iterable)
+    return math.prod(integers)</code></pre>
+<p>qui donne le bon résultat “quand tout va bien”</p>
+<pre class="python"><code>&gt;&gt;&gt; factorial(0)
+1
+&gt;&gt;&gt; factorial(1)
+1
+&gt;&gt;&gt; factorial(2)
+2
+&gt;&gt;&gt; factorial(3)
+6
+&gt;&gt;&gt; factorial(10)
+3628800
+&gt;&gt;&gt; factorial(20)
+2432902008176640000</code></pre>
+<p>Mais en cas d’erreur sur le type de l’argument, l’erreur associée est
+quelque peu cryptique :</p>
+<pre class="python"><code>&gt;&gt;&gt; factorial(&quot;100&quot;)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 2, in factorial
+TypeError: can only concatenate str (not &quot;int&quot;) to str</code></pre>
+<p>Il est possible de faire mieux, par exemple avec le code suivant
+:</p>
+<pre class="python"><code>def factorial(n):
+    if not isinstance(n, int):
+        message = f&quot;{n!r} is not an integer&quot;
+        raise TypeError(message)
+    integers = range(1, n+1) # 1, 2, 3, ..., n (iterable)
+    return math.prod(integers)</code></pre>
+<p>On obtiendra alors l’erreur plus explicite</p>
+<pre><code>&gt;&gt;&gt; factorial(&quot;100&quot;)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 4, in factorial
+TypeError: &#39;100&#39; is not an integer</code></pre>
+<p>Mais même ainsi nous pouvons encore avoir des surprises. Ainsi, si
+<code>n</code> est un entier mais qu’il est strictement négatif,
+<code>factorial</code> va évaluer le <code>math.prod([])</code>, qui
+vaut 1.</p>
+<pre class="python"><code>&gt;&gt;&gt; factorial(-1)
+1</code></pre>
+<p>Corrigeons ce défaut de notre implémentation !</p>
+<pre class="python"><code>def factorial(n):
+    if not isinstance(n, int):
+        message = f&quot;{n!r} is not an integer.&quot;
+        raise TypeError(message)
+    if n &lt; 0:
+        message = f&quot;{n} &lt; 0.&quot;
+        raise ValueError(message) 
+    integers = range(1, n+1) # 1, 2, 3, ..., n (iterable)
+    return math.prod(integers)</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; factorial(-1)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 7, in factorial
+ValueError: -1 &lt; 0.</code></pre>
+<section
+id="its-easier-to-ask-forgiveness-than-it-is-to-get-permission."
+class="details div-details">
+<h4 class="details">“It’s easier to ask forgiveness than it is to get
+permission.”</h4>
+<p>Une citation de <a
+href="https://en.wikipedia.org/wiki/Grace_Hopper">Grace Hopper</a>, qui
+correspond à un style de gestion des erreurs classique en Python. Au
+lieu de tester au préalable toutes les conditions d’erreurs possibles,
+ce qui peut être fastidieux, on “fait ce qu’on a à faire” et on
+l’analyse ensuite le résultat et éventuellement on gère les erreurs qui
+en résultent. Dans le cas de la fonction factorielle, ce style pourrait
+se traduire comme suit :</p>
+<pre class="python"><code>def factorial(n):
+    try:
+        if n &lt; 0:
+            message = f&quot;{n} &lt; 0.&quot;
+            raise ValueError(message) 
+        integers = range(1, n+1) # 1, 2, 3, ..., n (iterable)
+        return math.prod(integers)
+    except TypeError:
+        message = f&quot;{n!r} is not an integer.&quot;
+        raise TypeError(message)</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; factorial(-1)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 5, in factorial
+ValueError: -1 &lt; 0.</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; factorial(&quot;100&quot;)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 3, in factorial
+TypeError: &#39;&lt;&#39; not supported between instances of &#39;str&#39; and &#39;int&#39;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 11, in factorial
+TypeError: &#39;100&#39; is not an integer.</code></pre>
+</section>
+<h3 id="exceptions-contrôle-de-flux">Exceptions &amp; contrôle de
+flux</h3>
+<p>Il n’est peut-être pas évident que les exceptions – a priori
+destinées à décrire des erreurs – fournissent un puissant mécanisme de
+contrôle de flux. Et pourtant c’est bien le cas !</p>
+<p>A titre d’exemple, montrons comment un exception nous permet de
+sortir de plusieurs boucles imbriquées (contrairement au mot-clé
+<code>break</code>). On peut ainsi utiliser (par exemple) l’exception
+<code>StopIteration</code> dans le code suivant :</p>
+<pre class="python"><code>&gt;&gt;&gt; try:
+...     for i in range(10):
+...         for j in range(10):
+...             for k in range(10):
+...                 print(i, j, k)
+...                 if i + j + k == 7:
+...                     raise StopIteration() 
+... except StopIteration:
+...     pass
+...
+0 0 0
+0 0 1
+0 0 2
+0 0 3
+0 0 4
+0 0 5
+0 0 6
+0 0 7</code></pre>
+<p>A noter que cet usage n’est pas si exotique qu’il y paraît. En effet,
+Python utilise lui-même (implicitement) l’exception
+<code>StopIteration</code> dans les boucles <code>for</code> pour
+signaler l’épuisement d’un itérable.</p>
+<p>Ainsi le code</p>
+<pre class="python"><code>for i in [1, 2, 3]:
+    print(i)</code></pre>
+<p>est (schématiquement) équivalent à :</p>
+<pre class="python"><code>it = iter([1, 2, 3])
+while True:
+    try:
+        i = next(it)
+        print(i)
+    except StopIteration:
+        break</code></pre>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<script>
+
+function copyAttributes(source, target) {
+  return Array.from(source.attributes).forEach(attribute => {
+    target.setAttribute(
+      attribute.nodeName,
+      attribute.nodeValue,
+    );
+  });
+}
+
+document.addEventListener("DOMContentLoaded", (event) => {
+    let details = document.querySelectorAll("section.details")
+    details.forEach((elt) => {
+        let details = document.createElement("details");
+        details.innerHTML = elt.innerHTML;
+        copyAttributes(elt, details)
+        elt.replaceWith(details);
+        let header = details.querySelector("h1, h2, h3, h4")
+        let summary = document.createElement("summary")
+        summary.appendChild(header.cloneNode(true))
+        header.replaceWith(summary)
+    })
+})
+
+</script>

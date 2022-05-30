@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
+          }
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault, MINES Paris – PSL" name="author"/>
+<title>Le retour du retour du serpent</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le retour du retour du serpent</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
+Boisgérault</a>, MINES Paris – PSL</p>
+<p class="date">Monday 30 may 2022</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/583f7ea">
+          #583f7ea
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/edit.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/edit/master/tps/snake-3/index.md">
+          Edition
+        </a>
+</p>
+</header>
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">🕹️
+Introduction</a></li>
+<li><a href="#constantes" id="toc-constantes">🧱 Constantes</a></li>
+<li><a href="#un-type-snake" id="toc-un-type-snake">🐍 Un type
+<code>Snake</code></a></li>
+<li><a href="#validation" id="toc-validation">✔️ Validation</a></li>
+<li><a href="#en-mouvement" id="toc-en-mouvement">🏃 En
+mouvement</a></li>
+<li><a href="#etat-du-jeu" id="toc-etat-du-jeu">🗃️ Etat du jeu</a></li>
+<li><a href="#moteur-de-jeu" id="toc-moteur-de-jeu">⚙️ Moteur de
+jeu</a></li>
+<li><a href="#pilote-automatique" id="toc-pilote-automatique">🤖 Pilote
+automatique</a></li>
+</ul>
+</nav></details>
+
+
+<h1 id="introduction">🕹️ Introduction</h1>
+<p>Nous allons remanier (à nouveau !) notre programme <a href="../snake-2/solutions/snake-v2.4.py">🐍 snake.py</a>, en exploitant
+une conception orientée objet. Nous tenterons de rendre son code plus
+robuste / réutilisable / compréhensible / maintenable. Nous tâcherons
+ensuite de tirer les bénéfices de cette réorganisation en développant –
+avec le minimum d’effort de développement – un 🤖 bot qui assistera le
+joueur dans la poursuite du high-score.</p>
+<details>
+<summary>
+<strong>📄 Snake version 2</strong>
+</summary>
+<pre class="python"><code># Python Standard Library
+import random
+import sys
+
+# Pygame
+import pygame
+
+# Setup
+# ------------------------------------------------------------
+WIDTH = 30
+HEIGHT = 30
+CELL_SIZE = 20
+FPS = 1.0
+COLORS = {
+    "background": [255, 255, 255],
+    "snake": [0, 0, 0],
+    "fruit": [255, 0, 0]
+}
+UP = [0, -1]
+DOWN = [0, 1]
+LEFT = [-1, 0]
+RIGHT = [1, 0]
+SNAPSHOT="snapshot.py"
+
+# State
+# ------------------------------------------------------------
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = DOWN
+fruit = [10, 10]
+score = 0
+
+def save_state():
+    state = {
+        "snake": snake,
+        "direction": direction,
+        "fruit": fruit,
+        "score": score
+    }
+    with open(SNAPSHOT, mode="w") as file:
+        file.write(repr(state))
+
+def load_state():
+    global snake, direction, fruit, score
+    with open(SNAPSHOT, mode="r", encoding="utf-8") as file:
+        data = file.read()
+    state = eval(data)
+    snake = state["snake"]
+    direction = state["direction"]
+    fruit = state["fruit"]
+    score = state["score"]    
+
+
+# Helper Functions
+# ------------------------------------------------------------
+def init():
+    pygame.init()
+    screen = pygame.display.set_mode([CELL_SIZE*WIDTH, CELL_SIZE*HEIGHT])
+    clock = pygame.time.Clock()
+    return screen, clock
+
+def draw(screen):
+    screen.fill(COLORS["background"])
+    for x, y in snake:
+        rect = [x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE]
+        pygame.draw.rect(screen, COLORS["snake"], rect)
+    rect = [fruit[0]*CELL_SIZE, fruit[1]*CELL_SIZE, CELL_SIZE, CELL_SIZE]
+    pygame.draw.rect(screen, COLORS["fruit"], rect)  
+    pygame.display.set_caption(f"Score : {score}")
+
+def set_direction(d):
+    def action():
+        global direction
+        direction = d
+    return action
+
+def move_snake():
+    global snake, score, fruit
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0], 
+      head[1] + direction[1]
+    ]
+    if new_head in snake:
+        sys.exit()
+    elif new_head[0] &lt; 0 or new_head[0] &gt;= WIDTH:
+        sys.exit()
+    elif new_head[1] &lt; 0 or new_head[1] &gt;= HEIGHT:
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, WIDTH-1), 
+            random.randint(0, HEIGHT-1)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+
+# Event Management
+# ------------------------------------------------------------
+KEY_BINDINGS = {
+    "q": sys.exit,
+    "up": set_direction(UP),
+    "down": set_direction(DOWN),
+    "left": set_direction(LEFT),
+    "right": set_direction(RIGHT),
+    "s": save_state,
+    "l": load_state,
+}
+
+KEY_EVENT_HANDLER = {pygame.key.key_code(k): v for k, v in KEY_BINDINGS.items()}
+
+def handle_events(events):
+    for event in events:
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            event_handler = KEY_EVENT_HANDLER.get(event.key)
+            if event_handler:
+                event_handler()
+
+def wait_for_next_frame(clock):
+    clock.tick(FPS)
+
+# Main Loop
+# ------------------------------------------------------------
+if __name__ == "__main__":
+    screen, clock = init()
+    while True:
+        events = pygame.event.get()
+        handle_events(events)
+        move_snake()
+        draw(screen)
+        pygame.display.update()
+        wait_for_next_frame(clock)</code></pre>
+</details>
+<h1 id="constantes">🧱 Constantes</h1>
+<p>🧹 <strong>Nettoyage de printemps !</strong> Déplacez la définition
+des constantes du programme (<code>WIDTH</code>, <code>HEIGHT</code>,
+<code>CELL_SIZE</code>, etc.) dans un fichier <code>constants.py</code>,
+puis les importer dans <code>snake.py</code> avec :</p>
+<pre class="python"><code>from constants import *</code></pre>
+<h1 id="un-type-snake">🐍 Un type <code>Snake</code></h1>
+<p>Implémenter une classe <code>Snake</code> encapsulant la géométrie et
+la direction du serpent. On veut pouvoir l’instancier comme suit :</p>
+<pre class="python"><code>&gt;&gt;&gt; geometry = [[10, 15], [11, 15], [12, 15]]
+&gt;&gt;&gt; direction = [0, 1]
+&gt;&gt;&gt; snake = Snake(geometry, direction)</code></pre>
+<p>Stockez les arguments <code>geometry</code> et <code>direction</code>
+comme les attributs de même nom de l’instance snake.</p>
+<pre class="python"><code>&gt;&gt;&gt; snake.geometry
+[[10, 15], [11, 15], [12, 15]]
+&gt;&gt;&gt; snake.direction
+[0, 1]</code></pre>
+<p>Développez une propriété <code>head</code>, accessible uniquement en
+lecture, renvoyant la tête du serpent.</p>
+<pre class="python"><code>&gt;&gt;&gt; snake.head
+[12, 15]</code></pre>
+<p>⚠️ <strong>Encapsulation.</strong> Non seulement on veut que
+l’attribut <code>head</code> du serpent ne puisse pas être réaffecté
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; snake.head = [0, 7]
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: can't set attribute</code></pre>
+<p>mais on veut également qu’une modification de la tête récupérée par
+<code>snake.head</code> n’ait pas d’incidence sur l’état du serpent
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; head = snake.head
+&gt;&gt;&gt; head[0] = 0
+&gt;&gt;&gt; head[1] = 7
+&gt;&gt;&gt; snake.head
+[12, 15]</code></pre>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>import copy
+
+class Snake:
+    def __init__(self, geometry, direction):
+        self.direction = direction
+        self.geometry = geometry
+
+    def get_head(self):
+        return copy.copy(self.geometry[-1])
+
+    head = property(get_head)</code></pre>
+</details>
+<h1 id="validation">✔️ Validation</h1>
+<p>Quelles sont les valeurs admissibles pour la direction du serpent ?
+Implémenter une fonction <code>check_direction</code> qui prenne en
+argument une direction, ne renvoie rien si la direction est admissible
+et lève une exception (de type <code>ValueError</code> ou
+<code>TypeError</code>, à déterminer) dans le cas contraire.</p>
+<p>De même, toutes les listes de n-uplets représentant la géométrie du
+serpent ne sont pas valides. Faire la liste des toutes les conditions
+qui rendent la géométrie du serpent invalide ; on distinguera les</p>
+<ul>
+<li><p>🐛 <strong>bugs</strong> qui résultent d’erreurs de programmation
+et ne devraient pas exister,</p></li>
+<li><p>💀 <strong>game over</strong> qui peuvent arriver mais doivent
+entrainer la fin immédiate du jeu.</p></li>
+</ul>
+<p>Mettre en correspondance ces catégories avec un type d’exception
+(soit <code>TypeError</code>, soit <code>ValueError</code>, soit
+<code>SystemExit</code>), puis implémenter une fonction
+<code>check_geometry</code> qui prenne en argument une géométrie de
+serpent, ne renvoie rien si elle est valide et lève l’exception
+appropriée dans le cas contraire.</p>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>def check_direction(direction):
+    try:
+        direction = list(direction)
+    except TypeError:
+        error = f"{direction} is not list-like"
+        raise TypeError(error)
+    if (
+        len(direction) != 2
+        or not isinstance(direction[0], int)
+        or not isinstance(direction[1], int)
+    ):
+        raise TypeError(f"{direction} is not a pair of integers")
+    elif direction not in DIRECTIONS:
+        raise ValueError(f"{direction} is not in {DIRECTIONS}")
+
+
+def is_in_scope(tile):
+    x, y = tile
+    return 0 &lt;= x &lt; WIDTH and 0 &lt;= y &lt; HEIGHT
+
+
+def check_geometry(geometry):
+    try:
+        geometry = list(geometry)
+    except TypeError:
+        error = f"{geometry} is not list-like"
+        raise TypeError(error)
+    try:
+        geometry = [list(item) for item in geometry]
+    except TypeError:
+        error = f"{item} is not list-like"
+        raise TypeError(error)
+    if not all(
+        len(item) == 2 and isinstance(item[0], int) and isinstance(item[1], int)
+        for item in geometry
+    ):
+        raise TypeError("all geometry items should be pairs of integers")
+
+    if not geometry:
+        raise ValueError("empty geometry")
+
+    for i, item in enumerate(geometry[:-1]):
+        next_item = geometry[i + 1]
+        diff = (next_item[0] - item[0], next_item[1] - item[1])
+        if abs(diff[0]) + abs(diff[1]) != 1:
+            raise ValueError("non-connected snake geometry")
+
+    if not all(is_in_scope(item) for item in geometry):
+        raise SystemExit("snake out of bounds")
+
+    for i, elt in enumerate(geometry):
+        if elt in geometry[i + 1 :]:
+            # at least one repeated item
+            raise SystemExit("snake self-collision")</code></pre>
+</details>
+<p>A-t’on la garantie que ces attributs restent valides quel que soit
+l’usage que le programmeur fasse de l’instance <code>snake</code> dans
+son code ? Faites disparaître les attributs publics
+<code>geometry</code> et <code>direction</code> au profit d’attributs
+privés <code>_geometry</code> et <code>_direction</code>, puis
+développez des méthodes <code>get_direction</code> et
+<code>set_direction</code> permettant d’accéder à l’attribut
+<code>_direction</code> en assurant sa validité</p>
+<pre class="python"><code>&gt;&gt;&gt; snake.get_direction()
+[0, 1]
+&gt;&gt;&gt; snake.set_direction([0, -1])
+&gt;&gt;&gt; snake.get_direction()
+[0, -1]</code></pre>
+<p>⚠️ <strong>Encapsulation.</strong> Assurez-vous que
+<code>set_direction</code> soit bien la seule façon de modifier la
+direction du serpent. En particulier, vérifiez que l’on a bien le
+comportement ci-dessous :</p>
+<pre class="python"><code>&gt;&gt;&gt; direction = snake.get_direction()
+&gt;&gt;&gt; direction
+[0, 1]
+&gt;&gt;&gt; direction[0] = 999
+&gt;&gt;&gt; snake.get_direction()
+[0, 1]</code></pre>
+<p>Même chose pour <code>set_geometry</code>.</p>
+<p>Enfin, associez aux accesseurs <code>get_direction</code>,
+<code>set_direction</code>, <code>get_geometry</code> et
+<code>set_geometry</code> des propriétés <code>geometry</code> et
+<code>direction</code>.</p>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>class Snake:
+    def __init__(self, geometry, direction):
+        self.direction = direction
+        self.geometry = geometry
+
+    def get_direction(self):
+        return copy.deepcopy(self._direction)
+
+    def set_direction(self, direction):
+        check_direction(direction)
+        self._direction = copy.deepcopy(direction)
+
+    direction = property(get_direction, set_direction)
+
+    def get_geometry(self):
+        return copy.deepcopy(self._geometry)
+
+    def set_geometry(self, geometry):
+        check_geometry(geometry)
+        self._geometry = copy.deepcopy(geometry)
+
+    geometry = property(get_geometry, set_geometry)
+
+    def get_head(self):
+        return self.geometry[-1]
+
+    head = property(get_head)</code></pre>
+</details>
+<h1 id="en-mouvement">🏃 En mouvement</h1>
+<p>Introduire une méthode <code>move</code> dans la classe
+<code>Snake</code> qui va mettre à jour la géométrie du serpent en
+tenant compte de la direction courante du serpent et de la position des
+fruits (à remettre à jour le cas échéant).</p>
+<p>Adapter la boucle générale du programme pour intégrer les
+développements de la classe <code>Snake</code>. Vérifier en y jouant que
+le comportement du jeu reste identique.</p>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>class Snake:
+    ...
+
+    def move(self):
+        global fruit
+        head = self.head
+        new_head = [head[0] + self.direction[0], head[1] + self.direction[1]]
+        if new_head == fruit:
+            state.score += 1
+            self.geometry = self.geometry + [new_head]
+            fruit = [random.randint(0, WIDTH - 1), random.randint(0, HEIGHT - 1)]
+        else:
+            self.geometry = self.geometry[1:] + [new_head]</code></pre>
+</details>
+<h1 id="etat-du-jeu">🗃️ Etat du jeu</h1>
+<p>Définir une classe <code>State</code> représentant l’état à un
+instant donné du programme. On souhaite pouvoir initialiser cet état par
+un code de la forme</p>
+<pre class="python"><code>snake = Snake(
+    geometry=[[10, 15], [11, 15], [12, 15]], 
+    direction=RIGHT
+) 
+state = State(snake=snake, fruit=[10, 10], score=0)</code></pre>
+<p>et que l’instance <code>state</code> expose les attributs
+<code>snake</code>, <code>fruit</code> et <code>score</code> (en lecture
+et en écriture).</p>
+<p>Adapter le reste du code en conséquence. A-t’on encore besoin du
+mot-clé <code>global</code> ? Pourquoi ?</p>
+<p>Faites en sorte que la classe <code>Snake</code> prenne en charge la
+sauvegarde et le chargement de l’état du jeu.</p>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code># Game State
+# ------------------------------------------------------------------------------
+class Snake:
+    def __init__(self, geometry, direction):
+        self.direction = direction
+        self.geometry = geometry
+
+    def get_direction(self):
+        return copy.deepcopy(self._direction)
+
+    def set_direction(self, direction):
+        check_direction(direction)
+        self._direction = copy.deepcopy(direction)
+
+    direction = property(get_direction, set_direction)
+
+    def get_geometry(self):
+        return copy.deepcopy(self._geometry)
+
+    def set_geometry(self, geometry):
+        check_geometry(geometry)
+        self._geometry = copy.deepcopy(geometry)
+
+    geometry = property(get_geometry, set_geometry)
+
+    def get_head(self):
+        return self.geometry[-1]
+
+    head = property(get_head)
+
+    def move(self):
+        head = self.head
+        new_head = [head[0] + self.direction[0], head[1] + self.direction[1]]
+        if new_head == state.fruit:
+            state.score += 1
+            self.geometry = self.geometry + [new_head]
+            state.fruit = [random.randint(0, WIDTH - 1), random.randint(0, HEIGHT - 1)]
+        else:
+            self.geometry = self.geometry[1:] + [new_head]
+
+class State:
+    def __init__(self, snake, fruit, score=0):
+        self.snake = snake
+        self.fruit = fruit
+        self.score = score
+
+    def save(self):
+        state = {
+            "snake": self.snake.geometry,
+            "direction": self.snake.direction,
+            "fruit": self.fruit,
+            "score": self.score,
+        }
+        with open(SNAPSHOT, mode="w") as file:
+            file.write(repr(state))
+
+    def load(self):
+        with open(SNAPSHOT, mode="r", encoding="utf-8") as file:
+            data = file.read()
+        state = eval(data)
+        self.state.geometry = state["snake"]
+        self.direction = state["direction"]
+        self.fruit = state["fruit"]
+        self.score = state["score"]
+
+state = State(snake=Snake([[10, 15], [11, 15], [12, 15]], RIGHT,), fruit=[10, 10])
+
+# Event Management
+# ------------------------------------------------------------------------------
+def set_direction(direction):
+    def action():
+        state.snake.direction = direction
+
+    return action
+
+
+KEY_BINDINGS = {
+    "q": sys.exit,
+    "up": set_direction(UP),
+    "down": set_direction(DOWN),
+    "left": set_direction(LEFT),
+    "right": set_direction(RIGHT),
+    "s": state.save,
+    "l": state.load,
+}
+
+KEY_EVENT_HANDLER = {pygame.key.key_code(k): v for k, v in KEY_BINDINGS.items()}</code></pre>
+</details>
+<h1 id="moteur-de-jeu">⚙️ Moteur de jeu</h1>
+<p>On souhaite désormais séparer aussi nettement que possible le code
+qui relève spécifiquement de notre jeu et le code générique, commun à
+(presque) tous les jeux. Ce dernier type de code formera les bases d’un
+moteur de jeu et sera développé dans une classe <code>Game</code> du
+fichier <code>game.py</code>. Cette classe devra prendre en charge
+l’initialisation de <code>pygame</code>, la gestion des fps, la
+récupération des évènements, etc.</p>
+<p>On souhaite pouvoir exploiter cette classe générique en définissant
+une classe <code>SnakeGame</code> qui en dérive et qui régit le jeu du
+serpent. La classe <code>SnakeGame</code> sera définie de la façon
+suivante :</p>
+<pre class="python"><code>from game import Game
+
+class SnakeGame(Game):
+    def process_events(self, events):
+        for event in events:
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                event_handler = KEY_EVENT_HANDLER.get(event.key)
+                if event_handler:
+                    event_handler()
+        state.snake.move()
+
+    def draw(self):
+        screen = self.screen
+        self.caption = f"Score: {state.score}"
+        draw_background(screen)
+        draw_snake(screen, state.snake)
+        draw_fruit(screen, state.fruit)</code></pre>
+<p>Lorsque l’on invoque la commande <code>python snake.py</code>, le
+code suivant sera exécuté :</p>
+<pre class="python"><code>snake_game = SnakeGame()
+snake_game.start()</code></pre>
+<p>Développez la classe <code>Game</code> (dans le fichier
+<code>game.py</code>) en conséquence !</p>
+<details>
+<summary>
+<strong>✨ Solution : <code>game.py</code></strong>
+</summary>
+<pre class="python"><code># Python Standard Library
+import sys
+
+# Third-party Libraries
+import pygame
+
+# Local
+from constants import *
+
+class Game:
+    def __init__(
+        self, size=(WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE), fps=FPS, caption=""
+    ):
+        self.size = size
+        self.fps = fps
+        self.caption = caption
+
+    def start(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode(self.size)
+        self.clock = pygame.time.Clock()
+        while True:
+            events = pygame.event.get()
+            self.process_events(events)
+            self.draw()
+            pygame.display.update()
+            pygame.display.set_caption(self.caption)
+            self.clock.tick(self.fps)
+
+    def process_events(self, events):
+        raise NotImplementedError()
+
+    def draw(self):
+        raise NotImplementedError()</code></pre>
+</details>
+<h1 id="pilote-automatique">🤖 Pilote automatique</h1>
+<p>On souhaite faciliter la vie du joueur : lorsque celui-ci ne presse
+aucune touche entre deux frames successives, votre programme devra
+prendre une décision à sa place pour le rapprocher du fruit, en évitant
+de créer trop de collisions (au minimum : en ne faisant jamais un
+demi-tour).</p>
+<p>Développez une classe 🤖 <code>AutoSnakeGame</code> qui prenne en
+charge cette fonctionnalité quand on lance le jeu avec la commande
+<code>python autosnake.py</code>.</p>
+<pre class="python"><code># Third-Party Libraries
+import pygame as pg
+
+# Local Modules
+from constants import *
+from snake import state, SnakeGame
+
+class AutoSnakeGame(SnakeGame):
+    pass # TODO!
+
+if __name__ == "__main__":
+    snake_game = AutoSnakeGame()
+    snake_game.start()</code></pre>
+<details>
+<summary>
+<strong>✨ Solution : <code>autosnake.py</code></strong>
+</summary>
+<pre class="python"><code>
+# Third-Party Libraries
+import pygame as pg
+
+# Local Modules
+from constants import *
+from snake import state, SnakeGame
+
+class AutoSnakeGame(SnakeGame):
+    def process_events(self, events):
+        if not events:
+            snake = state.snake
+            snake_head = snake.head
+            direction = snake.direction
+            fruit = state.fruit
+            aim = [fruit[0] - snake_head[0], fruit[1] - snake_head[1]]
+            key = None
+            if aim[0] &gt; 0 and direction != LEFT:
+                key = pg.K_RIGHT
+            elif aim[0] &lt; 0 and direction != RIGHT:
+                key = pg.K_LEFT
+            elif aim[1] &gt; 0 and direction != UP:
+                key = pg.K_DOWN
+            elif aim[1] &lt; 0 and direction != DOWN:
+                key = pg.K_UP
+            if key is not None:
+                event = pg.event.Event(pg.KEYDOWN, key=key)
+                events.append(event)
+        super().process_events(events)
+
+
+if __name__ == "__main__":
+    snake_game = AutoSnakeGame()
+    snake_game.start()</code></pre>
+</details></body>
+</html>
