@@ -101,79 +101,11 @@ Avec Visual Studio Code
 qu'on souhaite travailler dans l'environnement conda `snake` :
 cliquez dans la bannière du bas la zone qui indique le Python courant.
 
-<!--
-**Suggestion #3.** Pour lancer le programme directement depuis VS Code :
-
-- ouvrir la palette de commandes
-  - `⇧ ⌘ P` Shift-Command-P (mac)
-  - `⇧ ⌃ P` Shift-Control-P (windows)
-- chercher la fonction *Toggle Integrated Terminal*
-  - mémoriser le raccourci clavier
-  - qui est Control-backtick sur Mac (le backtick c'est `)
--->
-
-<!--
-Premiers pas avec PyGame
---------------------------------------------------------------------------------
-
-(factor out ? Indep doc? *Maybe*, given that the set of learning objectives
-is autonomous)
-
-Prérequis :
-
-  - `dir` / `help` / usage doc en ligne
-
-
-Objectifs :
-
-  - import de module (bases)
-
-  - sous-modules (principes et énumération)
-
-  - concepts propres à pygame :
-  
-      - initialisation
-
-      - modules & classes : display, time, Surface
-
-      - display: création de "surface" (window / screen), taille
-
-      - flux d'exécution et disparition de la surface !
-
-      - time & delay
-
-      - tracé sur une surface. N'apparaît pas !!!
-
-      - display: update
-
-
-``` python
-import pygame
-pygame.init()
-
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 255, 0)
-
-SCREEN_SIZE = (300, 300)
-
-screen = pygame.display.set_mode(SCREEN_SIZE)
-
-screen.fill(GREEN)
-
-pygame.display.update()
-
-pygame.time.delay(3000)
-```
-
--->
 
 Code de démarrage
 --------------------------------------------------------------------------------
 
 Notre point de départ : un arrière-plan dont la couleur varie aléatoirement.
-
-
 
 ```python
 import random
@@ -275,10 +207,12 @@ clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-              sys.exit()
+                pygame.quit()
+                sys.exit()
     red = random.randint(0, 255)
     green = random.randint(0, 255)
     blue = random.randint(0, 255)
@@ -429,10 +363,12 @@ clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-              sys.exit()
+                pygame.quit()
+                sys.exit()
             if event.key == pygame.K_UP:
                 direction = [0.0, -1.0]
             elif event.key == pygame.K_LEFT:
@@ -507,18 +443,20 @@ clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-              sys.exit()
+                pygame.quit()
+                sys.exit()
             if event.key == pygame.K_UP:
-                direction = [0.0, -1.0]
+                direction = [0, -1]
             elif event.key == pygame.K_LEFT:
-                direction = [-1.0, 0.0]
+                direction = [-1, 0]
             elif event.key == pygame.K_DOWN:
-                direction = [0.0, 1.0]
+                direction = [0, 1]
             elif event.key == pygame.K_RIGHT:
-                direction = [1.0, 0.0]
+                direction = [1, 0]
     head = snake[-1]
     new_head = [
       head[0] + direction[0], 
@@ -592,18 +530,20 @@ clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-              sys.exit()
+                pygame.quit()
+                sys.exit()
             if event.key == pygame.K_UP:
-                direction = [0.0, -1.0]
+                direction = [0, -1]
             elif event.key == pygame.K_LEFT:
-                direction = [-1.0, 0.0]
+                direction = [-1, 0]
             elif event.key == pygame.K_DOWN:
-                direction = [0.0, 1.0]
+                direction = [0, 1]
             elif event.key == pygame.K_RIGHT:
-                direction = [1.0, 0.0]
+                direction = [1, 0]
     head = snake[-1]
     new_head = [
       head[0] + direction[0], 
