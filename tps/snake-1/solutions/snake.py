@@ -12,6 +12,7 @@ snake = [
 ]
 direction = [1, 0]
 fruit = [10, 10]
+score = 0
 
 pygame.init()
 screen = pygame.display.set_mode([20 * 30, 20 * 30])
@@ -35,7 +36,14 @@ while True:
                 direction = [1, 0]
     head = snake[-1]
     new_head = [head[0] + direction[0], head[1] + direction[1]]
+    if new_head in snake:
+        sys.exit()
+    elif new_head[0] < 0 or new_head[0] >= 30:
+        sys.exit()
+    elif new_head[1] < 0 or new_head[1] >= 30:
+        sys.exit()
     if new_head == fruit:
+        score = score + 1
         snake = snake + [new_head]
         fruit = [random.randint(0, 29), random.randint(0, 29)]
     else:
@@ -47,4 +55,5 @@ while True:
     rect = [fruit[0] * 20, fruit[1] * 20, 20, 20]
     pygame.draw.rect(screen, red, rect)
     pygame.display.update()
+    pygame.display.set_caption(f"Score: {score}")
     clock.tick(1)

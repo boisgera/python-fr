@@ -572,7 +572,7 @@ while True:
     pygame.draw.rect(screen, red, rect)  
     pygame.display.update()
     pygame.display.set_caption(f"Score: {score}")
-    clock.tick(1.0)
+    clock.tick(1)
 ```
 
 </details>
