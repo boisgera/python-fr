@@ -19,16 +19,15 @@ Introduction
 Ce TP vous propose de développer un petit jeu en Python. Il constitue 
 une introduction à la conception et à la réalisation d'un programme complet.
 
-Son sujet est un classique du jeu vidéo : le 🐍 [snake].
-Si vous ne connaissez pas son principe, prenez un moment pour 
-découvrir [slither.io](http://slither.io/), 
-qui en est est une version moderne ... et complexe ! 
+Son sujet est un standard du jeu vidéo, le 🐍 [snake]. 
+Vous pouvez découvrir une version classique de ce jeu à l'adresse
+<https://wasm4.org/play/snake> ou un version très modernisée (et complexe !) à l'adresse
+<https://slither.io/>.
 
 [Snake]: https://fr.wikipedia.org/wiki/Snake_(genre_de_jeu_vid%C3%A9o)
 
-
-Notre objectif sera plus modeste (et plus proche des versions anciennes du jeu) :
-nous réaliserons plusieurs versions d'un **programme qui marche** 
+Rassurez-vous, notre objectif sera modeste et donc proche de la version 
+classique du jeu : nous réaliserons plusieurs versions d'un **programme qui marche** 
 (et pas un programme parfait) dont les fonctionnalités s'enrichiront à
 chaque nouvelle étape. 
 

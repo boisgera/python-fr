@@ -121,8 +121,8 @@ Boisgérault</a>, Mines Paris, Université PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/b5fb102">
-          #b5fb102
+<a href="https://github.com/boisgera/python-fr/commit/e6a1ea2">
+          #e6a1ea2
         </a>
 </p>
 
@@ -165,12 +165,11 @@ serpent qui bouge</a></li>
 <p>Ce TP vous propose de développer un petit jeu en Python. Il constitue
 une introduction à la conception et à la réalisation d’un programme
 complet.</p>
-<p>Son sujet est un classique du jeu vidéo : le 🐍 <a href="https://fr.wikipedia.org/wiki/Snake_(genre_de_jeu_vid%C3%A9o)">snake</a>.
-Si vous ne connaissez pas son principe, prenez un moment pour découvrir
-<a href="http://slither.io/">slither.io</a>, qui en est est une version
-moderne … et complexe !</p>
-<p>Notre objectif sera plus modeste (et plus proche des versions
-anciennes du jeu) : nous réaliserons plusieurs versions d’un
+<p>Son sujet est un standard du jeu vidéo, le 🐍 <a href="https://fr.wikipedia.org/wiki/Snake_(genre_de_jeu_vid%C3%A9o)">snake</a>.
+Vous pouvez découvrir une version classique de ce jeu à l’adresse <a class="uri" href="https://wasm4.org/play/snake">https://wasm4.org/play/snake</a> ou un version très
+modernisée (et complexe !) à l’adresse <a class="uri" href="https://slither.io/">https://slither.io/</a>.</p>
+<p>Rassurez-vous, notre objectif sera modeste et donc proche de la
+version classique du jeu : nous réaliserons plusieurs versions d’un
 <strong>programme qui marche</strong> (et pas un programme parfait) dont
 les fonctionnalités s’enrichiront à chaque nouvelle étape.</p>
 <h2 id="prérequis">Prérequis</h2>
@@ -211,71 +210,6 @@ de VS Code pour Python</a>.</p>
 au terminal) qu’on souhaite travailler dans l’environnement conda
 <code>snake</code> : cliquez dans la bannière du bas la zone qui indique
 le Python courant.</p>
-<!--
-**Suggestion #3.** Pour lancer le programme directement depuis VS Code :
-
-- ouvrir la palette de commandes
-  - `⇧ ⌘ P` Shift-Command-P (mac)
-  - `⇧ ⌃ P` Shift-Control-P (windows)
-- chercher la fonction *Toggle Integrated Terminal*
-  - mémoriser le raccourci clavier
-  - qui est Control-backtick sur Mac (le backtick c'est `)
--->
-<!--
-Premiers pas avec PyGame
---------------------------------------------------------------------------------
-
-(factor out ? Indep doc? *Maybe*, given that the set of learning objectives
-is autonomous)
-
-Prérequis :
-
-  - `dir` / `help` / usage doc en ligne
-
-
-Objectifs :
-
-  - import de module (bases)
-
-  - sous-modules (principes et énumération)
-
-  - concepts propres à pygame :
-  
-      - initialisation
-
-      - modules & classes : display, time, Surface
-
-      - display: création de "surface" (window / screen), taille
-
-      - flux d'exécution et disparition de la surface !
-
-      - time & delay
-
-      - tracé sur une surface. N'apparaît pas !!!
-
-      - display: update
-
-
-``` python
-import pygame
-pygame.init()
-
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 255, 0)
-
-SCREEN_SIZE = (300, 300)
-
-screen = pygame.display.set_mode(SCREEN_SIZE)
-
-screen.fill(GREEN)
-
-pygame.display.update()
-
-pygame.time.delay(3000)
-```
-
--->
 <h2 id="code-de-démarrage">Code de démarrage</h2>
 <p>Notre point de départ : un arrière-plan dont la couleur varie
 aléatoirement.</p>
@@ -414,10 +348,12 @@ clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-              sys.exit()
+                pygame.quit()
+                sys.exit()
     red = random.randint(0, 255)
     green = random.randint(0, 255)
     blue = random.randint(0, 255)
@@ -536,10 +472,12 @@ clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-              sys.exit()
+                pygame.quit()
+                sys.exit()
             if event.key == pygame.K_UP:
                 direction = [0.0, -1.0]
             elif event.key == pygame.K_LEFT:
@@ -598,18 +536,20 @@ clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-              sys.exit()
+                pygame.quit()
+                sys.exit()
             if event.key == pygame.K_UP:
-                direction = [0.0, -1.0]
+                direction = [0, -1]
             elif event.key == pygame.K_LEFT:
-                direction = [-1.0, 0.0]
+                direction = [-1, 0]
             elif event.key == pygame.K_DOWN:
-                direction = [0.0, 1.0]
+                direction = [0, 1]
             elif event.key == pygame.K_RIGHT:
-                direction = [1.0, 0.0]
+                direction = [1, 0]
     head = snake[-1]
     new_head = [
       head[0] + direction[0], 
@@ -671,18 +611,20 @@ clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-              sys.exit()
+                pygame.quit()
+                sys.exit()
             if event.key == pygame.K_UP:
-                direction = [0.0, -1.0]
+                direction = [0, -1]
             elif event.key == pygame.K_LEFT:
-                direction = [-1.0, 0.0]
+                direction = [-1, 0]
             elif event.key == pygame.K_DOWN:
-                direction = [0.0, 1.0]
+                direction = [0, 1]
             elif event.key == pygame.K_RIGHT:
-                direction = [1.0, 0.0]
+                direction = [1, 0]
     head = snake[-1]
     new_head = [
       head[0] + direction[0], 
@@ -711,7 +653,7 @@ while True:
     pygame.draw.rect(screen, red, rect)  
     pygame.display.update()
     pygame.display.set_caption(f"Score: {score}")
-    clock.tick(1.0)</code></pre>
+    clock.tick(1)</code></pre>
 </details>
 </body>
 </html>
