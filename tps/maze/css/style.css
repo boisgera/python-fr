@@ -79,16 +79,16 @@ html {
       }
       pre {
         margin: 1em 0;
-        overflow: auto;
+        overflow: scroll;
       }
       pre code {
         padding: 0;
-        overflow: visible;
-        overflow-wrap: normal;
+        /* overflow: scroll; */
+        /* overflow-wrap: normal; */
       }
       .sourceCode {
        background-color: transparent;
-       overflow: visible;
+       /*overflow: visible;*/
       }
       hr {
         background-color: #1a1a1a;
@@ -129,7 +129,7 @@ html {
       #TOC a:not(:hover) {
         text-decoration: none;
       }
-      pre code{white-space: pre-wrap;}
+      /* pre code{white-space: pre-wrap;} */
       span.smallcaps{font-variant: small-caps;}
       span.underline{text-decoration: underline;}
       div.column{display: inline-block; vertical-align: top; width: 50%;}
@@ -169,6 +169,7 @@ code:not(fuckcss){
   font-family: "Fira Code", monospace;
   font-size: 90%;
   background: #f1f3f5;
+  white-space: pre
 }
 
 

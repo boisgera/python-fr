@@ -55,5 +55,5 @@ while True:
     rect = [fruit[0] * 20, fruit[1] * 20, 20, 20]
     pygame.draw.rect(screen, red, rect)
     pygame.display.update()
-    pygame.display.set_caption(f"Score: {score}")
+    pygame.display.set_caption(f"🐍 Score: {score}")
     clock.tick(1)

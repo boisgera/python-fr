@@ -58,7 +58,6 @@ def dense_maze():
         candidates = []
         for n in ns:
             nns = neighbors(n) - {current}
-            print(f"{nns=}")
             if not (nns & (set(todo) | maze)):
                 candidates.append(n)
         if candidates:
@@ -67,11 +66,11 @@ def dense_maze():
         if len(candidates) <= 1:
             maze.add(current)
             todo.remove(current)
-        print(maze, todo)
-    return list(maze)
+    maze = list(maze)
+    return maze
 
 
-def make_random_maze(seed=42):
+def random_maze(seed=42):
     maze = []
     random.seed(seed)
     for y in range(30):
@@ -90,14 +89,15 @@ maze = make_slit_maze()
 # ------------------------------------------------------------------------------
 def display_maze(maze):
     pg.init()
+    pg.display.set_caption("Labyrinthes")
     clock = pg.time.Clock()
     screen = pg.display.set_mode((WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE))
     while True:
         events = pg.event.get()
         if any(event.type == pg.QUIT for event in events):
             break
-        if any(event.type == pg.KEYDOWN and event.key == pg.K_q for event in events):
-            pg.image.save(screen, "screenshot.jpeg")
+        if any(event.type == pg.KEYDOWN and event.key == pg.K_s for event in events):
+            pg.image.save(screen, "screenshot.jpg")
         draw_maze(screen, maze)
         pg.display.update()
         clock.tick(FPS)
@@ -255,7 +255,7 @@ def shortest_path_to(graph, source, target):
 
 
 if __name__ == "__main__":
-    maze = dense_maze()
+    maze = random_maze()
     display_maze(maze)
     # graph = maze_to_graph(maze)
     # path = path_to(graph, source=(0, 0), target=(29, 29), display=True)

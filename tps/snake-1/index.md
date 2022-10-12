@@ -506,7 +506,7 @@ fonctionnel :
 **Solution**
 </summary>
 
-```python
+```lang=python
 import random
 import sys
 import pygame
