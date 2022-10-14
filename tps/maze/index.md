@@ -6,17 +6,19 @@ license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 date: auto
 ---
 
+!["Maze" par [Mitchell Luo](https://unsplash.com/photos/z1c9juteR5c) sur [Unsplash](https://unsplash.com/)](images/mitchell-luo-z1c9juteR5c-unsplash.jpg)
+
 Labyrinthes
 --------------------------------------------------------------------------------
 
-Nous nous intéressons aux labyrinthes définis au sein d'une grille 30x30,
-que nous décrirons en Python par des listes des paires d'entiers 
-compris entre 0 et 29 (non dupliquées), 
-représentant les coordonnées des cellules vides du labyrinthes. 
+Nous nous intéressons aux labyrinthes définis au sein d'une grille 30x30.
+Nous les représenterons en Python par des ensembles des paires d'entiers 
+compris entre 0 et 29, qui désignent les coordonnées des cellules vides 
+du labyrinthe.
 Toutes les autres cellules de la grille sont des murs.
 
-![Un labyrinthe généré (pseudo-)aléatoirement avec 25% de murs (cellules vides en blanc,
-murs en noir).](images/random-maze.jpg)
+![Un labyrinthe généré (pseudo-)aléatoirement avec 25% de murs 
+(cellules vides en blanc, murs en noir).](images/random-maze.jpg)
 
 ### Bibliothèque de labyrinthes
 
@@ -65,28 +67,32 @@ FPS = 1
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
+def draw_background(screen):
+    screen.fill(BLACK)
+
+def draw_walls(screen, maze):
+    screen.fill(BLACK)
+    for x, y in maze:
+        h = CELL_SIZE
+        pg.draw.rect(screen, WHITE, (x * h, y * h, h, h))
 
 def display_maze(maze):
     pg.init()
+    pg.display.set_caption("Labyrinthes")
     width_height = (WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE)
     screen = pg.display.set_mode(width_height)
-
     clock = pg.time.Clock()
     while True:
         events = pg.event.get()
         if any(event.type == pg.QUIT for event in events):
             break
-        draw_maze(screen, maze)
+        if any(event.type == pg.KEYDOWN and event.key == pg.K_s for event in events):
+            pg.image.save(screen, "screenshot.jpg")
+        draw_background(screen)
+        draw_walls(screen, maze)
         pg.display.update()
         clock.tick(FPS)
-
     pg.quit()
-
-def draw_maze(screen, maze):
-    screen.fill(BLACK)
-    for x, y in maze:
-        h = CELL_SIZE
-        pg.draw.rect(screen, WHITE, (x * h, y * h, h, h))
 ```
 
 </details>
@@ -119,12 +125,14 @@ Graphes et chemins
 
 🏷️ Un **graphe** (orienté et pondéré) est un triplet composé :
 
-  - d'un ensemble de sommets,
+  - d'un ensemble de **sommets** ou **noeuds** (🇺🇸 **vertices**),
 
-  - d'un ensemble d'arêtes (une arête est une paire composée d'un sommet
-    source et d'un sommet cible),
+  - d'un ensemble d'**arêtes** (orientées) ou **arcs** (🇺🇸 **edges**). 
+    Une arête orientée est une paire composée d'un sommet
+    source et d'un sommet cible.
 
-  - d'une fonction qui associe à chaque arête son poids (un nombre).
+  - une famille de **poids** (🇺🇸 **weights**), des valeurs numériques 
+    associées à chaque arête.
 
 🏷️ Un **chemin** d'un graphe est une suite de sommets du graphe tels que 
 chaque élément de la suite et son successeur forment une arête du graphe.
@@ -136,11 +144,10 @@ On souhaite associer à un labyrinthe un graphe dont
 
   - les sommets sont les cellules vides du labyrinthe,
 
-  - les arêtes représentent les cellules vides adjacentes 
-    (vers le haut, le bas, la gauche ou la droite, mais pas les diagonales).
+  - les arêtes représentent les cellules vides adjacentes (au sens de : partageant un coté).
 
-  - le poids de chaque arête est 1 : un déplacement élémentaire étant nécessaire 
-    pour se déplacer d'une cellule à une cellule adjacente.
+  - le poids de chaque arête est 1 ; il représente le coût du déplacement
+    d'une cellule à une cellule adjacente.
 
 Quelle structure de données Python utiliserait-t'on "naturellement" 
 pour représenter ces graphes ? Décrivez le cas échéant quelles variantes 
@@ -156,7 +163,7 @@ qui construit le graphe associé à un labyrinthe.
 
 Il semble naturel de représenter 
 les sommets comme un ensemble de paires d'entiers, les arêtes comme un ensemble
-de paires de sommets et la fonction de pondération comme un dictionnaire ayant
+de paires de sommets et les poids comme un dictionnaire ayant
 comme clé les sommets et comme valeur unique 1.
 
 On note qu'ici la valeur unique 1 rend la donnée des poids totalement redondante
@@ -169,8 +176,6 @@ On pourrait imaginer d'autres structures décrivant des graphes qui soient
 plus efficaces mais il faudrait pour cela savoir quelles sont les 
 opérations courantes que nous allons devoir réaliser fréquemment, 
 afin d'optimiser la structure par rapport à ces opérations. 
-
-
 
 ```python
 def maze_to_graph(maze):
@@ -193,9 +198,8 @@ def maze_to_graph(maze):
 ### Ensemble atteignable
 
 Implémentez une fonction `reachable_set` qui renvoie l'ensemble
-des cellules d'un labyrinthe `maze` qui sont accessibles depuis la cellule `source`.
-
-
+des cellules d'un labyrinthe `maze` qui sont accessibles depuis 
+la cellule `source`.
 
 <details>
 <summary>
@@ -222,86 +226,137 @@ def reachable_set(graph, source):
 
 ### Labyrinthes et chemins 
 
-Implémentez une fonction `path_to` qui prend comme argument un labyrinthe,
-une cellule source et une cellule cible et renvoie un chemin joignant l'une
-à l'autre si un tel chemin existe, ou `None` si cela n'est pas le cas.
+Implémentez une fonction `path_from` qui prend comme arguments :
+
+  - `maze`: un labyrinthe 30x30,
+
+  - `source`: une cellule source ,
+  
+et renvoie 
+
+  - `path`: un dictionnaire ayant pour clés des cellules et 
+    pour valeurs des chemins. Le chemin `path[target]` doit joindre 
+    `source` et `target` si c'est possible ; dans le cas
+    contraire, `target` ne doit pas appartenir au dictionnaire.
+
+Utilisez cette fonction pour trouvez un chemin joignant les coins en haut à
+gauche et en bas à droite du labyrinthe "random" et représenter graphiquement
+le résulat.
 
 
-
-<details>
-<summary>
-**Solution**
-</summary>
-
-```python
-def path_to(graph, source, target):
-    vertices, edges, _ = graph
-    todo = {source}
-    done = set()
-    path = {source: [source]}
-    while todo:
-        current = todo.pop()
-        neighbors = {v for v in vertices if (current, v) in edges}
-        for n in neighbors:
-            if n not in (done | todo):
-                path[n] = path[current] + [n]
-                if n == target:
-                    return path[n]
-                todo.add(n)
-        done.add(current)
-```
-
-</details>
-
-Etendez ensuite cette fonction : quand la cellule cible est non
-spécifiée, renvoyez un dictionnaire dont les clés sont les 
-cellules atteignables et les valeurs les chemins correspondants.
-
+![Un chemin joignant les coins en haut à gauche et en bas à droite.](images/path.jpg)
 
 <details>
 <summary>
 **Solution**
 </summary>
 
+Une solution possible consiste à définir :
+
 ```python
-def path_to(graph, source, target=None):
-    vertices, edges, _ = graph
-    todo = {source}
+def path_from(maze, source):
+    vertices, edges, _ = maze_to_graph(maze)
+    todo = set()
     done = set()
-    path = {source: [source]}
+    path = {}
+    if source in maze:
+       todo.add(source)
+       path[source] = [source]
     while todo:
         current = todo.pop()
         neighbors = {v for v in vertices if (current, v) in edges}
         for n in neighbors:
-            if n not in (done | todo):
+            if n not in done and n not in todo:
                 path[n] = path[current] + [n]
-                if n == target:
-                    return path[n]
                 todo.add(n)
         done.add(current)
-    if target is None:
-        return path
-    else:
-        return None
+    return path
 ```
 
+puis à étendre notre fonction `display_maze` pour qu'elle prenne en charge
+(optionnellement) l'affichage d'un chemin :
+
+```python
+def draw_path(screen, path):
+    h = CELL_SIZE
+    for x, y in path:
+        pg.draw.rect(screen, PINK, (x * h, y * h, h, h))
+
+def display_maze(maze, path=None):
+    pg.init()
+    pg.display.set_caption("Labyrinthes")
+    width_height = (WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE)
+    screen = pg.display.set_mode(width_height)
+    clock = pg.time.Clock()
+    while True:
+        events = pg.event.get()
+        if any(event.type == pg.QUIT for event in events):
+            break
+        if any(event.type == pg.KEYDOWN and event.key == pg.K_s for event in events):
+            pg.image.save(screen, "screenshot.jpg")
+        draw_background(screen)
+        draw_walls(screen, maze)
+        if path is not None:
+            draw_path(screen, path)
+        pg.display.update()
+        clock.tick(FPS)
+    pg.quit()
+```
+
+On exploite ensuite ces fonctions de la façon suivante:
+
+```pycon
+>>> random_maze_repr = open("mazes/random.py", encoding="utf-8").read())
+>>> random_maze = eval(random_maze_repr)
+>>> TOP_LEFT = (0, 0)
+>>> BOTTOM_RIGHT = (WIDTH - 1, HEIGHT - 1)
+>>> target_to_path = path_from(maze, TOP_LEFT)
+>>> path = target_to_path[BOTTOM_RIGHT]
+>>> display_maze(maze, path=path)
+```
 </details>
 
+Afficher, toujours pour la carte random, la carte des longueurs **TODO**
+
+```python
+import matplotlib.cm  # matplotlib colormaps
+
+COLORMAP = matplotlib.cm.viridis
+
+def colormap(x):
+    x = float(x)
+    rgba = COLORMAP(x)
+    rgb = rgba[0:3]
+    RGB = [min(int(256 * c), 255) for c in rgb]
+    return RGB
+```
+
+```pycon
+>>> colormap(0.0)  # purple
+[68, 1, 84]
+>>> colormap(0.5)  # turquoise
+[32, 145, 140]
+>>> colormap(1.0)  # yellow
+[254, 231, 36]
+```
+
+
+![La carte des longueurs des chemins issus du coin en haut à gauche (violet
+pour de petits nombres, jaune pour de grands nombres).](images/map.jpg)
 
 
 ### Chemin optimal 
 
-Implémentez une fonction `shortest_path_to(maze, origin)` qui renvoie un 
+Implémentez une fonction `shortest_path_from(maze, origin)` qui renvoie un 
 dictionnaire dont les clés sont les cellules atteignables depuis l'origine
 et les valeurs un des chemins associés le plus courts (nécessitant le moins
-de déplacements) qui joignent l'origine et la destination.
+de déplacements) qui joignent la source et la cible.
 
 Vous pourrez tester votre résultat graphiquement en invoquant `display_maze`
 comme à la question précédente.
 
-```
-def shortest_path_to(graph, source, target): 
-    "Non-greedy version"
+```python
+def shortest_path_from(graph, source, target): 
     vertices, edges, weight = graph
     distance, paths = {}, {}
     todo = {source}
