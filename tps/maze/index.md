@@ -15,11 +15,11 @@ Nous nous intéressons aux labyrinthes définis au sein d'une grille 30x30.
 Nous les représenterons en Python par des ensembles des paires d'entiers 
 compris entre 0 et 29, paires qui désignent les coordonnées des cellules 
 vides (traversables) du labyrinthe. 
-La paire `(0,0)` correspond au coin en haut à gauche de la grille.
+La paire `(0, 0)` correspond au coin en haut à gauche de la grille.
 
 
-![Un labyrinthe généré (pseudo-)aléatoirement avec 25% de murs 
-(cellules vides en blanc, murs en noir).](images/random-maze.jpg)
+![Un labyrinthe généré (pseudo-)aléatoirement avec un mélange de 
+75% de cellules vides (en blanc) et 25% de murs (en noir).](images/random-maze.jpg)
 
 ### Bibliothèque de labyrinthes
 
@@ -27,14 +27,16 @@ La paire `(0,0)` correspond au coin en haut à gauche de la grille.
 
   - Chargez le texte des ces fichiers.
   
-  - Reconstituez les labyrinthes associés.
+  - Reconstituez les objets labyrinthes (ensembles de paires) associés.
+    Nommez `random_maze` le labyrinthe du fichier
+    `"random-maze.py"`.
 
 <details>
 <summary>
 **Solution**
 </summary>
 
-Par exemple, pour obtenir le labyrinthe du fichier `"random-maze.py"`:
+Pour obtenir le labyrinthe du fichier `"random-maze.py"`:
 
 ```python
 filename = "mazes/random-maze.py"
@@ -64,7 +66,7 @@ import pygame as pg
 # Constants
 WIDTH, HEIGHT = 30, 30
 CELL_SIZE = 20
-FPS = 1
+FPS = 10
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
@@ -105,13 +107,22 @@ def display_maze(maze):
 **Solution**
 </summary>
 
-Une fois votre labyrinthe `my_maze` conçu selon vos préférences
+Par exemple pour créer un labyrinthe sans mur:
 
-```pycon
->>> my_maze_repr = repr(my_maze)
->>> file = open("mazes/my-maze.py", "w", encoding="utf-8")
->>> file.write(my_maze_repr)
->>> file.close()
+```python
+empty_maze = set()
+for y in range(0, HEIGHT):
+    for x in range(0, WIDTH):
+        empty_maze.add((x, y))
+```
+
+Puis pour le sauvegarder 
+
+``` python
+empty_maze_repr = repr(empty_maze)
+file = open("mazes/empty_maze.py", "w", encoding="utf-8")
+file.write(empty_maze_repr)
+file.close()
 ```
 
 </details>
@@ -136,7 +147,6 @@ chaque élément de la suite et son successeur forment une arête du graphe.
 
 
 ### Labyrinthes et graphes
-
 On souhaite associer à un labyrinthe un graphe dont
 
   - les sommets sont les cellules vides du labyrinthe,
@@ -250,8 +260,9 @@ def display_maze(maze, cells=None):
 ```
 
 ```python
-cells = reachable_cells(random_maze, source=(0, 0))
-display_maze(maze, cells=cells)
+TOP_LEFT = (0, 0)
+cells = reachable_cells(random_maze, source=TOP_LEFT)
+display_maze(random_maze, cells=cells)
 ```
 
 </details>
@@ -273,11 +284,14 @@ et renvoie
     dans le cas contraire, `target` ne doit pas être une clé du dictionnaire.
 
 Utilisez cette fonction pour trouvez un chemin joignant les coins en haut à
-gauche et en bas à droite du labyrinthe "random" et représenter graphiquement
-le résulat.
+gauche et en bas à droite du labyrinthe `random_maze` et représenter graphiquement
+le résulat en mettant à jour votre function `display_maze`.
 
 
-![Un chemin joignant les coins en haut à gauche et en bas à droite.](images/path.jpg)
+![Un chemin joignant les coins en haut à gauche et en bas à droite. 
+Ce chemin minimise le nombre de déplacements nécessaires
+(58 = 29 + 29) ; mais c'est un coup de chance, 
+car rien ne garantissait a priori que cela soit le cas !](images/path.jpg)
 
 <details>
 <summary>
@@ -309,8 +323,7 @@ def path_from(maze, source):
     return path
 ```
 
-puis à étendre notre fonction `display_maze` pour qu'elle prenne en charge
-(optionnellement) l'affichage d'un chemin :
+puis à étendre notre fonction `display_maze` de la façon suivante :
 
 ```python
 PINK = (255, 128, 128)
@@ -344,11 +357,10 @@ def display_maze(maze, cells=None, path=None):
 On exploite ensuite ces fonctions de la façon suivante:
 
 ```python
-TOP_LEFT = (0, 0)
+target_to_path = path_from(random_maze, TOP_LEFT)
 BOTTOM_RIGHT = (WIDTH - 1, HEIGHT - 1)
-target_to_path = path_from(maze, TOP_LEFT)
 path = target_to_path[BOTTOM_RIGHT]
-display_maze(maze, path=path)
+display_maze(random_maze, path=path)
 ```
 </details>
 
@@ -357,7 +369,7 @@ argument supplémentaire le dictionnaire produit par `path_from`  et
 affiche chaque cellule atteignable dans une couleur dépendant 
 de la longueur du chemin qui y mène.
 
-Exploiter cette fonctionnalité avec le labyrinthe `"random"` avec comme
+Exploiter cette fonctionnalité avec le labyrinthe `random_maze` avec comme
 source le coin en haut à gauche.
 
 
@@ -366,7 +378,8 @@ pour de petits nombres, jaune pour de grands nombres).](images/map.jpg)
 
 
 🗝️ On pourra utiliser la fonction `colormap` suivante qui associe aux nombres
-flottants entre `0.0` et `1.0` une couleur exploitable avec pygame.
+flottants entre `0.0` et `1.0` un triplet RGB d'entiers représentant une couleur 
+exploitable avec pygame.
 
 ```python
 import matplotlib.cm  # matplotlib colormaps
@@ -412,7 +425,7 @@ def display_maze(maze, cells=None, path=None, map=None):
         if any(event.type == pg.QUIT for event in events):
             break
         draw_background(screen)
-        draw_maze(screen, maze)
+        draw_walls(screen, maze)
         if cells is not None:
             draw_cells(screen, cells)
         if map is not None:
@@ -423,9 +436,20 @@ def display_maze(maze, cells=None, path=None, map=None):
         clock.tick(FPS)
     pg.quit()
 ```
+
+```python
+map = {
+    target: len(path) - 1 
+    for target, path in target_to_path.items()
+}
+display_maze(random_maze, map=map)
+```
 </details>
 
 ### Chemin optimal 
+
+Pouvez-vous trouvez sur la carte précédente des cibles où le chemin trouvé
+n'est pas de longueur minimale ?
 
 Implémentez une fonction `shortest_path_from(maze, origin)` qui renvoie un 
 dictionnaire dont les clés sont les cellules atteignables depuis l'origine
@@ -438,17 +462,34 @@ comme à la question précédente.
 ![La carte des longueurs des plus courts chemins chemins issus du coin en haut à gauche (violet
 pour de petits nombres, jaune pour de grands nombres).](images/optimal-map.jpg)
 
+<details>
+<summary>
+**Solution**
+</summary>
+
+Par construction, si à chaque cellule cible le chemin associé est le plus court
+possible, les longueurs des chemins entre deux cellules vides voisines ne 
+peuvent différer que de -1, 0 ou 1. 
+Par conséquent, il suffit de constater des écarts de couleurs
+importants entre cellules voisines de la carte (correspondant à un écart de
+longueur égal au moins à deux) pour en conclure qu'on a trouvé un chemin non
+optimale. Et c'est bien le cas à quelques endroits sur la carte des longueurs
+associée à l'algorithme `path_from`.
+
+On va donc développer un algorithme nous assurant que la longueur est 
+effectivement minimale.
+
 ```python
-def shortest_path_from(graph, source, target): 
-    vertices, edges, weight = graph
-    distance, paths = {}, {}
+import math
+
+def shortest_path_from(maze, source): 
+    vertices, edges, weight = maze_to_graph(maze)
+    distance, path = {}, {}
     todo = {source}
     distance[source] = 0
-    paths[source] = [source]
+    path[source] = [source]
     while todo:
         current = todo.pop()
-        if current == target:
-            return paths[current]
         neighbors = {
             v for v in vertices 
             if (current, v) in edges
@@ -457,10 +498,24 @@ def shortest_path_from(graph, source, target):
             d = distance[current] + weight[(current, n)]
             if d < distance.get(n, math.inf):
                 distance[n] = d
-                paths[n] = paths[current] + [n]
+                path[n] = path[current] + [n]
                 todo.add(n)
-    return None
+    return path
 ```
+
+On peut tracer la carte de couleurs correspondantes avec :
+
+```python
+target_to_path = shortest_path_from(random_maze, TOP_LEFT)
+map = {
+    target: len(path) - 1 
+    for target, path in target_to_path.items()
+}
+display_maze(random_maze, map=map)
+```
+
+
+</details>
 
 <!--
 
@@ -480,7 +535,7 @@ par exemple :
 
 ``` python
 start = time.time()
-paths = shortest_paths(maze, origin)
+path = shortest_path(maze, origin)
 stop = time.time()
 print(f"elapsed time (secs): {stop - start}")
 ```
@@ -499,6 +554,8 @@ votre représentation des graphes en conséquence et mesure le résultat.
 
 -->
 
+<!--
+
 ## Pour aller plus loin
 
 ### Algorithmes
@@ -508,3 +565,4 @@ classique :
 
   - 🎓 <https://fr.wikipedia.org/wiki/Algorithme_de_Dijkstra>
 
+-->

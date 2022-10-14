@@ -107,7 +107,7 @@
 <h1 class="title">Programmation Orientée Objet 2</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
 Boisgérault</a>, MINES Paris, Université PSL</p>
-<p class="date">Dimanche 29 mai 2022</p>
+<p class="date">Vendredi 14 octobre 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -122,8 +122,8 @@ Boisgérault</a>, MINES Paris, Université PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/e97599c">
-          #e97599c
+<a href="https://github.com/boisgera/python-fr/commit/e7f3ee9">
+          #e7f3ee9
         </a>
 </p>
 
@@ -765,7 +765,7 @@ _doctest_OutputChecker = doctest.OutputChecker
 
 class OutputChecker(_doctest_OutputChecker):
     def check_output(self, want, got, optionflags):
-        if "🐛" in got:
+        if "🐛" in want:
             return True
         else:
             return super().check_output(want, got, optionflags)

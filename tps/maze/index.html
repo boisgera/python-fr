@@ -121,8 +121,8 @@ Boisgérault</a>, MINES Paris – PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/20c6ceb">
-          #20c6ceb
+<a href="https://github.com/boisgera/python-fr/commit/e7f3ee9">
+          #e7f3ee9
         </a>
 </p>
 
@@ -144,8 +144,6 @@ Boisgérault</a>, MINES Paris – PSL</p>
 <li><a href="#labyrinthes" id="toc-labyrinthes">Labyrinthes</a></li>
 <li><a href="#graphes-et-chemins" id="toc-graphes-et-chemins">Graphes et
 chemins</a></li>
-<li><a href="#pour-aller-plus-loin" id="toc-pour-aller-plus-loin">Pour
-aller plus loin</a></li>
 </ul>
 </nav></details>
 
@@ -159,24 +157,27 @@ aller plus loin</a></li>
 30x30. Nous les représenterons en Python par des ensembles des paires
 d’entiers compris entre 0 et 29, paires qui désignent les coordonnées
 des cellules vides (traversables) du labyrinthe. La paire
-<code>(0,0)</code> correspond au coin en haut à gauche de la grille.</p>
+<code>(0, 0)</code> correspond au coin en haut à gauche de la
+grille.</p>
 <figure>
-<img alt="Un labyrinthe généré (pseudo-)aléatoirement avec 25% de murs (cellules vides en blanc, murs en noir)." src="images/random-maze.jpg"/>
+<img alt="Un labyrinthe généré (pseudo-)aléatoirement avec un mélange de 75% de cellules vides (en blanc) et 25% de murs (en noir)." src="images/random-maze.jpg"/>
 <figcaption aria-hidden="true">Un labyrinthe généré
-(pseudo-)aléatoirement avec 25% de murs (cellules vides en blanc, murs
-en noir).</figcaption>
+(pseudo-)aléatoirement avec un mélange de 75% de cellules vides (en
+blanc) et 25% de murs (en noir).</figcaption>
 </figure>
 <h3 id="bibliothèque-de-labyrinthes">Bibliothèque de labyrinthes</h3>
 <ul>
 <li><p>Examinez les fichiers du dossier 📁 <a href="https://github.com/boisgera/python-fr/tree/master/tps/maze/mazes">mazes</a>.</p></li>
 <li><p>Chargez le texte des ces fichiers.</p></li>
-<li><p>Reconstituez les labyrinthes associés.</p></li>
+<li><p>Reconstituez les objets labyrinthes (ensembles de paires)
+associés. Nommez <code>random_maze</code> le labyrinthe du fichier
+<code>"random-maze.py"</code>.</p></li>
 </ul>
 <details>
 <summary>
 <strong>Solution</strong>
 </summary>
-<p>Par exemple, pour obtenir le labyrinthe du fichier
+<p>Pour obtenir le labyrinthe du fichier
 <code>"random-maze.py"</code>:</p>
 <pre class="python"><code>filename = "mazes/random-maze.py"
 file = open(filename, mode="r", encoding="utf-8")
@@ -198,7 +199,7 @@ import pygame as pg
 # Constants
 WIDTH, HEIGHT = 30, 30
 CELL_SIZE = 20
-FPS = 1
+FPS = 10
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
@@ -233,12 +234,16 @@ labyrinthes</h3>
 <summary>
 <strong>Solution</strong>
 </summary>
-<p>Une fois votre labyrinthe <code>my_maze</code> conçu selon vos
-préférences</p>
-<pre class="pycon"><code>&gt;&gt;&gt; my_maze_repr = repr(my_maze)
-&gt;&gt;&gt; file = open("mazes/my-maze.py", "w", encoding="utf-8")
-&gt;&gt;&gt; file.write(my_maze_repr)
-&gt;&gt;&gt; file.close()</code></pre>
+<p>Par exemple pour créer un labyrinthe sans mur:</p>
+<pre class="python"><code>empty_maze = set()
+for y in range(0, HEIGHT):
+    for x in range(0, WIDTH):
+        empty_maze.add((x, y))</code></pre>
+<p>Puis pour le sauvegarder</p>
+<pre class="python"><code>empty_maze_repr = repr(empty_maze)
+file = open("mazes/empty_maze.py", "w", encoding="utf-8")
+file.write(empty_maze_repr)
+file.close()</code></pre>
 </details>
 <h2 id="graphes-et-chemins">Graphes et chemins</h2>
 <p>🏷️ Un <strong>graphe</strong> (orienté et pondéré) est un triplet
@@ -350,8 +355,9 @@ def display_maze(maze, cells=None):
         pg.display.update()
         clock.tick(FPS)
     pg.quit()</code></pre>
-<pre class="python"><code>cells = reachable_cells(random_maze, source=(0, 0))
-display_maze(maze, cells=cells)</code></pre>
+<pre class="python"><code>TOP_LEFT = (0, 0)
+cells = reachable_cells(random_maze, source=TOP_LEFT)
+display_maze(random_maze, cells=cells)</code></pre>
 </details>
 <h3 id="labyrinthes-et-chemins">Labyrinthes et chemins</h3>
 <p>Implémentez une fonction <code>path_from</code> qui prend comme
@@ -370,12 +376,15 @@ cas contraire, <code>target</code> ne doit pas être une clé du
 dictionnaire.</li>
 </ul>
 <p>Utilisez cette fonction pour trouvez un chemin joignant les coins en
-haut à gauche et en bas à droite du labyrinthe “random” et représenter
-graphiquement le résulat.</p>
+haut à gauche et en bas à droite du labyrinthe <code>random_maze</code>
+et représenter graphiquement le résulat en mettant à jour votre function
+<code>display_maze</code>.</p>
 <figure>
-<img alt="Un chemin joignant les coins en haut à gauche et en bas à droite." src="images/path.jpg"/>
+<img alt="Un chemin joignant les coins en haut à gauche et en bas à droite. Ce chemin minimise le nombre de déplacements nécessaires (58 = 29 + 29) ; mais c’est un coup de chance, car rien ne garantissait a priori que cela soit le cas !" src="images/path.jpg"/>
 <figcaption aria-hidden="true">Un chemin joignant les coins en haut à
-gauche et en bas à droite.</figcaption>
+gauche et en bas à droite. Ce chemin minimise le nombre de déplacements
+nécessaires (58 = 29 + 29) ; mais c’est un coup de chance, car rien ne
+garantissait a priori que cela soit le cas !</figcaption>
 </figure>
 <details>
 <summary>
@@ -402,8 +411,8 @@ gauche et en bas à droite.</figcaption>
                 todo.add(n)
         done.add(current)
     return path</code></pre>
-<p>puis à étendre notre fonction <code>display_maze</code> pour qu’elle
-prenne en charge (optionnellement) l’affichage d’un chemin :</p>
+<p>puis à étendre notre fonction <code>display_maze</code> de la façon
+suivante :</p>
 <pre class="python"><code>PINK = (255, 128, 128)
 
 def draw_path(screen, path):
@@ -431,18 +440,17 @@ def display_maze(maze, cells=None, path=None):
         clock.tick(FPS)
     pg.quit()</code></pre>
 <p>On exploite ensuite ces fonctions de la façon suivante:</p>
-<pre class="python"><code>TOP_LEFT = (0, 0)
+<pre class="python"><code>target_to_path = path_from(random_maze, TOP_LEFT)
 BOTTOM_RIGHT = (WIDTH - 1, HEIGHT - 1)
-target_to_path = path_from(maze, TOP_LEFT)
 path = target_to_path[BOTTOM_RIGHT]
-display_maze(maze, path=path)</code></pre>
+display_maze(random_maze, path=path)</code></pre>
 </details>
 <p>Etendre à nouveau la fonction <code>display_maze</code> pour qu’elle
 accepte comme argument supplémentaire le dictionnaire produit par
 <code>path_from</code> et affiche chaque cellule atteignable dans une
 couleur dépendant de la longueur du chemin qui y mène.</p>
 <p>Exploiter cette fonctionnalité avec le labyrinthe
-<code>"random"</code> avec comme source le coin en haut à gauche.</p>
+<code>random_maze</code> avec comme source le coin en haut à gauche.</p>
 <figure>
 <img alt="La carte des longueurs des chemins issus du coin en haut à gauche (violet pour de petits nombres, jaune pour de grands nombres)." src="images/map.jpg"/>
 <figcaption aria-hidden="true">La carte des longueurs des chemins issus
@@ -451,7 +459,8 @@ grands nombres).</figcaption>
 </figure>
 <p>🗝️ On pourra utiliser la fonction <code>colormap</code> suivante qui
 associe aux nombres flottants entre <code>0.0</code> et <code>1.0</code>
-une couleur exploitable avec pygame.</p>
+un triplet RGB d’entiers représentant une couleur exploitable avec
+pygame.</p>
 <pre class="python"><code>import matplotlib.cm  # matplotlib colormaps
 
 COLORMAP = matplotlib.cm.viridis
@@ -490,7 +499,7 @@ def display_maze(maze, cells=None, path=None, map=None):
         if any(event.type == pg.QUIT for event in events):
             break
         draw_background(screen)
-        draw_maze(screen, maze)
+        draw_walls(screen, maze)
         if cells is not None:
             draw_cells(screen, cells)
         if map is not None:
@@ -500,8 +509,15 @@ def display_maze(maze, cells=None, path=None, map=None):
         pg.display.update()
         clock.tick(FPS)
     pg.quit()</code></pre>
+<pre class="python"><code>map = {
+    target: len(path) - 1 
+    for target, path in target_to_path.items()
+}
+display_maze(random_maze, map=map)</code></pre>
 </details>
 <h3 id="chemin-optimal">Chemin optimal</h3>
+<p>Pouvez-vous trouvez sur la carte précédente des cibles où le chemin
+trouvé n’est pas de longueur minimale ?</p>
 <p>Implémentez une fonction
 <code>shortest_path_from(maze, origin)</code> qui renvoie un
 dictionnaire dont les clés sont les cellules atteignables depuis
@@ -516,16 +532,30 @@ cible.</p>
 chemins chemins issus du coin en haut à gauche (violet pour de petits
 nombres, jaune pour de grands nombres).</figcaption>
 </figure>
-<pre class="python"><code>def shortest_path_from(graph, source, target): 
-    vertices, edges, weight = graph
-    distance, paths = {}, {}
+<details>
+<summary>
+<strong>Solution</strong>
+</summary>
+<p>Par construction, si à chaque cellule cible le chemin associé est le
+plus court possible, les longueurs des chemins entre deux cellules vides
+voisines ne peuvent différer que de -1, 0 ou 1. Par conséquent, il
+suffit de constater des écarts de couleurs importants entre cellules
+voisines de la carte (correspondant à un écart de longueur égal au moins
+à deux) pour en conclure qu’on a trouvé un chemin non optimale. Et c’est
+bien le cas à quelques endroits sur la carte des longueurs associée à
+l’algorithme <code>path_from</code>.</p>
+<p>On va donc développer un algorithme nous assurant que la longueur est
+effectivement minimale.</p>
+<pre class="python"><code>import math
+
+def shortest_path_from(maze, source): 
+    vertices, edges, weight = maze_to_graph(maze)
+    distance, path = {}, {}
     todo = {source}
     distance[source] = 0
-    paths[source] = [source]
+    path[source] = [source]
     while todo:
         current = todo.pop()
-        if current == target:
-            return paths[current]
         neighbors = {
             v for v in vertices 
             if (current, v) in edges
@@ -534,9 +564,17 @@ nombres, jaune pour de grands nombres).</figcaption>
             d = distance[current] + weight[(current, n)]
             if d &lt; distance.get(n, math.inf):
                 distance[n] = d
-                paths[n] = paths[current] + [n]
+                path[n] = path[current] + [n]
                 todo.add(n)
-    return None</code></pre>
+    return path</code></pre>
+<p>On peut tracer la carte de couleurs correspondantes avec :</p>
+<pre class="python"><code>target_to_path = shortest_path_from(random_maze, TOP_LEFT)
+map = {
+    target: len(path) - 1 
+    for target, path in target_to_path.items()
+}
+display_maze(random_maze, map=map)</code></pre>
+</details>
 <!--
 
 Performance
@@ -555,7 +593,7 @@ par exemple :
 
 ``` python
 start = time.time()
-paths = shortest_paths(maze, origin)
+path = shortest_path(maze, origin)
 stop = time.time()
 print(f"elapsed time (secs): {stop - start}")
 ```
@@ -573,12 +611,17 @@ quelles sont les opérations les plus fréquemment utilisées ; adaptez
 votre représentation des graphes en conséquence et mesure le résultat.
 
 -->
-<h2 id="pour-aller-plus-loin">Pour aller plus loin</h2>
-<h3 id="algorithmes">Algorithmes</h3>
-<p>Améliorez ensuite l’algorithme lui-même. On pourra notamment étudier
-le classique :</p>
-<ul>
-<li>🎓 <a class="uri" href="https://fr.wikipedia.org/wiki/Algorithme_de_Dijkstra">https://fr.wikipedia.org/wiki/Algorithme_de_Dijkstra</a></li>
-</ul>
+<!--
+
+## Pour aller plus loin
+
+### Algorithmes
+
+Améliorez ensuite l'algorithme lui-même. On pourra notamment étudier le
+classique : 
+
+  - 🎓 <https://fr.wikipedia.org/wiki/Algorithme_de_Dijkstra>
+
+-->
 </body>
 </html>

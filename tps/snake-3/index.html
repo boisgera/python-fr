@@ -106,7 +106,7 @@
 <h1 class="title">Le retour du retour du serpent</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
 Boisgérault</a>, MINES Paris – PSL</p>
-<p class="date">Dimanche 29 mai 2022</p>
+<p class="date">Vendredi 14 octobre 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -121,8 +121,8 @@ Boisgérault</a>, MINES Paris – PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/e97599c">
-          #e97599c
+<a href="https://github.com/boisgera/python-fr/commit/e7f3ee9">
+          #e7f3ee9
         </a>
 </p>
 
@@ -534,12 +534,12 @@ instant donné du programme. On souhaite pouvoir initialiser cet état par
 un code de la forme</p>
 <pre class="python"><code>snake = Snake(
     geometry=[[10, 15], [11, 15], [12, 15]], 
-    direction=DIRECTIONS["RIGHT"]
+    direction=RIGHT
 ) 
-state = State(snake=snake, fruit=[10, 10])</code></pre>
+state = State(snake=snake, fruit=[10, 10], score=0)</code></pre>
 <p>et que l’instance <code>state</code> expose les attributs
-<code>snake</code> et <code>fruit</code> (en lecture et en
-écriture).</p>
+<code>snake</code>, <code>fruit</code> et <code>score</code> (en lecture
+et en écriture).</p>
 <p>Adapter le reste du code en conséquence. A-t’on encore besoin du
 mot-clé <code>global</code> ? Pourquoi ?</p>
 <p>Faites en sorte que la classe <code>Snake</code> prenne en charge la
