@@ -18,7 +18,9 @@ FPS = 30
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 PINK = (255, 128, 128)
+LIGHT_GREEN = (128, 255, 128)
 GREEN = (0, 255, 0)
+
 COLORMAP = matplotlib.cm.viridis
 
 # Colormap Helper
@@ -99,7 +101,7 @@ def random_maze():
 
 # Visualization
 # ------------------------------------------------------------------------------
-def display_maze(maze, path=None, map=None):
+def display_maze(maze, cells=None, path=None, map=None):
     pg.init()
     pg.display.set_caption("Labyrinthes")
     screen = pg.display.set_mode((WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE))
@@ -108,10 +110,10 @@ def display_maze(maze, path=None, map=None):
         events = pg.event.get()
         if any(event.type == pg.QUIT for event in events):
             break
-        if any(event.type == pg.KEYDOWN and event.key == pg.K_s for event in events):
-            pg.image.save(screen, "screenshot.jpg")
         draw_background(screen)
         draw_maze(screen, maze)
+        if cells is not None:
+            draw_cells(screen, cells)
         if map is not None:
             draw_map(screen, map)
         if path is not None:
@@ -131,6 +133,12 @@ def draw_maze(screen, maze):
         pg.draw.rect(screen, WHITE, (x * h, y * h, h, h))
 
 
+def draw_cells(screen, cells):
+    h = CELL_SIZE
+    for x, y in cells:
+        pg.draw.rect(screen, LIGHT_GREEN, (x * h, y * h, h, h))
+
+
 def draw_path(screen, path):
     h = CELL_SIZE
     for x, y in path:
@@ -147,11 +155,6 @@ def draw_map(screen, map, v_max=None):
             colormap(float(v / v_max)),
             (x * h, y * h, h, h),
         )
-
-
-def draw_cells(screen, cells, color):
-    for x, y in cells:
-        pg.draw.rect(screen, color, (x * 20, y * 20, 20, 20))
 
 
 # Graphs
@@ -173,7 +176,7 @@ def maze_to_graph(maze):
 
 # Path Generation
 # ------------------------------------------------------------------------------
-def reachable_set(maze, source):
+def reachable_cells(maze, source):
     vertices, edges, _ = maze_to_graph(maze)
     todo = {source}
     done = set()
@@ -276,7 +279,8 @@ def shortest_path_from(maze, source, display=False):
 
 if __name__ == "__main__":
     maze = random_maze()
-    path = path_from(maze, source=(0, 0))
-    display_maze(maze)  # , map={k: len(p) - 1 for k, p in path.items()})
-    # map = {cell: len(path) for cell, path in paths.items()}
-    # display_maze(maze, path=paths[(WIDTH - 1, HEIGHT - 1)], map=map)
+    path = shortest_path_from(maze, source=(0, 0))
+    # cells = reachable_cells(maze, (0, 0))
+    # display_maze(maze, cells=cells)  # , map={k: len(p) - 1 for k, p in path.items()})
+    map = {cell: len(p) for cell, p in path.items()}
+    display_maze(maze, map=map)
