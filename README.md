@@ -8,7 +8,7 @@ Python 🇫🇷
 
   - 📖 [Le retour du serpent](https://boisgera.github.io/python-fr/tps/snake-2/index.html)
 
-  - 📖 [Labyrinthes](https://boisgera.github.io/python-fr/tps/maze/index.html)
+  - 📖 🚧 [Labyrinthes](https://boisgera.github.io/python-fr/tps/maze/index.html) 🚧
 
   - 📖 [Le retour du retour du serpent](https://boisgera.github.io/python-fr/tps/snake-3/index.html)
 

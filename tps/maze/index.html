@@ -121,8 +121,8 @@ Boisgérault</a>, MINES Paris – PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/bd7566b">
-          #bd7566b
+<a href="https://github.com/boisgera/python-fr/commit/8518559">
+          #8518559
         </a>
 </p>
 
@@ -165,7 +165,7 @@ sont des murs.</p>
 en noir).</figcaption>
 </figure>
 <h3 id="bibliothèque-de-labyrinthes">Bibliothèque de labyrinthes</h3>
-<p>Explorez les fichiers du dossier 📁 <a href="./mazes/">mazes</a>.
+<p>Explorez les fichiers du dossier 📁 <a href="https://github.com/boisgera/python-fr/tree/master/tps/maze/mazes">mazes</a>.
 Chaque fichier contient la représentation sous forme de texte (générez
 par <code>repr</code>) d’un labyrinthe. Chargez le contenu des ces
 fichiers, puis reconstituez les objets labyrinthes associés.</p>
@@ -175,11 +175,11 @@ fichiers, puis reconstituez les objets labyrinthes associés.</p>
 </summary>
 <p>Par exemple, pour obtenir le labyrinthe du fichier
 <code>"random-maze.py"</code>:</p>
-<pre class="pycon"><code>&gt;&gt;&gt; filename = "mazes/random-maze.py"
-&gt;&gt;&gt; file = open(filename, mode="r", encoding="utf-8")
-&gt;&gt;&gt; random_maze_repr = file.read()
-&gt;&gt;&gt; file.close()
-&gt;&gt;&gt; random_maze = eval(maze_repr)</code></pre>
+<pre class="python"><code>filename = "mazes/random-maze.py"
+file = open(filename, mode="r", encoding="utf-8")
+random_maze_repr = file.read()
+file.close()
+random_maze = eval(random_maze_repr)</code></pre>
 </details>
 <h3 id="visualisation">Visualisation</h3>
 <p>Développez avec pygame une fonction <code>display_maze</code>

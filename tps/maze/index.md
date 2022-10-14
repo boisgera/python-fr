@@ -22,7 +22,7 @@ Toutes les autres cellules de la grille sont des murs.
 
 ### Bibliothèque de labyrinthes
 
-Explorez les fichiers du dossier 📁 [mazes](./mazes/).
+Explorez les fichiers du dossier 📁 [mazes](https://github.com/boisgera/python-fr/tree/master/tps/maze/mazes).
 Chaque fichier contient la représentation sous forme de texte
 (générez par `repr`) d'un labyrinthe. 
 Chargez le contenu des ces fichiers, puis reconstituez
@@ -35,12 +35,12 @@ les objets labyrinthes associés.
 
 Par exemple, pour obtenir le labyrinthe du fichier `"random-maze.py"`:
 
-```pycon
->>> filename = "mazes/random-maze.py"
->>> file = open(filename, mode="r", encoding="utf-8")
->>> random_maze_repr = file.read()
->>> file.close()
->>> random_maze = eval(maze_repr)
+```python
+filename = "mazes/random-maze.py"
+file = open(filename, mode="r", encoding="utf-8")
+random_maze_repr = file.read()
+file.close()
+random_maze = eval(random_maze_repr)
 ```
 
 </details>
