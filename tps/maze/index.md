@@ -473,7 +473,7 @@ peuvent différer que de -1, 0 ou 1.
 Par conséquent, il suffit de constater des écarts de couleurs
 importants entre cellules voisines de la carte (correspondant à un écart de
 longueur égal au moins à deux) pour en conclure qu'on a trouvé un chemin non
-optimale. Et c'est bien le cas à quelques endroits sur la carte des longueurs
+optimal. Et c'est bien le cas à quelques endroits sur la carte des longueurs
 associée à l'algorithme `path_from`.
 
 On va donc développer un algorithme nous assurant que la longueur est 
