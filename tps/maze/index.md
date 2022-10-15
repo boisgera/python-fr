@@ -12,7 +12,7 @@ Labyrinthes
 --------------------------------------------------------------------------------
 
 Nous nous intéressons aux labyrinthes définis au sein d'une grille 30x30.
-Nous les représenterons en Python par des ensembles des paires d'entiers 
+Nous les représenterons en Python par des ensembles de paires d'entiers 
 compris entre 0 et 29, paires qui désignent les coordonnées des cellules 
 vides (traversables) du labyrinthe. 
 La paire `(0, 0)` correspond au coin en haut à gauche de la grille.
