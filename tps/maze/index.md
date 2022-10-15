@@ -107,7 +107,7 @@ def display_maze(maze):
 **Solution**
 </summary>
 
-Par exemple pour créer un labyrinthe sans mur:
+Par exemple pour créer un labyrinthe sans mur :
 
 ```python
 empty_maze = set()
