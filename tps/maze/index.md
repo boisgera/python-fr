@@ -173,8 +173,8 @@ Implémentez une fonction `maze_to_graph` qui construit le graphe associé
 
 Il semble naturel de représenter 
 les sommets comme un ensemble de paires d'entiers, les arêtes comme un ensemble
-de paires de sommets et les poids comme un dictionnaire ayant
-comme clés les sommets et comme valeur unique l'entier 1.
+de paires de sommets, et les poids comme un dictionnaire ayant
+comme clés les arêtes et comme valeur unique l'entier 1.
 
 ```python
 def maze_to_graph(maze):
