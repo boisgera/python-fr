@@ -16,11 +16,13 @@ date: auto
 Introduction
 --------------------------------------------------------------------------------
 
-Ce TP vous propose de développer un petit jeu en Python. Il constitue 
-une introduction à la conception et à la réalisation d'un programme complet.
+Ce TP vous propose de développer un petit jeu en Python. 
+Il constitue une introduction à la conception et à la réalisation 
+d'un programme complet.
 
 Son sujet est un standard du jeu vidéo, le 🐍 [snake]. 
-Vous pouvez découvrir une version classique de ce jeu à l'adresse
+Vous pouvez découvrir des versions classiques de ce jeu aux adresses
+<https://kitao.github.io/pyxel/wasm/examples/07_snake.html> et
 <https://wasm4.org/play/snake> ou un version très modernisée (et complexe !) à l'adresse
 <https://slither.io/>.
 
@@ -106,7 +108,7 @@ Code de démarrage
 
 Notre point de départ : un arrière-plan dont la couleur varie aléatoirement.
 
-```python
+``` {.python output="snake-1.py"}
 import random
 import pygame
 
@@ -194,7 +196,7 @@ Nous pouvons ainsi faire en sorte de forcer l'arrêt du programme lorsque
 l'utilisateur clique sur le bouton de fermeture de la fenêtre ou appuie sur
 la touche Q :
 
-```python
+``` {.python output="snake-2.py"}
 import random
 import sys
 import pygame
@@ -243,7 +245,7 @@ Pour vérifier la validité de ce plateau de jeu,
 
 🗝️ Vous pouvez utiliser la méthode [`pygame.draw.rect`](https://www.pygame.org/docs/ref/draw.html#pygame.draw.rect) :
 
-```python
+``` python
 x = 100
 y = 100
 width = 30
@@ -282,7 +284,7 @@ et `[12, 15]` est la tête :
 <summary>
 **Solution**
 </summary>
-```python
+```{.python output="snake-3.py"}
 import sys
 import pygame
 
@@ -300,10 +302,12 @@ clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
-              sys.exit()
+                pygame.quit()
+                sys.exit()
     screen.fill(white)
     for x, y in snake:
         rect = [x*20, y*20, 20, 20]
@@ -343,7 +347,7 @@ Aussi on peut commencer à envisager d'accélérer un peu le jeu à ce stade ...
 **Solution**
 </summary>
 
-```python
+``` {.python output="snake-4.py"}
 import sys
 import pygame
 
@@ -420,7 +424,7 @@ On va procéder comme suit:
 
 
 
-```python
+``` {.python output="snake-5.py"}
 import random
 import sys
 import pygame
@@ -494,9 +498,10 @@ fonctionnel :
 - Enfin on peut afficher le score.
   La façon la plus simple de procéder est de changer le titre de la fenêtre, 
   avec la fonction `set_caption` :
+
   ```python
   score = 0
-  pygame.display.set_caption(f"Score : {score}")
+  pygame.display.set_caption(f"🐍 Score: {score}")
   ```
 
 ![](images/score.png)
@@ -506,7 +511,7 @@ fonctionnel :
 **Solution**
 </summary>
 
-```lang=python
+``` {.python output="snake-6.py"}
 import random
 import sys
 import pygame
@@ -570,7 +575,7 @@ while True:
     rect = [fruit[0]*20, fruit[1]*20, 20, 20]
     pygame.draw.rect(screen, red, rect)  
     pygame.display.update()
-    pygame.display.set_caption(f"Score: {score}")
+    pygame.display.set_caption(f"🐍 Score: {score}")
     clock.tick(1)
 ```
 

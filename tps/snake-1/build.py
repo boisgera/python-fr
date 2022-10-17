@@ -7,7 +7,7 @@ from typing import Optional
 
 # First-Party Librairies
 import pandoc
-from pandoc.types import CodeBlock
+from pandoc.types import CodeBlock, Div, Para, Str
 
 # Third-Party Librairies
 from bs4 import BeautifulSoup
@@ -60,20 +60,36 @@ def generate_videos():
 
 def generate_py():
     doc = pandoc.read(file="index.md")
-    src = ""
     for elt in pandoc.iter(doc):
         if isinstance(elt, CodeBlock):
             codeblock = elt
-            attr, text = codeblock
-            _, cls, _ = attr
+            attr, src = codeblock
+            _, cls, kvs = attr
             if "python" in cls:
-                src += text + 2 * "\n"
-    with open("index.py", mode="w", encoding="utf-8") as file:
-        file.write(src)
+                output = dict(kvs).get("output")
+                if output is not None:
+                    with open(output, mode="w", encoding="utf-8") as file:
+                        file.write(src + "\n\n")
+
+
+def highlight_warnings(doc):
+    warnings = []
+    for elt, path in pandoc.iter(doc, path=True):
+        if type(elt) is Para:
+            para = elt
+            inline = para[:][0][0]
+            if isinstance(inline, Str) and inline[0].strip().startswith("⚠️"):
+                holder, index = path[-1]
+                warnings.append((holder, index, para))
+    for warning in warnings:
+        (holder, index, para) = warning
+        wrapped_warning = Div(("", ["warning"], []), [para])
+        holder[index] = wrapped_warning
 
 
 def generate_html():
     doc = pandoc.read(file="index.md")
+    highlight_warnings(doc)
     pandoc.write(doc, file="index.html", options=options)
 
 
