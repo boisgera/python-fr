@@ -106,7 +106,7 @@
 <h1 class="title">Labyrinthes</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
 Boisgérault</a>, MINES Paris – PSL</p>
-<p class="date">Vendredi 14 octobre 2022</p>
+<p class="date">Lundi 17 octobre 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -121,8 +121,8 @@ Boisgérault</a>, MINES Paris – PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/e7f3ee9">
-          #e7f3ee9
+<a href="https://github.com/boisgera/python-fr/commit/9b33100">
+          #9b33100
         </a>
 </p>
 
@@ -154,7 +154,7 @@ chemins</a></li>
 </figure>
 <h2 id="labyrinthes">Labyrinthes</h2>
 <p>Nous nous intéressons aux labyrinthes définis au sein d’une grille
-30x30. Nous les représenterons en Python par des ensembles des paires
+30x30. Nous les représenterons en Python par des ensembles de paires
 d’entiers compris entre 0 et 29, paires qui désignent les coordonnées
 des cellules vides (traversables) du labyrinthe. La paire
 <code>(0, 0)</code> correspond au coin en haut à gauche de la
@@ -234,7 +234,7 @@ labyrinthes</h3>
 <summary>
 <strong>Solution</strong>
 </summary>
-<p>Par exemple pour créer un labyrinthe sans mur:</p>
+<p>Par exemple pour créer un labyrinthe sans mur :</p>
 <pre class="python"><code>empty_maze = set()
 for y in range(0, HEIGHT):
     for x in range(0, WIDTH):
@@ -282,7 +282,7 @@ graphe associé à un labyrinthe.</p>
 </summary>
 <p>Il semble naturel de représenter les sommets comme un ensemble de
 paires d’entiers, les arêtes comme un ensemble de paires de sommets et
-les poids comme un dictionnaire ayant comme clés les sommets et comme
+les poids comme un dictionnaire ayant comme clés les arêtes et comme
 valeur unique l’entier 1.</p>
 <pre class="python"><code>def maze_to_graph(maze):
     vertices = set(maze)
@@ -541,7 +541,7 @@ plus court possible, les longueurs des chemins entre deux cellules vides
 voisines ne peuvent différer que de -1, 0 ou 1. Par conséquent, il
 suffit de constater des écarts de couleurs importants entre cellules
 voisines de la carte (correspondant à un écart de longueur égal au moins
-à deux) pour en conclure qu’on a trouvé un chemin non optimale. Et c’est
+à deux) pour en conclure qu’on a trouvé un chemin non optimal. Et c’est
 bien le cas à quelques endroits sur la carte des longueurs associée à
 l’algorithme <code>path_from</code>.</p>
 <p>On va donc développer un algorithme nous assurant que la longueur est

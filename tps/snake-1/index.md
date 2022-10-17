@@ -20,11 +20,15 @@ Ce TP vous propose de développer un petit jeu en Python.
 Il constitue une introduction à la conception et à la réalisation 
 d'un programme complet.
 
-Son sujet est un standard du jeu vidéo, le 🐍 [snake]. 
-Vous pouvez découvrir des versions classiques de ce jeu aux adresses
-<https://kitao.github.io/pyxel/wasm/examples/07_snake.html> et
-<https://wasm4.org/play/snake> ou un version très modernisée (et complexe !) à l'adresse
-<https://slither.io/>.
+Son sujet est un standard du jeu vidéo, le 🐍 [snake].
+
+![[🎮 Snake!](https://kitao.github.io/pyxel/wasm/examples/07_snake.html) ;
+une version classique du snake, réalisée avec la plate-forme de retro-gaming
+Python [Pyxel](https://github.com/kitao/pyxel).](images/snake-pyxel.jpg)
+
+
+De nombreuses variantes de ce jeu existent ; [slither.io](https://slither.io)
+est un bon exemple de snake modernisé (et notamment, massivement multijoueur !).
 
 [Snake]: https://fr.wikipedia.org/wiki/Snake_(genre_de_jeu_vid%C3%A9o)
 
@@ -40,10 +44,10 @@ Prérequis
 et que vous avez un terminal `bash` fonctionnel sur votre ordinateur.
 
 Commencez par créer un environnement nommé `snake`, dédié au TP et 
-contenant Python 3.9
+contenant Python 3.10
 
 ```bash
-(base) $ conda create -n snake python=3.9
+(base) $ conda create -n snake python=3.10
 ```
 
 Puis activez-le
@@ -52,7 +56,7 @@ Puis activez-le
 (base) $ conda activate snake
 ```
 
-Vous devriez alors avoir une nouvelle invite de commmande :
+Vous devriez alors avoir une nouvelle invite de commande :
 
 ```
 (snake) $
@@ -123,7 +127,7 @@ while True:
     color = [red, green, blue]
     screen.fill(color)
     pygame.display.update()
-    clock.tick(1.0)
+    clock.tick(1)
 ```
 
 Copiez ce code dans un fichier `snake.py` et exécutez-le :
@@ -142,9 +146,9 @@ Copiez ce code dans un fichier `snake.py` et exécutez-le :
 
   - ⏲️ **Horloge.** Dans l'appel à la fonction `clock.tick`,
     
-      - remplacez l'argument `1.0` par `0.2` (puis exécutez le programme),
+      - remplacez l'argument `1` par `2` (puis exécutez le programme),
       
-      - procédez de même avec `5.0`,
+      - procédez de même avec `5`,
 
       - puis supprimez (ou commentez) l'appel à `clock.tick`.
 
@@ -159,31 +163,8 @@ Copiez ce code dans un fichier `snake.py` et exécutez-le :
   - 🎨 **Couleurs.** Faites en sorte que les couleurs qui s'affichent
     soient toujours aléatoires, mais uniquement parmi des nuances de bleu.
 
-    <details>
-    <summary> 
-    **Code RGB ℹ️**
-    </summary>
-    --------------------------------------------------------------------------------
+    🗝️ On pourra consulter l'annexe ["Codes RGB"][Annexe -- Codes RGB].
 
-    La couleur d'un pixel est décrite par son [code RGB](https://fr.wikipedia.org/wiki/Rouge_vert_bleu) : un triplet d'entiers compris entre 0 et 255 qui déterminent
-    l'intensité des composantes rouge, verte et bleue de la couleur. 
-    On a par exemple :
-
-            R           G           B    Couleur
-    ----------  ----------  ----------  ----------- 
-          255           0           0      🟥
-            0         255           0      🟩
-            0           0         255      🟦
-          255         255         255      ⬜
-            0           0           0      ⬛
-          128          64           0      🟫
-          255         128           0      🟧
-          255         255           0      🟨
-          106          13         173      🟪
-            
-    --------------------------------------------------------------------------------
-
-    </details>
 
 
 Événements
@@ -220,7 +201,7 @@ while True:
     color = [red, green, blue]
     screen.fill(color)
     pygame.display.update()
-    clock.tick(1.0)
+    clock.tick(1)
 ```
 
 Modifier ce programme pour que lorsque l'utilisateur presse 
@@ -313,7 +294,7 @@ while True:
         rect = [x*20, y*20, 20, 20]
         pygame.draw.rect(screen, black, rect)    
     pygame.display.update()
-    clock.tick(1.0)
+    clock.tick(1)
 ```
 
 </details>
@@ -391,7 +372,7 @@ while True:
         rect = [x*20, y*20, 20, 20]
         pygame.draw.rect(screen, black, rect)  
     pygame.display.update()
-    clock.tick(1.0)
+    clock.tick(1)
 ```
 
 </details>
@@ -480,7 +461,7 @@ while True:
     rect = [fruit[0]*20, fruit[1]*20, 20, 20]
     pygame.draw.rect(screen, red, rect)  
     pygame.display.update()
-    clock.tick(1.0)
+    clock.tick(1)
 ```
 
 </details>
@@ -503,8 +484,6 @@ fonctionnel :
   score = 0
   pygame.display.set_caption(f"🐍 Score: {score}")
   ```
-
-![](images/score.png)
 
 <details>
 <summary>
@@ -580,3 +559,23 @@ while True:
 ```
 
 </details>
+
+Annexe -- Codes RGB
+--------------------------------------------------------------------------------
+
+La couleur d'un pixel est décrite par son [code RGB](https://fr.wikipedia.org/wiki/Rouge_vert_bleu) : un triplet d'entiers compris entre 0 et 255 qui déterminent
+l'intensité de ses composantes rouge, verte et bleue. 
+On a par exemple :
+
+         R           G           B    Couleur
+----------  ----------  ----------  ----------- 
+       255           0           0      🟥
+         0         255           0      🟩
+         0           0         255      🟦
+       255         255         255      ⬜
+         0           0           0      ⬛
+       128          64           0      🟫
+       255         128           0      🟧
+       255         255           0      🟨
+       106          13         173      🟪
+        
