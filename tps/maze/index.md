@@ -12,7 +12,7 @@ Labyrinthes
 --------------------------------------------------------------------------------
 
 Nous nous intéressons aux labyrinthes définis au sein d'une grille 30x30.
-Nous les représenterons en Python par des ensembles des paires d'entiers 
+Nous les représenterons en Python par des ensembles de paires d'entiers 
 compris entre 0 et 29, paires qui désignent les coordonnées des cellules 
 vides (traversables) du labyrinthe. 
 La paire `(0, 0)` correspond au coin en haut à gauche de la grille.
@@ -107,7 +107,7 @@ def display_maze(maze):
 **Solution**
 </summary>
 
-Par exemple pour créer un labyrinthe sans mur:
+Par exemple pour créer un labyrinthe sans mur :
 
 ```python
 empty_maze = set()
@@ -174,7 +174,7 @@ Implémentez une fonction `maze_to_graph` qui construit le graphe associé
 Il semble naturel de représenter 
 les sommets comme un ensemble de paires d'entiers, les arêtes comme un ensemble
 de paires de sommets et les poids comme un dictionnaire ayant
-comme clés les sommets et comme valeur unique l'entier 1.
+comme clés les arêtes et comme valeur unique l'entier 1.
 
 ```python
 def maze_to_graph(maze):
@@ -473,7 +473,7 @@ peuvent différer que de -1, 0 ou 1.
 Par conséquent, il suffit de constater des écarts de couleurs
 importants entre cellules voisines de la carte (correspondant à un écart de
 longueur égal au moins à deux) pour en conclure qu'on a trouvé un chemin non
-optimale. Et c'est bien le cas à quelques endroits sur la carte des longueurs
+optimal. Et c'est bien le cas à quelques endroits sur la carte des longueurs
 associée à l'algorithme `path_from`.
 
 On va donc développer un algorithme nous assurant que la longueur est 
