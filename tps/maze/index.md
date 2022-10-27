@@ -1,7 +1,7 @@
 ---
 title: Labyrinthes
 author: 
-- "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@minesparis.psl.eu), MINES Paris -- PSL"
+- "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@minesparis.psl.eu), Mines Paris -- PSL"
 license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 date: auto
 ---

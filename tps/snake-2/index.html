@@ -106,7 +106,7 @@
 <h1 class="title">Le retour du serpent</h1>
 <p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
 Boisgérault</a>, MINES Paris – PSL</p>
-<p class="date">Lundi 17 octobre 2022</p>
+<p class="date">Jeudi 27 octobre 2022</p>
 
 <p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
@@ -121,8 +121,17 @@ Boisgérault</a>, MINES Paris – PSL</p>
 <span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
 <img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
 </span>
-<a href="https://github.com/boisgera/python-fr/commit/9b33100">
-          #9b33100
+<a href="https://github.com/boisgera/python-fr/commit/f820b2e">
+          #f820b2e
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/edit.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/edit/master/tps/snake-2/index.md">
+          Edition
         </a>
 </p>
 </header>
@@ -133,14 +142,13 @@ Boisgérault</a>, MINES Paris – PSL</p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction">Introduction</a></li>
-<li><a href="#espaces-commentaires" id="toc-espaces-commentaires">Espaces &amp; commentaires</a></li>
+<li><a href="#structure-commentaires" id="toc-structure-commentaires">Structure &amp; commentaires</a></li>
 <li><a href="#configuration-constantes" id="toc-configuration-constantes">Configuration &amp;
 constantes</a></li>
 <li><a href="#structuration-en-fonctions" id="toc-structuration-en-fonctions">Structuration en fonctions</a></li>
-<li><a href="#sauvegarde-restauration-de-létat-du-jeu" id="toc-sauvegarde-restauration-de-létat-du-jeu">Sauvegarde &amp;
-restauration de l’état du jeu</a></li>
-<li><a href="#gestion-configurable-des-événements" id="toc-gestion-configurable-des-événements">Gestion configurable des
-événements</a></li>
+<li><a href="#sauvegarde-restauration" id="toc-sauvegarde-restauration">Sauvegarde &amp; restauration</a></li>
+<li><a href="#configuration-clavier" id="toc-configuration-clavier">Configuration clavier</a></li>
+<li><a href="#lexique" id="toc-lexique">Lexique</a></li>
 </ul>
 </nav></details>
 
@@ -149,62 +157,214 @@ restauration de l’état du jeu</a></li>
 <p>Ce TP vous propose de poursuivre le développement du jeu du
 serpent.</p>
 <p>Nous allons lui ajouter quelques fonctionnalités, mais surtout avant
-cela, nous allons faire le ménage ! C’est-à-dire, structurer le code
-existant (à fonctionnalité constante) en utilisant quelques “bonnes
-pratiques” qui rendront (espérons-le !) notre code plus lisible, plus
-facile à maintenir et à faire évoluer par la suite … avant qu’il ne soit
-trop tard !</p>
-<p>ℹ️ <strong>Mini-lexique</strong> :</p>
+cela, nous allons faire du <strong>réusinage</strong>, c’est-à-dire,
+restructurer notre code existant – à fonctionnalités constantes – en
+utilisant quelques “bonnes pratiques” qui le rendront (espérons-le !)
+plus facile à maintenir (cf <a href="#lexique">Lexique</a>).</p>
+<p>On rappelle l’état actuel du projet :</p>
+<details>
+<summary>
+<strong>Le programme initial</strong>
+</summary>
+<pre class="python" data-output="snake-0.py"><code>import random
+import sys
+import pygame
+
+white = [255, 255, 255]
+black = [0, 0, 0]
+red = [255, 0, 0]
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+fruit = [10, 10]
+score = 0
+
+pygame.init()
+screen = pygame.display.set_mode([20*30, 20*30])
+clock = pygame.time.Clock()
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                pygame.quit()
+                sys.exit()
+            if event.key == pygame.K_UP:
+                direction = [0, -1]
+            elif event.key == pygame.K_LEFT:
+                direction = [-1, 0]
+            elif event.key == pygame.K_DOWN:
+                direction = [0, 1]
+            elif event.key == pygame.K_RIGHT:
+                direction = [1, 0]
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    if (
+        new_head in snake
+        or new_head[0] &lt; 0
+        or new_head[0] &gt;= 30
+        or new_head[1] &lt; 0
+        or new_head[1] &gt;= 30
+    ):
+        pygame.quit()
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29),
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+    screen.fill(white)
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, black, rect)
+    rect = [fruit[0]*20, fruit[1]*20, 20, 20]
+    pygame.draw.rect(screen, red, rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {score}")
+    clock.tick(1)</code></pre>
+</details>
+<h1 id="structure-commentaires">Structure &amp; commentaires</h1>
+<p>On simpliferait probablement la lecture du code en insérant quelques
+lignes blanches pour délimiter des sections et en les faisant précéder
+d’un commentaire indiquant leur rôle.</p>
+<p>On suggère les labels suivants (dans l’ordre alphabétique):</p>
 <ul>
-<li><p>🍝 <strong><a href="https://fr.wikipedia.org/wiki/Programmation_spaghetti">Code
-spaghetti</a></strong> (🇺🇸 <strong>spaghetti code</strong>)</p></li>
-<li><p>💸 <strong><a href="https://fr.wikipedia.org/wiki/Dette_technique">Dette
-technique</a></strong> (🇺🇸 <strong>technical debt</strong>)</p></li>
-<li><p>♻️ <strong><a href="https://fr.wikipedia.org/wiki/R%C3%A9usinage_de_code">Réusinage</a></strong>
-(🇺🇸 <strong>refactoring</strong>)</p></li>
+<li><p>🏷️ Constants</p></li>
+<li><p>🏷️ Event Management</p></li>
+<li><p>🏷️ Frame Update</p></li>
+<li><p>🏷️ Game Logic (move snake),</p></li>
+<li><p>🏷️ Game State</p></li>
+<li><p>🏷️ Main Loop,</p></li>
+<li><p>🏷️ Setup,</p></li>
+<li><p>🏷️ Wait for next frame</p></li>
 </ul>
-<h1 id="espaces-commentaires">Espaces &amp; commentaires</h1>
-<p>Il serait pertinent d’utiliser des commentaires et quelques lignes
-blanches pour mettre en évidence des “sections” dans le code, des
-groupements d’instructions qui ont un rôle bien défini.</p>
-<p>Définir de telles sections ; on suggère par défaut les labels
-suivants en commentaire :</p>
-<ul>
-<li><p>Setup, State, Init, Main Loop,</p></li>
-<li><p>Handle Events, Move the snake, Draw &amp; update the screen, Time
-management</p></li>
-</ul>
+<p>A vous de localiser les sections correspondantes !</p>
 <details>
 <summary>
 <strong>Solution</strong>
 </summary>
-<a href="solutions/snake-v2.0.py">📁 <code>snake.py</code></a>
+<pre class="python" data-output="snake-1.py"><code>import random
+import sys
+import pygame
+
+# Constants
+white = [255, 255, 255]
+black = [0, 0, 0]
+red = [255, 0, 0]
+
+# Game State
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+fruit = [10, 10]
+score = 0
+
+# Setup
+pygame.init()
+screen = pygame.display.set_mode([20*30, 20*30])
+clock = pygame.time.Clock()
+
+# Main Loop
+while True:
+    # Event Management
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                pygame.quit()
+                sys.exit()
+            if event.key == pygame.K_UP:
+                direction = [0, -1]
+            elif event.key == pygame.K_LEFT:
+                direction = [-1, 0]
+            elif event.key == pygame.K_DOWN:
+                direction = [0, 1]
+            elif event.key == pygame.K_RIGHT:
+                direction = [1, 0]
+
+    # Game Logic (move snake)
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    if (
+        new_head in snake
+        or new_head[0] &lt; 0
+        or new_head[0] &gt;= 30
+        or new_head[1] &lt; 0
+        or new_head[1] &gt;= 30
+    ):
+        pygame.quit()
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29),
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+
+    # Frame Update
+    screen.fill(white)
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, black, rect)
+    rect = [fruit[0]*20, fruit[1]*20, 20, 20]
+    pygame.draw.rect(screen, red, rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {score}")
+
+    # Wait for next frame ... wait for it! 
+    # (📺 https://www.youtube.com/watch?v=O_mlJwQ1_ZM)
+    clock.tick(1)</code></pre>
 </details>
 <h1 id="configuration-constantes">Configuration &amp; constantes</h1>
 <p>En Python, l’usage est de désigner les grandeurs constantes par des
-noms en majuscules (ici dans la section “Setup”). Un des intérêts
-d’avoir explicitement une section où l’on déclare les constantes et que
-l’on évite d’avoir à dupliquer leur valeur “en dur” dans le code et que
-si ultérieurement on est amené à changer leur valeur, il suffira de le
-faire à un seul endroit.</p>
+noms en majuscules. Un des intérêts d’avoir explicitement une section où
+l’on déclare les constantes et que l’on évite d’avoir à dupliquer leur
+valeur “en dur” dans le code et que si ultérieurement on est amené à
+changer leur valeur, il suffira de le faire à un seul endroit.</p>
 <ul>
 <li><p>Définir les constantes entières</p>
-<pre class="python"><code>WIDTH = 30
-HEIGHT = 30
-CELL_SIZE = 20</code></pre>
+<pre class="python"><code>WIDTH = 30      # number of cells
+HEIGHT = 30     # number of cells
+CELL_SIZE = 20  # number of pixels</code></pre>
 <p>et les utiliser pour faire disparaître les valeurs associées codées
 “en dur” dans le code.</p></li>
 <li><p>Même chose avec</p>
-<pre class="python"><code>FPS = 1.0 # frames per second</code></pre></li>
+<pre class="python"><code>FPS = 1  # frames per second</code></pre></li>
 <li><p>Plutôt que de coder en dur les couleurs dans le code, on va
 définir un thème de couleurs, qui désignera les couleurs choises par
 leur rôle dans l’application :</p>
-<pre class="python"><code>COLORS = {
-    "background": [255, 255, 255],
-    "snake": [0, 0, 0],
-    "fruit": [255, 0, 0]
+<pre class="python"><code>WHITE = [255, 255, 255]
+BLACK = [0, 0, 0]
+RED = [255, 0, 0]
+COLORS = {
+    "background": WHITE,
+    "snake": BLACK,
+    "fruit": RED
 }</code></pre>
-<p>Modifier le code pour exploiter le dictionnaire
+<p>Modifier le code pour exploiter le dictionnaire constant
 <code>COLORS</code>.</p></li>
 <li><p>Vous avez peut-être remarqué que le système de coordonnées de
 pygame, qui fait pointer l’axe des ordonnées vers le bas est un peu
@@ -215,43 +375,249 @@ DOWN = [0, 1]
 LEFT = [-1, 0]
 RIGHT = [1, 0]</code></pre>
 <p>Adapter le code pour les exploiter.</p></li>
+<li><p>On a de nombreuses fois dans le code la succession des deux
+appels</p>
+<pre class="python"><code>pygame.quit()
+sys.exit()</code></pre>
+<p>Pour éviter cette répétition (et les risques d’erreurs afférents),
+définir une fonction <code>exit</code> qui réalise ces deux appels, puis
+l’exploiter.</p></li>
 </ul>
 <details>
 <summary>
 <strong>Solution</strong>
 </summary>
-<a href="solutions/snake-v2.1.py">📁 <code>snake.py</code></a>
+<pre class="python" data-output="snake-2.py"><code>import random
+import sys
+import pygame
+
+# Constants
+WIDTH = 30      # number of cells
+HEIGHT = 30     # number of cells
+CELL_SIZE = 20  # number of pixels
+FPS = 1  # frames per second
+WHITE = [255, 255, 255]
+BLACK = [0, 0, 0]
+RED = [255, 0, 0]
+COLORS = {
+    "background": WHITE,
+    "snake": BLACK,
+    "fruit": RED
+}
+UP = [0, -1]
+DOWN = [0, 1]
+LEFT = [-1, 0]
+RIGHT = [1, 0]
+
+# Game State
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+fruit = [10, 10]
+score = 0
+
+# Setup
+pygame.init()
+width_height = [WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE]
+screen = pygame.display.set_mode(width_height)
+clock = pygame.time.Clock()
+
+# Helper Function
+def exit():
+    pygame.quit()
+    sys.exit()
+
+# Main Loop
+while True:
+    # Event Management
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                exit()
+            if event.key == pygame.K_UP:
+                direction = UP
+            elif event.key == pygame.K_LEFT:
+                direction = LEFT
+            elif event.key == pygame.K_DOWN:
+                direction = DOWN
+            elif event.key == pygame.K_RIGHT:
+                direction = RIGHT
+
+    # Game Logic (move snake)
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    if (
+        new_head in snake
+        or new_head[0] &lt; 0
+        or new_head[0] &gt;= 30
+        or new_head[1] &lt; 0
+        or new_head[1] &gt;= 30
+    ):
+        exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29),
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+
+    # Frame Update
+    screen.fill(COLORS["background"])
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, COLORS["snake"], rect)
+    rect = [fruit[0]*20, fruit[1]*20, 20, 20]
+    pygame.draw.rect(screen, COLORS["fruit"], rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {score}")
+
+    # Wait for next frame ... wait for it! 
+    # (📺 https://www.youtube.com/watch?v=O_mlJwQ1_ZM)
+    clock.tick(FPS)</code></pre>
 </details>
 <h1 id="structuration-en-fonctions">Structuration en fonctions</h1>
 <p>Les commentaires, c’est bien ! Ce qui est encore mieux, c’est d’avoir
 un code tellement explicite qu’on n’en a (presque) plus besoin.</p>
 <p>On souhaite dans cette étape remplacer le gros de notre code actuel
 par le code suivant, court et explicite :</p>
-<pre class="python"><code>screen, clock = init()
+<pre class="python"><code>screen, clock = setup()
 while True:
-    events = pygame.event.get()
-    handle_events(events)
+    handle_events()
     move_snake()
-    draw(screen)
-    pygame.display.update()
+    draw_frame(screen)
     wait_for_next_frame(clock)</code></pre>
+<p>Extrayez du code existant</p>
 <ul>
-<li><p>Extraire du code existant des fonctions <code>init</code> et
-<code>wait_for_next_frame</code> et les exploiter.</p></li>
-<li><p>Extraire une fonction <code>draw</code> du code existant et
-l’exploiter.</p></li>
-<li><p>Extraire du code existant des fonctions
-<code>handle_events</code> et <code>move_snake()</code> et les
-exploiter.</p></li>
+<li><p>des fonctions <code>setup</code>,
+<code>wait_for_next_frame</code> et <code>draw_frame</code>,</p></li>
+<li><p>des fonctions <code>handle_events</code> et
+<code>move_snake</code></p></li>
 </ul>
+<p>puis exploitez-les.</p>
 <details>
 <summary>
 <strong>Solution</strong>
 </summary>
-<a href="solutions/snake-v2.2.py">📁 <code>snake.py</code></a>
+<pre class="python" data-output="snake-3.py"><code>import random
+import sys
+import pygame
+
+# Constants
+WIDTH = 30      # number of cells
+HEIGHT = 30     # number of cells
+CELL_SIZE = 20  # number of pixels
+FPS = 1  # frames per second
+WHITE = [255, 255, 255]
+BLACK = [0, 0, 0]
+RED = [255, 0, 0]
+COLORS = {
+    "background": WHITE,
+    "snake": BLACK,
+    "fruit": RED
+}
+UP = [0, -1]
+DOWN = [0, 1]
+LEFT = [-1, 0]
+RIGHT = [1, 0]
+
+# Game State
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+fruit = [10, 10]
+score = 0
+
+# Helper Functions
+def setup():
+    pygame.init()
+    width_height = [WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE]
+    screen = pygame.display.set_mode(width_height)
+    clock = pygame.time.Clock()
+    return screen, clock
+
+def handle_events():
+    global direction
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+          exit()
+      elif event.type == pygame.KEYDOWN:
+          if event.key == pygame.K_q:
+              exit()
+          if event.key == pygame.K_UP:
+              direction = UP
+          elif event.key == pygame.K_LEFT:
+              direction = LEFT
+          elif event.key == pygame.K_DOWN:
+              direction = DOWN
+          elif event.key == pygame.K_RIGHT:
+              direction = RIGHT
+
+def move_snake():
+    global fruit, score, snake
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    if (
+        new_head in snake
+        or new_head[0] &lt; 0
+        or new_head[0] &gt;= 30
+        or new_head[1] &lt; 0
+        or new_head[1] &gt;= 30
+    ):
+        pygame.quit()
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29),
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+
+def draw_frame(screen):
+    screen.fill(COLORS["background"])
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, COLORS["snake"], rect)
+    rect = [fruit[0]*20, fruit[1]*20, 20, 20]
+    pygame.draw.rect(screen, COLORS["fruit"], rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {score}")
+
+def wait_for_next_frame(clock):
+    clock.tick(FPS)
+
+def exit():
+    pygame.quit()
+    sys.exit()
+
+# Setup &amp; Main Loop
+screen, clock = setup()
+while True:
+    handle_events()
+    move_snake()
+    draw_frame(screen)
+    wait_for_next_frame(clock)</code></pre>
 </details>
-<h1 id="sauvegarde-restauration-de-létat-du-jeu">Sauvegarde &amp;
-restauration de l’état du jeu</h1>
+<h1 id="sauvegarde-restauration">Sauvegarde &amp; restauration</h1>
 <p>L’état du jeu à un instant donné est capturé par les variables
 <code>snake</code>, <code>direction</code>, <code>fruit</code> et
 <code>score</code>.</p>
@@ -259,26 +625,156 @@ restauration de l’état du jeu</h1>
 <li><p>Définissez des fonctions <code>save_state</code> et
 <code>load_state</code> (sans argument ni valeur de retour) qui
 permettent respectivement de sauver l’état courant dans un fichier (par
-exemple “snaphot.py” ; vous pouvez adapter l’extension du fichier selon
+exemple “snapshot.py” ; vous pouvez adapter l’extension du fichier selon
 le format de sauvgarde que vous utilisez) et de remplacer l’état courant
 par l’état stocké dans ce fichier.</p></li>
 <li><p>Faites en sorte que l’état courant soit sauvegardé lorsque l’on
-appuie sur la touche “S” et que le programme charge l’état sauvegardé au
-démarrage si le fichier de sauvegarde existe.</p></li>
+appuie sur la touche “S” et que le programme charge l’état sauvegardé
+lorsque l’on appuie sur la touche “L”.</p></li>
 </ul>
 <details>
 <summary>
 <strong>Solution</strong>
 </summary>
-<a href="solutions/snake-v2.3.py">📁 <code>snake.py</code></a>
+<pre class="python" data-output="snake-4.py"><code>import random
+import sys
+import pygame
+
+# Constants
+WIDTH = 30      # number of cells
+HEIGHT = 30     # number of cells
+CELL_SIZE = 20  # number of pixels
+FPS = 1  # frames per second
+WHITE = [255, 255, 255]
+BLACK = [0, 0, 0]
+RED = [255, 0, 0]
+COLORS = {
+    "background": WHITE,
+    "snake": BLACK,
+    "fruit": RED
+}
+UP = [0, -1]
+DOWN = [0, 1]
+LEFT = [-1, 0]
+RIGHT = [1, 0]
+SNAPSHOT = "snapshot.py"
+
+# Game State
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+fruit = [10, 10]
+score = 0
+
+def save_state():
+    state = {
+        "snake": snake,
+        "direction": direction,
+        "fruit": fruit,
+        "score": score
+    }
+    with open(SNAPSHOT, mode="w", encoding="utf-8") as file:
+        file.write(repr(state))
+
+def load_state():
+    global snake, direction, fruit, score
+    with open(SNAPSHOT, mode="r", encoding="utf-8") as file:
+        data = file.read()
+    state = eval(data)
+    snake = state["snake"]
+    direction = state["direction"]
+    fruit = state["fruit"]
+    score = state["score"]
+
+# Helper Functions
+def setup():
+    pygame.init()
+    width_height = [WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE]
+    screen = pygame.display.set_mode(width_height)
+    clock = pygame.time.Clock()
+    return screen, clock
+
+def handle_events():
+    global direction
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+          exit()
+      elif event.type == pygame.KEYDOWN:
+          if event.key == pygame.K_q:
+              exit()
+          elif event.key == pygame.K_s:
+              save_state()
+          elif event.key == pygame.K_l:
+              load_state()
+          if event.key == pygame.K_UP:
+              direction = UP
+          elif event.key == pygame.K_LEFT:
+              direction = LEFT
+          elif event.key == pygame.K_DOWN:
+              direction = DOWN
+          elif event.key == pygame.K_RIGHT:
+              direction = RIGHT
+
+def move_snake():
+    global fruit, score, snake
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    if (
+        new_head in snake
+        or new_head[0] &lt; 0
+        or new_head[0] &gt;= 30
+        or new_head[1] &lt; 0
+        or new_head[1] &gt;= 30
+    ):
+        pygame.quit()
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29),
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+
+def draw_frame(screen):
+    screen.fill(COLORS["background"])
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, COLORS["snake"], rect)
+    rect = [fruit[0]*20, fruit[1]*20, 20, 20]
+    pygame.draw.rect(screen, COLORS["fruit"], rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {score}")
+
+def wait_for_next_frame(clock):
+    clock.tick(FPS)
+
+def exit():
+    pygame.quit()
+    sys.exit()
+
+# Setup &amp; Main Loop
+screen, clock = setup()
+while True:
+    handle_events()
+    move_snake()
+    draw_frame(screen)
+    wait_for_next_frame(clock) </code></pre>
 </details>
-<h1 id="gestion-configurable-des-événements">Gestion configurable des
-événements</h1>
-<p>Le code de gestion des évènements commence à ressembler à du
+<h1 id="configuration-clavier">Configuration clavier</h1>
+<p>Le code de gestion des évènements commence à ressembler à du code
 spaghetti … On souhaiterait remplacer ce code qui grossit à chaque fois
 que l’on rajoute une fonctionnalité par une fonction générique</p>
-<pre class="python"><code>def handle_events(events):
-    for event in events:
+<pre class="python"><code>def handle_events():
+    for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.KEYDOWN:
@@ -289,18 +785,18 @@ que l’on rajoute une fonctionnalité par une fonction générique</p>
 <strong>key bindings</strong>) configurable, décrivant l’association
 entre la touche sélectionnée et l’action correspondante :</p>
 <pre class="python"><code>KEY_BINDINGS = {
-    "q": sys.exit,
+    "q": exit,
     "s": save_state,
     ...
 }</code></pre>
 <ul>
-<li><p>Rajouter une fonction de chargement de l’état sauvegardé quand on
+<li><p>Rajoutez une fonction de chargement de l’état sauvegardé quand on
 appuie sur la touche “L”.</p></li>
-<li><p>Définir toutes les actions à gérer sous forme de fonction sans
+<li><p>Définissez toutes les actions à gérer sous forme de fonction sans
 argument (comme <code>sys.exit</code>, <code>save_state</code>,
 <code>load_state</code>).</p></li>
-<li><p>Compléter le dictionnaire <code>KEY_BINDINGS</code>, puis
-l’exploiter pour construire le dictionnaire
+<li><p>Complétez le dictionnaire <code>KEY_BINDINGS</code>, puis
+exploitez-le pour construire le dictionnaire
 <code>KEY_EVENT_HANDLER</code> qui va associer à chaque code clavier
 Pygame l’action correspondante.</p>
 <p>🗝️ Indication: <a href="https://www.pygame.org/docs/ref/key.html#pygame.key.key_code">📖
@@ -312,7 +808,154 @@ version générique.</p></li>
 <summary>
 <strong>Solution</strong>
 </summary>
-<a href="solutions/snake-v2.4.py">📁 <code>snake.py</code></a>
+<pre class="python" data-output="snake-5.py"><code>import random
+import sys
+import pygame
+
+# Constants
+WIDTH = 30      # number of cells
+HEIGHT = 30     # number of cells
+CELL_SIZE = 20  # number of pixels
+FPS = 1  # frames per second
+WHITE = [255, 255, 255]
+BLACK = [0, 0, 0]
+RED = [255, 0, 0]
+COLORS = {
+    "background": WHITE,
+    "snake": BLACK,
+    "fruit": RED
+}
+UP = [0, -1]
+DOWN = [0, 1]
+LEFT = [-1, 0]
+RIGHT = [1, 0]
+SNAPSHOT = "snapshot.py"
+
+# State Management
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+fruit = [10, 10]
+score = 0
+
+def save_state():
+    state = {
+        "snake": snake,
+        "direction": direction,
+        "fruit": fruit,
+        "score": score
+    }
+    with open(SNAPSHOT, mode="w", encoding="utf-8") as file:
+        file.write(repr(state))
+
+def load_state():
+    global snake, direction, fruit, score
+    with open(SNAPSHOT, mode="r", encoding="utf-8") as file:
+        data = file.read()
+    state = eval(data)
+    snake = state["snake"]
+    direction = state["direction"]
+    fruit = state["fruit"]
+    score = state["score"]
+
+# Helpers
+def setup():
+    pygame.init()
+    width_height = [WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE]
+    screen = pygame.display.set_mode(width_height)
+    clock = pygame.time.Clock()
+    return screen, clock
+
+def set_direction(d):
+    def action():
+        global direction
+        direction = d
+    return action
+
+# Event Management
+KEY_BINDINGS = {
+    "q": exit,
+    "up": set_direction(UP),
+    "down": set_direction(DOWN),
+    "left": set_direction(LEFT),
+    "right": set_direction(RIGHT),
+    "s": save_state,
+    "l": load_state,
+}
+
+KEY_EVENT_HANDLER = {pygame.key.key_code(k): v for k, v in KEY_BINDINGS.items()}
+
+def handle_events():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            event_handler = KEY_EVENT_HANDLER.get(event.key)
+            if event_handler:
+                event_handler()
+
+def move_snake():
+    global fruit, score, snake
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    if (
+        new_head in snake
+        or new_head[0] &lt; 0
+        or new_head[0] &gt;= 30
+        or new_head[1] &lt; 0
+        or new_head[1] &gt;= 30
+    ):
+        pygame.quit()
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29),
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+
+def draw_frame(screen):
+    screen.fill(COLORS["background"])
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, COLORS["snake"], rect)
+    rect = [fruit[0]*20, fruit[1]*20, 20, 20]
+    pygame.draw.rect(screen, COLORS["fruit"], rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {score}")
+
+def wait_for_next_frame(clock):
+    clock.tick(FPS)
+
+def exit():
+    pygame.quit()
+    sys.exit()
+
+# Setup &amp; Main Loop
+screen, clock = setup()
+while True:
+    handle_events()
+    move_snake()
+    draw_frame(screen)
+    wait_for_next_frame(clock) </code></pre>
 </details>
+<h1 id="lexique">Lexique</h1>
+<ul>
+<li><p>🍝 <strong><a href="https://fr.wikipedia.org/wiki/Programmation_spaghetti">Code
+spaghetti</a></strong> (🇺🇸 <strong>spaghetti code</strong>)</p></li>
+<li><p>💸 <strong><a href="https://fr.wikipedia.org/wiki/Dette_technique">Dette
+technique</a></strong> (🇺🇸 <strong>technical debt</strong>)</p></li>
+<li><p>♻️ <strong><a href="https://fr.wikipedia.org/wiki/R%C3%A9usinage_de_code">Réusinage</a></strong>
+(🇺🇸 <strong>refactoring</strong>)</p></li>
+</ul>
 </body>
 </html>
