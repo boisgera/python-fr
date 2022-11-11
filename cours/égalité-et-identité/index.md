@@ -48,8 +48,8 @@ Source: [📖  Méthodes de comparaison riches](https://docs.python.org/fr/3/ref
 
 ## Nombres
 
-Le test d'égalité de nombres se passe essentiellement sans grande surprise
-si l'on laisse de coté certains propriétés des [nombres à virgule flottante spéciaux](#IEEE754).
+Le test d'égalité de nombres se passe sans grande surprise
+si l'on laisse de coté certains propriétés des [nombres (à virgule flottante) spéciaux](#IEEE754).
 
 Notons simplement que les test d'égalité entre nombres sont suffisamment permissifs
 pour permettre de comparer des nombres dont le type est différent :
@@ -59,7 +59,7 @@ pour permettre de comparer des nombres dont le type est différent :
 True
 >>> 1 == 1.0
 True
->>> 1 == 1j
+>>> 1 == 1 + 0j
 True
 ```
 
@@ -116,9 +116,10 @@ Source: [📖 Standard IEEE 754](https://fr.wikipedia.org/wiki/IEEE_754)
 
 ## Collections 
 
-Deux collections -- listes, n-uplets, dictionnaires, ensembles, etc. --
-déléguent le test d'égalité aux éléments qui les composent -- récursivement
-si ceux-ci sont également des collections. Ainsi :
+Deux collections -- listes, n-uplets, dictionnaires, ensembles, etc. 
+-- délèguent le test d'égalité aux éléments qui les composent 
+-- récursivement si ceux-ci sont également des collections.
+Ainsi :
 
 ``` python
 >>> [] == [0]
@@ -189,7 +190,7 @@ d'obtenir visuellement le même caractère. Il y a ainsi un caractère
 'é'
 ```
 
-mais aussi un symbole combinable "accent aigu" qu'on peut combiner à un "e" :
+mais aussi un symbole "accent aigu" qu'on peut combiner à un "e" :
 
 ```python
 >>> "e\u0301"
@@ -221,7 +222,7 @@ L'expression `x is y` détermine si l'objet `x` **est** l'objet `y`,
 x is y
 ```
 
-La négation de ces propriétés sont testées par `!=` et `is not` :
+La négation de `==` est `!=`, celle de `is` est `is not` :
 
 
 ``` python
@@ -236,7 +237,7 @@ x is not y
 #### ℹ️ Terminologie {.details}
 - On pourra utiliser le terme **est égal à** pour affirmer l'égalité entre objets
 et tout simplement **est** pour affirmer qu'ils ont la même identité 
-(utiliser le terme "identique" serait ici un contre-sens).
+(utiliser le terme "identique" serait trompeur).
 
 - L'égalité entre objets est parfois appelée **égalité structurelle**
 et l'identité entre objets **égalité référentielle**.
@@ -305,7 +306,7 @@ pas la liste `a` (qui est un objet distinct) :
 [1, 2, 3]
 ```
 
-#### ⚠️ `x is not y` $\neq$ `x is (not y)`  {.details}
+#### ⚠️ `x is not y` n'est pas la même chose que `x is (not y)`  {.details}
 
 Bien qu'étant composé de deux mot-clés séparés par un espace, `is not` est
 un opérateur en tant que tel. L'expression `x is not y` est équivalente
