@@ -1,5 +1,5 @@
 ---
-title: Texte et binaire
+title: Texte, binaire et fichiers
 author: 
   - "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@mines-paristech.fr)" 
 affiliation: "MINES ParisTech, Université PSL"
@@ -309,6 +309,17 @@ encodage vous souhaitez utiliser.
 >>> file.write("Hello world! 👋")
 ```
 
+Et pour être totalement explicite, nous pouvons spécifier avec l'argument 
+`mode` que nous souhaitons ouvrir le fichier en écriture 
+**et en mode texte**, en précisant que `mode="wt"`, au lieu de `mode="w"`.
+Cela ne change rien pour l'interpréteur Python, mais cela simplifie la
+tâche des programmeurs qui vont être amenés à relire ce code.
+
+``` python
+>>> file = open("texte.txt", mode="wt", encoding="utf-8")
+>>> file.write("Hello world! 👋")
+```
+
 C'est aussi une bonne habitude de fermer le fichier après usage[^fermeture]
 
 [^fermeture]: Il est possible que l'écriture dans le fichier soit temporisée
@@ -317,7 +328,7 @@ l'ouverture du fichier "bloque" aux autres processus l'accès au même fichier,
 etc.
 
 ``` python
->>> file = open("texte.txt", mode="w", encoding="utf-8")
+>>> file = open("texte.txt", mode="wt", encoding="utf-8")
 >>> file.write("Hello world! 👋")
 >>> file.close()
 ```
@@ -330,7 +341,7 @@ Une version plus robuste consisterait à fermer le fichier dans tous les cas
 (erreur ou non), ce qui peut être fait de la façon suivante :
 
 ```python
->>> file = open("texte.txt", mode="w", encoding="utf-8")
+>>> file = open("texte.txt", mode="wt", encoding="utf-8")
 >>> try:
 ...     file.write("Hello world! 👋")
 ... finally:
@@ -341,25 +352,15 @@ Une version plus robuste consisterait à fermer le fichier dans tous les cas
 ... mais c'est un peu lourd ! Heureusement pour nous, il existe une construction
 plus compacte qui offre les mêmes garanties :
 
-```python
->>> with open("texte.txt", mode="w", encoding="utf-8") as file:
+```python"wt"
+>>> with open("texte.txt", mode="wt", encoding="utf-8") as file:
 ...     file.write("Hello world! 👋")
 ...
 ```
 
-L'écriture dans un fichier, se fait de façon analogue avec le mode `"r"`
-(pour "read").
+L'écriture dans un fichier se fait de façon analogue en remplaçant `"w"`
+par `"r"` (pour "read") dans le `mode` d'ouverture du fichier.
 
-```python
->>> with open("texte.txt", mode="r", encoding="utf-8") as file:
-...     print(file.read())
-...
-Hello world! 👋
-```
-
-Enfin, sachez que le mode `"r"` est interprété comme `"rt"` (et `"w"` comme `"wt"`),
-ou `"t"` signifie "texte" : la fonction `open` sait alors qu'elle doit lire ou
-écrire du texte. On peut donc être tout à fait explicite en écrivant :
 ```python
 >>> with open("texte.txt", mode="rt", encoding="utf-8") as file:
 ...     print(file.read())
@@ -369,8 +370,8 @@ Hello world! 👋
 
 Mais, si vous voulez accéder à des données qui ne sont pas du 
 **texte en clair** (🇺🇸 **plain text**) comme une image ou un document PDF, 
-ou bien du texte que vous décoderez vous-même, utilisez le mode
-"binaire" `"b"` (en lecture comme en écriture) :
+ou bien à du texte que vous souhaitez décoder vous-même, utilisez le mode
+**binaire** ((🇺🇸 **binary**)) `"b"` (en lecture comme en écriture) :
 
 ```python
 >>> with open("texte.txt", mode="rb") as file:

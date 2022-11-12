@@ -28,7 +28,7 @@ Python 🇫🇷
 
   - 📖 [Collections](https://boisgera.github.io/python-fr/cours/collections/index.html)
 
-  - 📖 [Texte et binaire](https://boisgera.github.io/python-fr/cours/texte-et-binaire/index.html)
+  - 📖 [Texte, binaire et fichiers](https://boisgera.github.io/python-fr/cours/texte-et-binaire/index.html)
 
   - 📖 [Evaluation dynamique](https://boisgera.github.io/python-fr/cours/évaluation-dynamique/index.html)
 
