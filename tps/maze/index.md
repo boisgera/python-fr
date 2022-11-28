@@ -40,7 +40,7 @@ Pour obtenir le labyrinthe du fichier `"random-maze.py"`:
 
 ```python
 filename = "mazes/random-maze.py"
-file = open(filename, mode="r", encoding="utf-8")
+file = open(filename, mode="rt", encoding="utf-8")
 random_maze_repr = file.read()
 file.close()
 random_maze = eval(random_maze_repr)
@@ -120,7 +120,7 @@ Puis pour le sauvegarder
 
 ``` python
 empty_maze_repr = repr(empty_maze)
-file = open("mazes/empty_maze.py", "w", encoding="utf-8")
+file = open("mazes/empty_maze.py", mode="wt", encoding="utf-8")
 file.write(empty_maze_repr)
 file.close()
 ```
@@ -203,7 +203,7 @@ la cellule `source`.
 Etendez la fonction `display_maze` pour différencier graphiquement 
 un ensemble de cellules. Puis utilisez-là pour représenter l'ensemble
 des cellules atteignables depuis le coin en haut à gauche du labyrinthe
-`"random"`.
+`random_maze`.
 
 ![Cellules atteignables depuis le coin en haut à gauche (en vert). 
 Un groupe de cellules vides sont inatteignables (en blanc) dans le coin en bas à gauche.](images/reachable-cells.jpg)
@@ -272,13 +272,13 @@ display_maze(random_maze, cells=cells)
 
 Implémentez une fonction `path_from` qui prend comme arguments :
 
-  - `maze`: un labyrinthe 30x30,
+  - `maze` : un labyrinthe 30x30,
 
-  - `source`: une cellule source ,
+  - `source` : une cellule source ,
   
 et renvoie 
 
-  - `path`: un dictionnaire ayant pour clés des cellules et 
+  - `path` : un dictionnaire ayant pour clés des cellules et 
     pour valeurs des chemins. Le chemin `path[target]` doit joindre 
     `source` et `target` si `target` est atteignable depuis `source` ; 
     dans le cas contraire, `target` ne doit pas être une clé du dictionnaire.
