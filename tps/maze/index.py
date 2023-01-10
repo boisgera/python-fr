@@ -1,5 +1,5 @@
 filename = "mazes/random-maze.py"
-file = open(filename, mode="r", encoding="utf-8")
+file = open(filename, mode="rt", encoding="utf-8")
 random_maze_repr = file.read()
 file.close()
 random_maze = eval(random_maze_repr)
@@ -45,7 +45,7 @@ for y in range(0, HEIGHT):
         empty_maze.add((x, y))
 
 empty_maze_repr = repr(empty_maze)
-file = open("mazes/empty_maze.py", "w", encoding="utf-8")
+file = open("mazes/empty_maze.py", mode="wt", encoding="utf-8")
 file.write(empty_maze_repr)
 file.close()
 

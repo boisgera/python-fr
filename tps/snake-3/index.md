@@ -10,65 +10,70 @@ date: auto
 🕹️ Introduction
 ================================================================================
 
-Nous allons remanier (à nouveau !) notre programme [🐍 snake.py](../snake-2/solutions/snake-v2.4.py),
-en exploitant une conception orientée objet.
+Nous allons remanier (à nouveau !) notre programme 🐍 `snake.py`,
+en développant une conception orientée objet.
 Nous tenterons de rendre son code plus robuste / réutilisable / compréhensible 
 / maintenable. 
 Nous tâcherons ensuite de tirer les bénéfices de cette réorganisation 
-en développant – avec le minimum d'effort de développement – 
+en développant – avec le minimum d'efforts – 
 un 🤖 bot qui assistera le joueur dans la poursuite du high-score. 
 
 
 <details>
 <summary>
-**📄 Snake version 2**
+**Snake version 2 (rappel)**
 </summary>
+
+📄 `snake.py`
 
 ```python
 # Python Standard Library
 import random
 import sys
 
-# Pygame
+# Third-Party Libraries
 import pygame
 
-# Setup
-# ------------------------------------------------------------
-WIDTH = 30
-HEIGHT = 30
-CELL_SIZE = 20
-FPS = 1.0
+# Constants
+WIDTH = 30  # number of cells
+HEIGHT = 30  # number of cells
+CELL_SIZE = 20  # number of pixels
+FPS = 1  # frames per second
+WHITE = [
+    255,
+    255,
+    255,
+]
+BLACK = [0, 0, 0]
+RED = [255, 0, 0]
 COLORS = {
-    "background": [255, 255, 255],
-    "snake": [0, 0, 0],
-    "fruit": [255, 0, 0]
+    "background": WHITE,
+    "snake": BLACK,
+    "fruit": RED,
 }
 UP = [0, -1]
 DOWN = [0, 1]
 LEFT = [-1, 0]
 RIGHT = [1, 0]
-SNAPSHOT="snapshot.py"
+SNAPSHOT = "snapshot.py"
 
-# State
-# ------------------------------------------------------------
-snake = [
-    [10, 15],
-    [11, 15],
-    [12, 15],
-]
+# State Management
+geometry = [[10, 15], [11, 15], [12, 15]]
 direction = DOWN
 fruit = [10, 10]
 score = 0
+
 
 def save_state():
     state = {
         "snake": snake,
         "direction": direction,
         "fruit": fruit,
-        "score": score
+        "score": score,
     }
-    with open(SNAPSHOT, mode="w") as file:
+    with open(SNAPSHOT, mode="w", encoding="utf-8") as file:
         file.write(repr(state))
+
 
 def load_state():
     global snake, direction, fruit, score
@@ -78,59 +83,34 @@ def load_state():
     snake = state["snake"]
     direction = state["direction"]
     fruit = state["fruit"]
-    score = state["score"]    
+    score = state["score"]
 
 
-# Helper Functions
-# ------------------------------------------------------------
-def init():
+# Helpers
+def setup():
     pygame.init()
-    screen = pygame.display.set_mode([CELL_SIZE*WIDTH, CELL_SIZE*HEIGHT])
+    width_height = [WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE]
+    screen = pygame.display.set_mode(width_height)
     clock = pygame.time.Clock()
-    return screen, clock
+    return (screen, clock)
 
-def draw(screen):
-    screen.fill(COLORS["background"])
-    for x, y in snake:
-        rect = [x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE]
-        pygame.draw.rect(screen, COLORS["snake"], rect)
-    rect = [fruit[0]*CELL_SIZE, fruit[1]*CELL_SIZE, CELL_SIZE, CELL_SIZE]
-    pygame.draw.rect(screen, COLORS["fruit"], rect)  
-    pygame.display.set_caption(f"Score : {score}")
+
+def exit():
+    pygame.quit()
+    sys.exit()
+
 
 def set_direction(d):
     def action():
         global direction
         direction = d
+
     return action
 
-def move_snake():
-    global snake, score, fruit
-    head = snake[-1]
-    new_head = [
-      head[0] + direction[0], 
-      head[1] + direction[1]
-    ]
-    if new_head in snake:
-        sys.exit()
-    elif new_head[0] < 0 or new_head[0] >= WIDTH:
-        sys.exit()
-    elif new_head[1] < 0 or new_head[1] >= HEIGHT:
-        sys.exit()
-    if new_head == fruit:
-        score = score + 1
-        snake = snake + [new_head]
-        fruit = [
-            random.randint(0, WIDTH-1), 
-            random.randint(0, HEIGHT-1)
-        ]
-    else:
-        snake = snake[1:] + [new_head]
 
 # Event Management
-# ------------------------------------------------------------
 KEY_BINDINGS = {
-    "q": sys.exit,
+    "q": exit,
     "up": set_direction(UP),
     "down": set_direction(DOWN),
     "left": set_direction(LEFT),
@@ -139,10 +119,14 @@ KEY_BINDINGS = {
     "l": load_state,
 }
 
-KEY_EVENT_HANDLER = {pygame.key.key_code(k): v for k, v in KEY_BINDINGS.items()}
+KEY_EVENT_HANDLER = {
+    pygame.key.key_code(k): v
+    for k, v in KEY_BINDINGS.items()
+}
 
-def handle_events(events):
-    for event in events:
+
+def handle_events():
+    for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.KEYDOWN:
@@ -150,20 +134,39 @@ def handle_events(events):
             if event_handler:
                 event_handler()
 
+
+def draw_frame(screen):
+    screen.fill(COLORS["background"])
+    for x, y in snake:
+        rect = [
+            x * CELL_SIZE,
+            y * CELL_SIZE,
+            CELL_SIZE,
+            CELL_SIZE,
+        ]
+        pygame.draw.rect(screen, COLORS["snake"], rect)
+    rect = [
+        fruit[0] * CELL_SIZE,
+        fruit[1] * CELL_SIZE,
+        CELL_SIZE,
+        CELL_SIZE,
+    ]
+    pygame.draw.rect(screen, COLORS["fruit"], rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {score}")
+
+
 def wait_for_next_frame(clock):
     clock.tick(FPS)
 
-# Main Loop
-# ------------------------------------------------------------
-if __name__ == "__main__":
-    screen, clock = init()
-    while True:
-        events = pygame.event.get()
-        handle_events(events)
-        move_snake()
-        draw(screen)
-        pygame.display.update()
-        wait_for_next_frame(clock)
+
+# Setup & Main Loop
+screen, clock = setup()
+while True:
+    handle_events()
+    move_snake()
+    draw_frame(screen)
+    wait_for_next_frame(clock)
 ```
 </details>
 
@@ -181,63 +184,232 @@ puis les importer dans `snake.py` avec :
 from constants import *
 ```
 
+<details>
+<summary>
+**✨ Solution**
+</summary>
+
+📄 `constants.py`
+```python
+WIDTH = 30  # number of cells
+HEIGHT = 30  # number of cells
+CELL_SIZE = 20  # number of pixels
+FPS = 1  # frames per second
+WHITE = [
+    255,
+    255,
+    255,
+]
+BLACK = [0, 0, 0]
+RED = [255, 0, 0]
+COLORS = {
+    "background": WHITE,
+    "snake": BLACK,
+    "fruit": RED,
+}
+UP = [0, -1]
+DOWN = [0, 1]
+LEFT = [-1, 0]
+RIGHT = [1, 0]
+SNAPSHOT = "snapshot.py"
+```
+
+📄 `snake.py`
+```python
+# Python Standard Library
+import random
+import sys
+
+# Third-Party Libraries
+import pygame
+
+# Snake
+from constants import *
+
+# State Management
+geometry = [[10, 15], [11, 15], [12, 15]]
+direction = DOWN
+fruit = [10, 10]
+score = 0
+
+
+def save_state():
+    state = {
+        "snake": snake,
+        "direction": direction,
+        "fruit": fruit,
+        "score": score,
+    }
+    with open(SNAPSHOT, mode="w", encoding="utf-8") as file:
+        file.write(repr(state))
+
+
+def load_state():
+    global snake, direction, fruit, score
+    with open(SNAPSHOT, mode="r", encoding="utf-8") as file:
+        data = file.read()
+    state = eval(data)
+    snake = state["snake"]
+    direction = state["direction"]
+    fruit = state["fruit"]
+    score = state["score"]
+
+
+# Helpers
+def setup():
+    pygame.init()
+    width_height = [WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE]
+    screen = pygame.display.set_mode(width_height)
+    clock = pygame.time.Clock()
+    return (screen, clock)
+
+
+def exit():
+    pygame.quit()
+    sys.exit()
+
+
+def set_direction(d):
+    def action():
+        global direction
+        direction = d
+
+    return action
+
+
+# Event Management
+KEY_BINDINGS = {
+    "q": exit,
+    "up": set_direction(UP),
+    "down": set_direction(DOWN),
+    "left": set_direction(LEFT),
+    "right": set_direction(RIGHT),
+    "s": save_state,
+    "l": load_state,
+}
+
+KEY_EVENT_HANDLER = {
+    pygame.key.key_code(k): v
+    for k, v in KEY_BINDINGS.items()
+}
+
+
+def handle_events():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            event_handler = KEY_EVENT_HANDLER.get(event.key)
+            if event_handler:
+                event_handler()
+
+
+def draw_frame(screen):
+    screen.fill(COLORS["background"])
+    for x, y in snake:
+        rect = [
+            x * CELL_SIZE,
+            y * CELL_SIZE,
+            CELL_SIZE,
+            CELL_SIZE,
+        ]
+        pygame.draw.rect(screen, COLORS["snake"], rect)
+    rect = [
+        fruit[0] * CELL_SIZE,
+        fruit[1] * CELL_SIZE,
+        CELL_SIZE,
+        CELL_SIZE,
+    ]
+    pygame.draw.rect(screen, COLORS["fruit"], rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {score}")
+
+
+def wait_for_next_frame(clock):
+    clock.tick(FPS)
+
+# Setup & Main Loop
+screen, clock = setup()
+while True:
+    handle_events()
+    move_snake()
+    draw_frame(screen)
+    wait_for_next_frame(clock)
+```
+</details>
+
 🐍 Un type `Snake`
 ================================================================================
 
-Implémenter une classe `Snake` encapsulant la géométrie et la direction du
+On souhaite créer un type `Snake` qui va regrouper toutes les données propres
+au serpent ainsi que les fonctions qui interagissent avec lui.
+
+  - Implémentez une classe `Snake` encapsulant la géométrie et la direction du
 serpent. On veut pouvoir l'instancier comme suit :
 
-```python
->>> geometry = [[10, 15], [11, 15], [12, 15]]
->>> direction = [0, 1]
->>> snake = Snake(geometry, direction)
-```
+    ```python
+    >>> geometry = [[10, 15], [11, 15], [12, 15]]
+    >>> direction = [0, 1]
+    >>> snake = Snake(geometry, direction)
+    ```
 
-Stockez les arguments `geometry` et `direction` comme les attributs 
-de même nom de l'instance snake.
+    Stockez dans un premier temps les arguments `geometry` et `direction` comme 
+les attributs de même nom de l'instance snake.
 
-```python
->>> snake.geometry
-[[10, 15], [11, 15], [12, 15]]
->>> snake.direction
-[0, 1]
-```
+    ```python
+    >>> snake.geometry
+    [[10, 15], [11, 15], [12, 15]]
+    >>> snake.direction
+    [0, 1]
+    ```
 
-Développez une propriété `head`, accessible uniquement en lecture,
-renvoyant la tête du serpent.
+  - Développez un accesseur (en lecture) `get_head`, renvoyant la tête du serpent.
 
-```python
->>> snake.head
-[12, 15]
-```
+    ```python
+    >>> snake.get_head()
+    [12, 15]
+    ```
 
-⚠️ **Encapsulation.** Non seulement on veut que l'attribut `head` du serpent 
-ne puisse pas être réaffecté :
+  - Exposez cette valeur comme une propriété `head`, accessible uniquement en lecture :
 
-```python
->>> snake.head = [0, 7]
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-AttributeError: can't set attribute
-```
+    ```python
+    >>> snake.head
+    [12, 15]
+    ```
 
-mais on veut également qu'une modification de la tête récupérée par 
-`snake.head` n'ait pas d'incidence sur l'état du serpent :
+    ⚠️ **Encapsulation.** Non seulement on veut que l'attribut `head` du serpent 
+    ne puisse pas être réaffecté :
 
-```python
->>> head = snake.head
->>> head[0] = 0
->>> head[1] = 7
->>> snake.head
-[12, 15]
-```
+    ```python
+    >>> snake.head = [0, 7]
+    Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    AttributeError: can't set attribute
+    ```
+
+    mais on veut également qu'une modification de la tête récupérée par 
+    `snake.head` n'ait pas d'incidence sur l'état du serpent :
+
+    ```python
+    >>> head = snake.head
+    >>> head[0] = 0
+    >>> head[1] = 7
+    >>> head
+    [0, 7]
+    >>> snake.head
+    [12, 15]
+    ```
 
 <details>
 <summary>
 **✨ Solution**
 </summary>
 ```python
+# Python Standard Library
+...
 import copy
+
+...
 
 class Snake:
     def __init__(self, geometry, direction):
@@ -254,23 +426,30 @@ class Snake:
 ✔️ Validation
 ================================================================================
 
-Quelles sont les valeurs admissibles pour la direction du serpent ?
-Implémenter une fonction `check_direction` qui prenne en argument une
-direction, ne renvoie rien si la direction est admissible et lève une
+ - Quelles sont les valeurs admissibles pour la direction du serpent ?
+
+  - Implémentez une fonction `check_direction` qui prenne en argument une
+direction, ne renvoie rien si la direction est admissible et génère une
 exception (de type `ValueError` ou `TypeError`, à déterminer) dans le cas contraire.
 
 De même, toutes les listes de n-uplets représentant la géométrie du serpent 
-ne sont pas valides. Faire la liste des toutes les conditions qui rendent 
+ne sont pas valides. 
+
+  - Faire la liste des toutes les conditions qui rendent 
 la géométrie du serpent invalide ; on distinguera les
 
-  - 🐛 **bugs** qui résultent d'erreurs de programmation et ne devraient pas exister,
+    - 🐛 **bugs** qui résultent d'erreurs de programmation 
+      et ne devraient dans un monde idéal jamais se produire,
+      mais qui en pratique risquent fort d'exister.
 
-  - 💀 **game over** qui peuvent arriver mais doivent entrainer la fin immédiate du jeu.
+    - 💀 **situation exceptionnelles**,
+      qui résultent des actions du joueur et doivent entrainer un
+      **game over** et l'arrêt de l'application.
 
-Mettre en correspondance ces catégories avec un type d'exception (soit
+  - Mettre en correspondance ces catégories avec un type d'exception (soit
 `TypeError`, soit `ValueError`, soit `SystemExit`), puis
 implémenter une fonction `check_geometry` qui prenne en argument une 
-géométrie de serpent, ne renvoie rien si elle est valide et lève 
+géométrie de serpent, ne renvoie rien si elle est valide et génère 
 l'exception appropriée dans le cas contraire.
 
 
@@ -279,6 +458,8 @@ l'exception appropriée dans le cas contraire.
 **✨ Solution**
 </summary>
 ```python
+DIRECTIONS = [RIGHT, DOWN, LEFT, UP]
+
 def check_direction(direction):
     try:
         direction = list(direction)
@@ -290,9 +471,13 @@ def check_direction(direction):
         or not isinstance(direction[0], int)
         or not isinstance(direction[1], int)
     ):
-        raise TypeError(f"{direction} is not a pair of integers")
+        raise TypeError(
+            f"{direction} is not a pair of integers"
+        )
     elif direction not in DIRECTIONS:
-        raise ValueError(f"{direction} is not in {DIRECTIONS}")
+        raise ValueError(
+            f"{direction} is not in {DIRECTIONS}"
+        )
 
 
 def is_in_scope(tile):
@@ -312,17 +497,24 @@ def check_geometry(geometry):
         error = f"{item} is not list-like"
         raise TypeError(error)
     if not all(
-        len(item) == 2 and isinstance(item[0], int) and isinstance(item[1], int)
+        len(item) == 2
+        and isinstance(item[0], int)
+        and isinstance(item[1], int)
         for item in geometry
     ):
-        raise TypeError("all geometry items should be pairs of integers")
+        raise TypeError(
+            "all geometry items should be pairs of integers"
+        )
 
     if not geometry:
         raise ValueError("empty geometry")
 
     for i, item in enumerate(geometry[:-1]):
         next_item = geometry[i + 1]
-        diff = (next_item[0] - item[0], next_item[1] - item[1])
+        diff = (
+            next_item[0] - item[0],
+            next_item[1] - item[1],
+        )
         if abs(diff[0]) + abs(diff[1]) != 1:
             raise ValueError("non-connected snake geometry")
 
@@ -337,37 +529,39 @@ def check_geometry(geometry):
 </details>
 
 
-A-t'on la garantie que ces attributs restent valides quel que soit l'usage
-que le programmeur fasse de l'instance `snake` dans son code ? Faites
+  - A-t'on la garantie que ces attributs restent valides quel que soit l'usage
+que le programmeur fasse de l'instance `snake` dans son code ? 
+
+  - Faites
 disparaître les attributs publics `geometry` et `direction` au profit
 d'attributs privés `_geometry` et `_direction`, puis développez des
 méthodes `get_direction` et `set_direction` permettant d'accéder à l'attribut
 `_direction` en assurant sa validité 
 
-```python
->>> snake.get_direction()
-[0, 1]
->>> snake.set_direction([0, -1])
->>> snake.get_direction()
-[0, -1]
-```
+    ```python
+    >>> snake.get_direction()
+    [0, 1]
+    >>> snake.set_direction([0, -1])
+    >>> snake.get_direction()
+    [0, -1]
+    ```
 
-⚠️ **Encapsulation.** Assurez-vous que `set_direction` soit bien la
-seule façon de modifier la direction du serpent. En particulier,
-vérifiez que l'on a bien le comportement ci-dessous :
+    ⚠️ **Encapsulation.** Assurez-vous que `set_direction` soit bien la
+    seule façon de modifier la direction du serpent. En particulier,
+    vérifiez que l'on a bien le comportement ci-dessous :
 
-```python
->>> direction = snake.get_direction()
->>> direction
-[0, 1]
->>> direction[0] = 999
->>> snake.get_direction()
-[0, 1]
-```
+    ```python
+    >>> direction = snake.get_direction()
+    >>> direction
+    [0, 1]
+    >>> direction[0] = 999
+    >>> snake.get_direction()
+    [0, 1]
+    ```
 
-Même chose pour `set_geometry`.
+  - Même chose pour `set_geometry`.
 
-Enfin, associez aux accesseurs `get_direction`, `set_direction`, 
+  - Enfin, associez aux accesseurs `get_direction`, `set_direction`, 
 `get_geometry` et `set_geometry` des propriétés `geometry` et `direction`.
 
 <details>
@@ -375,6 +569,8 @@ Enfin, associez aux accesseurs `get_direction`, `set_direction`,
 **✨ Solution**
 </summary>
 ```python
+import copy
+
 class Snake:
     def __init__(self, geometry, direction):
         self.direction = direction
@@ -409,56 +605,286 @@ class Snake:
 🏃 En mouvement
 ================================================================================
 
-Introduire une méthode `move` dans la classe `Snake` qui va mettre à jour
+  - Introduisez une méthode `move` dans la classe `Snake` qui va mettre à jour
 la géométrie du serpent en tenant compte de la direction courante du serpent
 et de la position des fruits (à remettre à jour le cas échéant).
 
-Adapter la boucle générale du programme pour intégrer les développements de la 
-classe `Snake`. Vérifier en y jouant que le comportement du jeu reste identique.
+  - Adaptez le programme pour intégrer les développements de la classe `Snake`. 
+Vérifiez en y jouant que le comportement du jeu reste identique.
 
 <details>
 <summary>
 **✨ Solution**
 </summary>
 ```python
+# Python Standard Library
+import copy
+import random
+import sys
+
+# Third-Party Libraries
+import pygame
+
+# Snake
+from constants import *
+
+
+DIRECTIONS = [RIGHT, DOWN, LEFT, UP]
+
+
+def check_direction(direction):
+    try:
+        direction = list(direction)
+    except TypeError:
+        error = f"{direction} is not list-like"
+        raise TypeError(error)
+    if (
+        len(direction) != 2
+        or not isinstance(direction[0], int)
+        or not isinstance(direction[1], int)
+    ):
+        raise TypeError(
+            f"{direction} is not a pair of integers"
+        )
+    elif direction not in DIRECTIONS:
+        raise ValueError(
+            f"{direction} is not in {DIRECTIONS}"
+        )
+
+
+def is_in_scope(tile):
+    x, y = tile
+    return 0 <= x < WIDTH and 0 <= y < HEIGHT
+
+
+def check_geometry(geometry):
+    try:
+        geometry = list(geometry)
+    except TypeError:
+        error = f"{geometry} is not list-like"
+        raise TypeError(error)
+    try:
+        geometry = [list(item) for item in geometry]
+    except TypeError:
+        error = f"{item} is not list-like"
+        raise TypeError(error)
+    if not all(
+        len(item) == 2
+        and isinstance(item[0], int)
+        and isinstance(item[1], int)
+        for item in geometry
+    ):
+        raise TypeError(
+            "all geometry items should be pairs of integers"
+        )
+
+    if not geometry:
+        raise ValueError("empty geometry")
+
+    for i, item in enumerate(geometry[:-1]):
+        next_item = geometry[i + 1]
+        diff = (
+            next_item[0] - item[0],
+            next_item[1] - item[1],
+        )
+        if abs(diff[0]) + abs(diff[1]) != 1:
+            raise ValueError("non-connected snake geometry")
+
+    if not all(is_in_scope(item) for item in geometry):
+        raise SystemExit("snake out of bounds")
+
+    for i, elt in enumerate(geometry):
+        if elt in geometry[i + 1 :]:
+            # at least one repeated item
+            raise SystemExit("snake self-collision")
+
+
 class Snake:
-    ...
+    def __init__(self, geometry, direction):
+        self.direction = direction
+        self.geometry = geometry
+
+    def get_direction(self):
+        return copy.deepcopy(self._direction)
+
+    def set_direction(self, direction):
+        check_direction(direction)
+        self._direction = copy.deepcopy(direction)
+
+    direction = property(get_direction, set_direction)
+
+    def get_geometry(self):
+        return copy.deepcopy(self._geometry)
+
+    def set_geometry(self, geometry):
+        check_geometry(geometry)
+        self._geometry = copy.deepcopy(geometry)
+
+    geometry = property(get_geometry, set_geometry)
+
+    def get_head(self):
+        return self.geometry[-1]
+
+    head = property(get_head)
 
     def move(self):
-        global fruit
+        global fruit, score
         head = self.head
-        new_head = [head[0] + self.direction[0], head[1] + self.direction[1]]
+        new_head = [
+            head[0] + self.direction[0],
+            head[1] + self.direction[1],
+        ]
         if new_head == fruit:
-            state.score += 1
+            score += 1
             self.geometry = self.geometry + [new_head]
-            fruit = [random.randint(0, WIDTH - 1), random.randint(0, HEIGHT - 1)]
+            fruit = [
+                random.randint(0, WIDTH - 1),
+                random.randint(0, HEIGHT - 1),
+            ]
         else:
             self.geometry = self.geometry[1:] + [new_head]
+
+
+# State Management
+geometry = [[10, 15], [11, 15], [12, 15]]
+direction = DOWN
+fruit = [10, 10]
+score = 0
+
+
+def save_state():
+    state = {
+        "geometry": snake.geometry,
+        "direction": snake.direction,
+        "fruit": fruit,
+        "score": score,
+    }
+    with open(SNAPSHOT, mode="w", encoding="utf-8") as file:
+        file.write(repr(state))
+
+
+def load_state():
+    global fruit, score
+    with open(SNAPSHOT, mode="r", encoding="utf-8") as file:
+        data = file.read()
+    state = eval(data)
+    snake.geometry = state["geometry"]
+    snake.direction = state["direction"]
+    fruit = state["fruit"]
+    score = state["score"]
+
+
+# Helpers
+def setup():
+    pygame.init()
+    width_height = [WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE]
+    screen = pygame.display.set_mode(width_height)
+    clock = pygame.time.Clock()
+    return (screen, clock)
+
+
+def set_direction(d):
+    def action():
+        snake.direction = d
+
+    return action
+
+
+def exit():
+    pygame.quit()
+    sys.exit()
+
+
+# Event Management
+KEY_BINDINGS = {
+    "q": exit,
+    "up": set_direction(UP),
+    "down": set_direction(DOWN),
+    "left": set_direction(LEFT),
+    "right": set_direction(RIGHT),
+    "s": save_state,
+    "l": load_state,
+}
+
+KEY_EVENT_HANDLER = {
+    pygame.key.key_code(k): v
+    for k, v in KEY_BINDINGS.items()
+}
+
+
+def handle_events():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            event_handler = KEY_EVENT_HANDLER.get(event.key)
+            if event_handler:
+                event_handler()
+
+
+def draw_frame(screen):
+    screen.fill(COLORS["background"])
+    for x, y in snake.geometry:
+        rect = [
+            x * CELL_SIZE,
+            y * CELL_SIZE,
+            CELL_SIZE,
+            CELL_SIZE,
+        ]
+        pygame.draw.rect(screen, COLORS["snake"], rect)
+    rect = [
+        fruit[0] * CELL_SIZE,
+        fruit[1] * CELL_SIZE,
+        CELL_SIZE,
+        CELL_SIZE,
+    ]
+    pygame.draw.rect(screen, COLORS["fruit"], rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {score}")
+
+
+def wait_for_next_frame(clock):
+    clock.tick(FPS)
+
+
+# Setup & Main Loop
+screen, clock = setup()
+snake = Snake(geometry, direction)
+while True:
+    handle_events()
+    snake.move()
+    draw_frame(screen)
+    wait_for_next_frame(clock)
+
 ```
 </details>
 
 🗃️ Etat du jeu
 ================================================================================
 
-Définir une classe `State` représentant l'état à un instant donné du programme.
-On souhaite pouvoir initialiser cet état par un code de la forme
+  - Définissez une classe `State` représentant l'état à un instant donné du programme.
+    On souhaite pouvoir initialiser cet état par un code de la forme
 
-``` python
-snake = Snake(
-    geometry=[[10, 15], [11, 15], [12, 15]], 
-    direction=RIGHT
-) 
-state = State(snake=snake, fruit=[10, 10], score=0)
-```
+    ```python
+    state = State(
+        snake=Snake(
+            geometry=[[10, 15], [11, 15], [12, 15]], 
+            direction=RIGHT
+        ),  
+        fruit=[10, 10], 
+        score=0
+    )
+    ```
 
-et que l'instance `state` expose les attributs `snake`, `fruit` et `score` (en lecture
-et en écriture). 
+    et que l'instance `state` expose les attributs `snake`, `fruit` et `score` 
+    (en lecture et en écriture). 
 
-Adapter le reste du code en conséquence. A-t'on encore besoin du mot-clé `global` ?
-Pourquoi ?
+  - Adaptez le reste du code en conséquence. 
+  
+  - A-t'on encore besoin du mot-clé `global` ? Pourquoi ?
 
-Faites en sorte que la classe `Snake` prenne en charge la sauvegarde et le
-chargement de l'état du jeu.
+  - Faites en sorte que la classe `Snake` prenne en charge la sauvegarde et le
+rechargement de l'état du jeu.
 
 
 <details>
@@ -466,8 +892,88 @@ chargement de l'état du jeu.
 **✨ Solution**
 </summary>
 ```python
-# Game State
-# ------------------------------------------------------------------------------
+# Python Standard Library
+import copy
+import random
+import sys
+
+# Third-Party Libraries
+import pygame
+
+# Snake
+from constants import *
+
+
+DIRECTIONS = [RIGHT, DOWN, LEFT, UP]
+
+
+def check_direction(direction):
+    try:
+        direction = list(direction)
+    except TypeError:
+        error = f"{direction} is not list-like"
+        raise TypeError(error)
+    if (
+        len(direction) != 2
+        or not isinstance(direction[0], int)
+        or not isinstance(direction[1], int)
+    ):
+        raise TypeError(
+            f"{direction} is not a pair of integers"
+        )
+    elif direction not in DIRECTIONS:
+        raise ValueError(
+            f"{direction} is not in {DIRECTIONS}"
+        )
+
+
+def is_in_scope(tile):
+    x, y = tile
+    return 0 <= x < WIDTH and 0 <= y < HEIGHT
+
+
+def check_geometry(geometry):
+    try:
+        geometry = list(geometry)
+    except TypeError:
+        error = f"{geometry} is not list-like"
+        raise TypeError(error)
+    try:
+        geometry = [list(item) for item in geometry]
+    except TypeError:
+        error = f"{item} is not list-like"
+        raise TypeError(error)
+    if not all(
+        len(item) == 2
+        and isinstance(item[0], int)
+        and isinstance(item[1], int)
+        for item in geometry
+    ):
+        raise TypeError(
+            "all geometry items should be pairs of integers"
+        )
+
+    if not geometry:
+        raise ValueError("empty geometry")
+
+    for i, item in enumerate(geometry[:-1]):
+        next_item = geometry[i + 1]
+        diff = (
+            next_item[0] - item[0],
+            next_item[1] - item[1],
+        )
+        if abs(diff[0]) + abs(diff[1]) != 1:
+            raise ValueError("non-connected snake geometry")
+
+    if not all(is_in_scope(item) for item in geometry):
+        raise SystemExit("snake out of bounds")
+
+    for i, elt in enumerate(geometry):
+        if elt in geometry[i + 1 :]:
+            # at least one repeated item
+            raise SystemExit("snake self-collision")
+
+
 class Snake:
     def __init__(self, geometry, direction):
         self.direction = direction
@@ -498,52 +1004,83 @@ class Snake:
 
     def move(self):
         head = self.head
-        new_head = [head[0] + self.direction[0], head[1] + self.direction[1]]
+        new_head = [
+            head[0] + self.direction[0],
+            head[1] + self.direction[1],
+        ]
         if new_head == state.fruit:
             state.score += 1
             self.geometry = self.geometry + [new_head]
-            state.fruit = [random.randint(0, WIDTH - 1), random.randint(0, HEIGHT - 1)]
+            state.fruit = [
+                random.randint(0, WIDTH - 1),
+                random.randint(0, HEIGHT - 1),
+            ]
         else:
             self.geometry = self.geometry[1:] + [new_head]
 
+
+# State Management
 class State:
-    def __init__(self, snake, fruit, score=0):
+    def __init__(self, snake, fruit, score):
         self.snake = snake
         self.fruit = fruit
         self.score = score
 
     def save(self):
-        state = {
-            "snake": self.snake.geometry,
+        state_dict = {
+            "geometry": self.snake.geometry,
             "direction": self.snake.direction,
             "fruit": self.fruit,
             "score": self.score,
         }
-        with open(SNAPSHOT, mode="w") as file:
-            file.write(repr(state))
+        with open(
+            SNAPSHOT, mode="w", encoding="utf-8"
+        ) as file:
+            file.write(repr(state_dict))
 
     def load(self):
-        with open(SNAPSHOT, mode="r", encoding="utf-8") as file:
+        with open(
+            SNAPSHOT, mode="r", encoding="utf-8"
+        ) as file:
             data = file.read()
-        state = eval(data)
-        self.state.geometry = state["snake"]
-        self.direction = state["direction"]
-        self.fruit = state["fruit"]
-        self.score = state["score"]
+        state_dict = eval(data)
+        self.snake = Snake(
+            state_dict["geometry"], state_dict["direction"]
+        )
+        self.fruit = state_dict["fruit"]
+        self.score = state_dict["score"]
 
-state = State(snake=Snake([[10, 15], [11, 15], [12, 15]], RIGHT,), fruit=[10, 10])
 
-# Event Management
-# ------------------------------------------------------------------------------
-def set_direction(direction):
+_snake = Snake(
+    geometry=[[10, 15], [11, 15], [12, 15]], direction=RIGHT
+)
+state = State(snake=_snake, fruit=[10, 10], score=0)
+
+
+# Helpers
+def setup():
+    pygame.init()
+    width_height = [WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE]
+    screen = pygame.display.set_mode(width_height)
+    clock = pygame.time.Clock()
+    return (screen, clock)
+
+
+def set_direction(d):
     def action():
-        state.snake.direction = direction
+        state.snake.direction = d
 
     return action
 
 
+def exit():
+    pygame.quit()
+    sys.exit()
+
+
+# Event Management
 KEY_BINDINGS = {
-    "q": sys.exit,
+    "q": exit,
     "up": set_direction(UP),
     "down": set_direction(DOWN),
     "left": set_direction(LEFT),
@@ -552,7 +1089,55 @@ KEY_BINDINGS = {
     "l": state.load,
 }
 
-KEY_EVENT_HANDLER = {pygame.key.key_code(k): v for k, v in KEY_BINDINGS.items()}
+KEY_EVENT_HANDLER = {
+    pygame.key.key_code(k): v
+    for k, v in KEY_BINDINGS.items()
+}
+
+
+def handle_events():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            event_handler = KEY_EVENT_HANDLER.get(event.key)
+            if event_handler:
+                event_handler()
+
+
+def draw_frame(screen):
+    screen.fill(COLORS["background"])
+    for x, y in state.snake.geometry:
+        rect = [
+            x * CELL_SIZE,
+            y * CELL_SIZE,
+            CELL_SIZE,
+            CELL_SIZE,
+        ]
+        pygame.draw.rect(screen, COLORS["snake"], rect)
+    rect = [
+        state.fruit[0] * CELL_SIZE,
+        state.fruit[1] * CELL_SIZE,
+        CELL_SIZE,
+        CELL_SIZE,
+    ]
+    pygame.draw.rect(screen, COLORS["fruit"], rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {state.score}")
+
+
+def wait_for_next_frame(clock):
+    clock.tick(FPS)
+
+
+# Setup & Main Loop
+screen, clock = setup()
+
+while True:
+    handle_events()
+    state.snake.move()
+    draw_frame(screen)
+    wait_for_next_frame(clock)
 ```
 </details>
 
