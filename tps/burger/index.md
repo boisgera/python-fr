@@ -360,7 +360,10 @@ Il manque deux choses à notre composant produit :
     au produit lors de sa construction:
    
     ```python
-    hamburgers = Product("🍔", 5.95, on_change=on_change)
+    def print_hamburgers_total(event):
+        print(hamburgers.total)
+
+    hamburgers = Product("🍔", 5.95, on_change=print_hamburgers_total)
     ```
 
 Réalisez les changements nécessaires dans `product.py`. 
@@ -375,7 +378,7 @@ from flet import icons
 from flet import MainAxisAlignment
 from flet import (
     IconButton,
-    Container,
+    Container
     Row,
     Text,
     TextField,
