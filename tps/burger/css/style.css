@@ -46,8 +46,12 @@ html {
     a:visited {
       color: #1a1a1a;
     }
+    figure {
+        text-align: center;
+    }
     img {
       max-width: 100%;
+      margin: auto;
     }
     h1, h2, h3, h4, h5, h6 {
       margin-top: 1.4em;
@@ -80,11 +84,10 @@ html {
       pre {
         margin: 1em 0;
         overflow: auto;
+        white-space: pre;
       }
       pre code {
         padding: 0;
-        overflow: visible;
-        overflow-wrap: normal;
       }
       .sourceCode {
        background-color: transparent;
@@ -129,7 +132,10 @@ html {
       #TOC a:not(:hover) {
         text-decoration: none;
       }
-      pre code{white-space: pre-wrap;}
+      pre code {
+        white-space: pre;
+      }
+
       span.smallcaps{font-variant: small-caps;}
       span.underline{text-decoration: underline;}
       div.column{display: inline-block; vertical-align: top; width: 50%;}
