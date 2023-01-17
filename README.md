@@ -13,6 +13,13 @@ Python 🇫🇷
   - 📖 [Le retour du retour du serpent](https://boisgera.github.io/python-fr/tps/snake-3/index.html)
 
 
+🔘 Interfaces graphiques
+--------------------------------------------------------------------------------
+
+  - 📖 [I Can Has Cheezburger?](https://boisgera.github.io/python-fr/tps/burger/index.html)
+
+
+
 🦠 Modèles épidémologiques
 --------------------------------------------------------------------------------
 
