@@ -351,7 +351,7 @@ Il manque deux choses à notre composant produit :
 
     ```python
     hamburgers = Product("🍔", 5.95)
-    hambugers.total  # 0.0 initially
+    hamburgers.total  # 0.0 initially
     ```
 
   - Un "hook" (optionnel) permettant de signaler à l'utilisateur du composant 
