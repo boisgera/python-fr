@@ -14,7 +14,7 @@ Au commencement ...
 ================================================================================
 
 [Flet](https://flet.dev/) est une bibliothèque Python permettant de réaliser
-des application graphiques. 
+des applications graphiques. 
 
 Mettez en oeuvre l'exemple donné dans [l'introduction de sa documentation](https://flet.dev/docs/) pour vous familiariser avec elle.
 
