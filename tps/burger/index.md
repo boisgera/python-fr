@@ -354,7 +354,7 @@ Il manque deux choses à notre composant produit :
     hambugers.total  # 0.0 initially
     ```
 
-  - Un "hook" (optionel) permettant de signaler à l'utilisateur du composant 
+  - Un "hook" (optionnel) permettant de signaler à l'utilisateur du composant 
     que le nombre d'unités (et donc le coût) de ce produit a changé. 
     Ce hook prendra la forme d'une fonction de callback que l'on fournit 
     au produit lors de sa construction:
