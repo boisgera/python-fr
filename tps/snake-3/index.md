@@ -135,6 +135,33 @@ def handle_events():
                 event_handler()
 
 
+def move_snake():
+    global fruit, score, snake
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    if (
+        new_head in snake
+        or new_head[0] < 0
+        or new_head[0] >= 30
+        or new_head[1] < 0
+        or new_head[1] >= 30
+    ):
+        pygame.quit()
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29),
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+
+
 def draw_frame(screen):
     screen.fill(COLORS["background"])
     for x, y in snake:
@@ -302,6 +329,33 @@ def handle_events():
             event_handler = KEY_EVENT_HANDLER.get(event.key)
             if event_handler:
                 event_handler()
+
+
+def move_snake():
+    global fruit, score, snake
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    if (
+        new_head in snake
+        or new_head[0] < 0
+        or new_head[0] >= 30
+        or new_head[1] < 0
+        or new_head[1] >= 30
+    ):
+        pygame.quit()
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29),
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
 
 
 def draw_frame(screen):
