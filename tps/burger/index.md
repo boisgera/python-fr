@@ -270,7 +270,7 @@ class Product(UserControl):
 </details>
 
 
-Composant localement fonctionel
+Composant localement fonctionnel
 ================================================================================
 
 Faites en sorte que les boutons `+` et `-` de votre composant `Product`
@@ -341,7 +341,7 @@ class Product(UserControl):
 </details>
 
 
-Composant pleinement fonctionel
+Composant pleinement fonctionnel
 ================================================================================
 
 Il manque deux choses à notre composant produit :
