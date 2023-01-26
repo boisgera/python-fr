@@ -552,9 +552,7 @@ l'intensité de ses composantes rouge, verte et bleue.
 On a par exemple :
 
          R           G           B    Couleur
-
----
-
+-----------------------------------------------------
        255           0           0      🟥
          0         255           0      🟩
          0           0         255      🟦
