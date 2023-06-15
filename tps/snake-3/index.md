@@ -58,7 +58,7 @@ RIGHT = [1, 0]
 SNAPSHOT = "snapshot.py"
 
 # State Management
-geometry = [[10, 15], [11, 15], [12, 15]]
+snake = [[10, 15], [11, 15], [12, 15]]
 direction = DOWN
 fruit = [10, 10]
 score = 0
@@ -254,7 +254,7 @@ import pygame
 from constants import *
 
 # State Management
-geometry = [[10, 15], [11, 15], [12, 15]]
+snake = [[10, 15], [11, 15], [12, 15]]
 direction = DOWN
 fruit = [10, 10]
 score = 0
