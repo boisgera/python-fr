@@ -1,0 +1,41 @@
+---
+import "@fontsource-variable/inter/index.css";
+import "@fontsource-variable/fira-code/index.css";
+
+const { frontmatter } = Astro.props;
+const { title, description } = frontmatter;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <title>{title}</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <style is:global>
+      html {
+        hyphens: auto;
+        font-size: 18px;
+        line-height: 32px;
+        font-family: "Inter Variable", sans-serif;
+      }
+      code {
+        font-family: "Fira Code Variable", sans-serif;
+      }
+    </style>
+    <style>
+      main {
+        max-width: 768px;
+        margin: 3rem auto 1rem auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>{title}</h1>
+      <slot />
+    </main>
+  </body>
+</html>
