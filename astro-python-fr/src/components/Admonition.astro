@@ -1,0 +1,59 @@
+---
+import { Icon } from "astro-icon";
+
+const { type = "note" } = Astro.props;
+
+function capitalize(word: string) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+---
+
+<div class="admonition">
+  <details>
+    <summary>
+      <Icon name="tabler:pencil" />
+      <strong>{capitalize(type)}</strong>
+      <Icon name="tabler:arrows-maximize" />
+    </summary>
+    <div style="margin: 1rem;">
+        <slot />
+      </div>
+  </details>
+
+</div>
+
+<style>
+  .icon-span {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 100%;
+    background-color: #38bdf8; /* sky-400 */
+  }
+  .admonition {
+    border: 0.1rem solid #0369a1; /* sky-700 */
+    border-radius: 0.25rem;
+  }
+  summary {
+    padding: 1rem;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    background-color: #e0f2fe; /* sky-100 */
+  }
+  details > summary {
+    list-style: none;
+  }
+  details[open] > summary {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  svg {
+    height: 1rem;
+    color: #0369a1;
+  }
+  svg.circle {
+    border-radius: 100%;
+    background-color: #38bdf8; /* sky-400 */
+    color: white;
+  }
+</style>
