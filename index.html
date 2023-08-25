@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>input</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+  <script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="python">Python 🇫🇷</h1>
+<h2 id="le-jeu-du-serpent">🐍 Le jeu du serpent</h2>
+<ul>
+<li><p>📖 <a href="tps/snake-1/index.html">Le serpent</a></p></li>
+<li><p>📖 <a href="tps/snake-2/index.html">Le retour du
+serpent</a></p></li>
+<li><p>📖 <a href="tps/maze/index.html">Interlude –
+Labyrinthes</a></p></li>
+<li><p>📖 <a href="tps/snake-3/index.html">Le retour du retour du
+serpent</a></p></li>
+</ul>
+<h2 id="burger-app">🍔 Burger App</h2>
+<ul>
+<li>📖 <a href="tps/burger/index.html">I Can Has Cheezburger?</a></li>
+</ul>
+<h2 id="modèles-épidémologiques">🦠 Modèles épidémologiques</h2>
+<ul>
+<li>📖 <a href="tps/SIR/index.html">Le modèle SIR</a></li>
+</ul>
+<h2 id="orientation">🧭 Orientation</h2>
+<ul>
+<li><p>📖 <a href="cours/flux-d-exécution/index.html">Flux
+d’exécution</a></p></li>
+<li><p>📖 <a href="cours/type-de-données/index.html">Type de
+données</a></p></li>
+<li><p>📖 <a
+href="cours/collections/index.html">Collections</a></p></li>
+<li><p>📖 <a href="cours/texte-et-binaire/index.html">Texte, binaire et
+fichiers</a></p></li>
+<li><p>📖 <a href="cours/évaluation-dynamique/index.html">Evaluation
+dynamique</a></p></li>
+<li><p>📖 <a href="cours/portée/index.html">Portée</a></p></li>
+<li><p>📖 <a href="cours/égalité-et-identité/index.html">Egalité et
+identité</a></p></li>
+<li><p>📖 <a
+href="cours/itération-et-compréhension/index.html">Itération et
+compréhension</a></p></li>
+<li><p>📖 <a href="cours/fonctions/index.html">Fonctions</a></p></li>
+<li><p>📖 <a href="cours/programmation-objet/index.html">Programmation
+objet 1</a></p></li>
+<li><p>📖 <a href="cours/programmation-objet-2/index.html">Programmation
+objet 2</a></p></li>
+</ul>
+<hr />
+<p><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Licence Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+Python 🇫🇷 par Sébastien Boisgérault, distribué selon les termes de la
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Licence
+Creative Commons Attribution 4.0 International</a>.</p>
+</body>
+</html>

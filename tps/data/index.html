@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Sébastien Boisgérault, MINES ParisTech" />
+  <title>Le modèle épidémiologique SIR</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <!--
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet">
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let h3 = document.createElement("h3");
+          h3.innerHTML = "Table des matières";
+          let toc = document.getElementById("TOC");
+          toc.prepend(h3);
+      });    
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let elts = document.querySelectorAll('body > :not(header):not(nav)');
+          let headers = [...elts].filter(elt =>  
+              ["H1", "H2", "H3", "H4", "H5", "H6"].includes(elt.tagName)
+          )
+          for (let header of headers) {
+              let anchor = document.createElement("a");
+              anchor.setAttribute("href", `#${header.id}`);
+              anchor.setAttribute("style", "text-decoration: None;");
+              anchor.innerHTML = header.outerHTML;
+              header.replaceWith(anchor);
+          }
+      });    
+  </script>
+  <script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+  <script>
+      // TODO: replace with clickable 📖, store inside (invis) the content ?
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let button = document.createElement("button");
+              let clone = elt.cloneNode(true);
+              clone.style.setProperty("display", "none");
+              button.appendChild(clone);
+              elt.replaceWith(button);
+
+              button.style.setProperty("height", "4.5em");
+              button.style.setProperty("width", "100%");
+
+              // button.style.setProperty("overflow", "hidden");
+
+              button.style.setProperty("position", "relative");
+              button.style.setProperty("border", "none");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              
+              /*
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              */
+
+              let icon = document.createElement("img");
+              button.appendChild(icon);
+              // button.style.setProperty("border", "none");
+              // button.style.setProperty("background", "none");
+              // button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              // button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  button.replaceWith(elt)
+
+              });
+
+
+              button.addEventListener('mouseover', (event) => {
+                  button.style.setProperty("cursor", "pointer");
+              });
+              
+              button.addEventListener('mouseout', (event) => {
+                  button.style.setProperty("cursor", "auto");
+              });
+
+      /*
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let wrapper = document.createElement("div");
+              let clone = elt.cloneNode(true);
+              wrapper.appendChild(clone);
+              elt.replaceWith(wrapper);
+
+              wrapper.style.setProperty("height", "4.5em");
+              wrapper.style.setProperty("overflow", "hidden");
+              wrapper.style.setProperty("position", "relative");
+              wrapper.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+
+              let button = document.createElement("div");
+              wrapper.appendChild(button);
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              
+              let icon = document.createElement("img");
+              let button = document.createElement("button");
+              button.appendChild(icon);
+              button.style.setProperty("border", "none");
+              button.style.setProperty("background", "none");
+              button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  wrapper.replaceWith(elt)
+
+              });
+
+
+  */
+          }
+      });    
+  </script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le modèle épidémiologique SIR</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien Boisgérault</a>, MINES ParisTech</p>
+<p class="date">Licence : <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#dépendances">Dépendances</a></li>
+<li><a href="#simulation">Simulation</a></li>
+<li><a href="#visualisation">Visualisation</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#temps-continu">Temps continu</a></li>
+<li><a href="#evènements">Evènements</a></li>
+<li><a href="#génération-de-dynamique">Génération de dynamique</a></li>
+</ul>
+</nav>
+<h2 id="introduction">Introduction</h2>
+<p>Le modèle épidémiologique à compartiments SIR détermine l’évolution dans le temps, parmi une population supposée constante de <span class="math inline">\(N\)</span> individus, du nombre d’individus susceptibles d'être infectés <span class="math inline">\(S\)</span>, du nombre d’individus infectés <span class="math inline">\(I\)</span> et du nombre d’individus en rémission (n’ayant plus de symptômes cliniques) <span class="math inline">\(R\)</span> (cf. <a href="https://www.nature.com/articles/s41592-020-0856-2">“The SEIRS model for infectious disease dynamics”</a> pour la présentation d’un modèle plus complet).</p>
+<p>Le paramètre <span class="math inline">\(\beta&gt;0\)</span> représente le taux de contagion, <span class="math inline">\(\gamma&gt;0\)</span> le taux de guérison et <span class="math inline">\(\omega&gt;0\)</span> le taux de perte d’immunité (ces grandeurs sont homogènes à l’inverse d'un temps). On définit le nombre de reproduction de base <span class="math inline">\(R_0\)</span> par</p>
+<p><span class="math display">\[
+R_0 := \frac{\beta}{\gamma}
+\]</span></p>
+<p>En l'absence de naissances et de morts, ces grandeurs évoluent selon les équations :</p>
+<p><span class="math display">\[
+\dot{S}(t) = \omega R(t) - \beta \frac{I(t)S(t)}{N} 
+\]</span></p>
+<p><span class="math display">\[
+\dot{I}(t) = \beta \frac{I(t)S(t)}{N} - \gamma  I(t) 
+\]</span></p>
+<p><span class="math display">\[
+\dot{R}(t) = \gamma I(t) - \omega R(t)
+\]</span></p>
+<h2 id="dépendances">Dépendances</h2>
+<p>Python 3, NumPy, SciPy, Matplotlib.</p>
+<pre class="python"><code>from numpy import *
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt</code></pre>
+<h2 id="simulation">Simulation</h2>
+<p>On définit les constantes</p>
+<pre class="python"><code>WEEK = 7
+YEAR = 365</code></pre>
+<p>et</p>
+<pre class="python"><code>N = 100
+beta = 1 / (WEEK)
+gamma = 1 / (2 * WEEK)
+omega = 1 / YEAR</code></pre>
+<h4 id="simulation-avec-solve_ivp">🚀 Simulation avec <code>solve_ivp</code></h4>
+<p>Développer une fonction <code>dSIR</code> telle que le code</p>
+<pre class="python"><code>S0, I0 = 99.0, 1.0
+R0 = N - S0 - I0
+t_span = [0.0, 5*YEAR]
+results = solve_ivp(dSIR, t_span=t_span, y0=(S0, I0, R0))</code></pre>
+<p>fournisse les résultats d’une simulation du modèle SIR sur 5 ans avec une population initiale de 1 % de personnes infectées.</p>
+<p>(Référence : 📖 <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html"><code>solve_ivp</code></a>)</p>
+<h4 id="solution">✨ Solution</h4>
+<div class="collapse">
+<pre class="python"><code>def dSIR(t, SIR):
+    S, I, R = SIR
+    dS = omega * R - beta * I * S / N
+    dI = beta * I * S / N - gamma * I
+    dR = gamma * I - omega * R  
+    return (dS, dI, dR)</code></pre>
+<p>Si vous êtes familier des fermetures, et que la présence d’un argument <code>t</code> “qui ne sert à rien” vous titille, vous pouvez également définir la fonction d’ordre supérieur</p>
+<pre class="python"><code>def autonomous(fx):
+    def f_tx(t, x):
+        return fx(x)
+    return f_tx</code></pre>
+<p>et l’exploiter comme un décorateur pour définir <code>dSIR</code> sans le paramètre <code>t</code> :</p>
+<pre class="python"><code>@autonomous
+def dSIR(SIR):
+    S, I, R = SIR
+    dS = omega * R - beta * I * S / N
+    dI = beta * I * S / N - gamma * I
+    dR = gamma * I - omega * R  
+    return (dS, dI, dR)</code></pre>
+</div>
+<h2 id="visualisation">Visualisation</h2>
+<h4 id="visualisation-des-résultats">🚀 Visualisation des résultats</h4>
+<p>Développez une fonction <code>plot</code> à invoquer par :</p>
+<pre class="python"><code>plot(**results)</code></pre>
+<p>qui produise le graphique :</p>
+<p><img src="images/SIR-discrete.svg" /></p>
+<h4 id="solution-1">✨ Solution</h4>
+<div class="collapse">
+<p>Les données dont nous avons besoin dans le dictionnaire <code>results</code> sont associées aux clés <code>"t"</code> et <code>"y"</code>. Si elles étaient les seules données présentes dans <code>results</code>, nous pourrions définir une fonction <code>plot</code> de signature :</p>
+<pre class="python"><code>def plot(t, y):
+    pass</code></pre>
+<p>et l’appel <code>plot(**results)</code> assignerait aux paramètres <code>t</code> et <code>y</code> les données correspondantes de <code>result</code>. Mais en pratique, <code>results</code> contient d’autre données :</p>
+<pre class="python"><code>&gt;&gt;&gt; list(results.keys())
+[&#39;t&#39;, &#39;y&#39;, &#39;sol&#39;, &#39;t_events&#39;, &#39;y_events&#39;, &#39;nfev&#39;, ...]</code></pre>
+<p>Or à ce stade notre fonction n’accepte pas les paramètres nommés <code>sol</code>, <code>t_events</code>, etc. L’appel à <code>plot</code> échoue donc logiquement :</p>
+<pre class="python"><code>&gt;&gt;&gt; plot(**result)
+Traceback (most recent call last):
+...
+TypeError: plot() got an unexpected keyword argument &#39;sol&#39;</code></pre>
+<p>Une façon de changer cette situation est d’introduire un “ramasse-miettes”, sous la forme d’un dictionnaire collectant les données de<code>result</code> qui ne sont pas associées aux clés <code>"t"</code> ou <code>"y"</code>. Pour ce faire, la notation <code>**</code> est utilisée ; le dictionnaire associé est ici nommé <code>_</code> pour indiquer qu’on ne fera pas usage de son contenu (cela n’est pas obligatoire, juste une convention).</p>
+<pre class="python"><code>def plot(t, y, **_):
+    print(list(_.keys()))</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; plot(**results)
+[&#39;sol&#39;, &#39;t_events&#39;, &#39;y_events&#39;, ...]</code></pre>
+<p>Avec cette technique, la fonction suivante fait l’affaire :</p>
+<pre class="python"><code>def plot(t, y, **_):
+    plt.plot(t, y.T, &quot;-+&quot;, label=[&quot;S&quot;, &quot;I&quot;, &quot;R&quot;])
+    plt.xlabel(&quot;Temps (années)&quot;)
+    xlabels = [str(i) for i in range(5+1)]
+    plt.xticks(arange(0, 5*YEAR+1, YEAR), xlabels)
+    plt.ylabel(&quot;Populations (%)&quot;)
+    plt.yticks(arange(0, 101, 10))
+    plt.axis([0, 5*YEAR, 0, 100])
+    plt.legend()
+    plt.grid(True)</code></pre>
+</div>
+<h2 id="configuration">Configuration</h2>
+<p>Après examen de vos résultats préliminaires, les spécialistes de la dynamique vous font par de réglages à effectuer sur la méthode du simulation. Leurs préconisations prennent la forme d’un fichier <code>options.py</code> à utiliser avec <code>solve_ivp</code> :</p>
+<pre class="python"><code>{
+    &quot;method&quot;: &quot;Radau&quot;,
+    &quot;rtol&quot;: 1e-3,
+    &quot;atol&quot;: 1e-6
+}</code></pre>
+<h4 id="réglages">🚀 Réglages</h4>
+<p>Prenez en compte le fichier d’options que l’on vous a donné.</p>
+<h4 id="solution-2">✨ Solution</h4>
+<div class="collapse">
+<pre class="python"><code>options = eval(open(&quot;options.py&quot;).read())
+results = solve_ivp(
+    dSIR, 
+    t_span=t_span, 
+    y0=(S0, I0, R0), 
+    **options
+)</code></pre>
+<p><img src="images/SIR-options.svg" /></p>
+</div>
+<h2 id="temps-continu">Temps continu</h2>
+<p>Lorsque <code>solve_ivp</code> est invoqué avec <code>dense_output=True</code></p>
+<pre class="python"><code>results = solve_ivp(
+    dSIR, 
+    t_span=t_span, 
+    y0=(S0, I0, R0), 
+    dense_output=True
+)</code></pre>
+<p>ses résultats comportent, en plus des données discrètes <code>t</code> et <code>y</code>, une approximation de la solution comme une fonction du temps.</p>
+<pre class="python"><code>&gt;&gt;&gt; sol = results[&quot;sol&quot;]</code></pre>
+<p>Cette fonctionalité nous permet de réaliser une nouvelle version de la fonction <code>plot</code>, telle que :</p>
+<pre class="python"><code>&gt;&gt;&gt; t = arange(0, 5*YEAR) # a value every day for 5 years.
+&gt;&gt;&gt; plot(t, **results)</code></pre>
+<p>produise le graphique :</p>
+<p><img src="images/SIR-dense.svg" /></p>
+<h4 id="exploitation-des-dense-outputs">🚀 Exploitation des “dense outputs”</h4>
+<p>Vérifier que <code>sol</code> est invocable, puis développer une nouvelle version de la fonction <code>plot</code> exploitant les “dense outputs” de <code>solve_ivp</code> pour réaliser le graphe voulu.</p>
+<h4 id="solution-3">✨ Solution</h4>
+<div class="collapse">
+<pre class="python"><code>&gt;&gt;&gt; sol = results[&quot;sol&quot;]
+&gt;&gt;&gt; sol
+&lt;scipy.integrate._ivp.common.OdeSolution at ...&gt;
+&gt;&gt;&gt; callable(sol)
+True</code></pre>
+<pre class="python"><code>def plot(t_, sol, **_):
+    plt.plot(t_, sol(t_).T, &quot;-&quot;, label=[&quot;S&quot;, &quot;I&quot;, &quot;R&quot;])
+    plt.xlabel(&quot;Temps (années)&quot;)
+    xlabels = [str(i) for i in range(5+1)]
+    plt.xticks(arange(0, 5*YEAR+1, YEAR), xlabels)
+    plt.ylabel(&quot;Populations (%)&quot;)
+    plt.yticks(arange(0, 101, 10))
+    plt.axis([0, 5*YEAR, 0, 100])
+    plt.legend()
+    plt.grid(True)</code></pre>
+</div>
+<h2 id="evènements">Evènements</h2>
+<h4 id="seuils-dinfection">🚀 Seuils d’infection</h4>
+<p>Utiliser le paramètre <code>events</code> de <code>solve_ivp</code> pour détecter les instants où le nombre d’infectés passe en-dessous ou au-dessus de 10 %. Adapter une nouvelle fois la fonction <code>plot</code> pour représenter ces évènements comme des points noirs sur la courbe associée à la variable <span class="math inline">\(I\)</span>.</p>
+<p><img src="images/SIR-events.svg" /></p>
+<p>Comment réorganiser votre programme pour prendre en charge facilement un seuil d’infection arbitraire et non pas fixe à 10 % ?</p>
+<h4 id="solution-4">✨ Solution</h4>
+<div class="collapse">
+<pre class="python"><code>def event(t, SIR):
+    S, I, R = SIR
+    return I - 10.0</code></pre>
+<pre class="python"><code>results = solve_ivp(
+    dSIR, 
+    y0=(S0, I0, R0), 
+    t_span=t_span, 
+    dense_output=True, 
+    events=[event]
+)</code></pre>
+<pre class="python"><code>def plot(t_, sol, t_events, **_):
+    plt.plot(t_, sol(t_).T, &quot;-&quot;, label=[&quot;S&quot;, &quot;I&quot;, &quot;R&quot;])
+    t_event = t_events[0]
+    plt.plot(t_event, sol(t_event)[1], &quot;k.&quot;)
+    plt.xlabel(&quot;Temps (années)&quot;)
+    xlabels = [str(i) for i in range(5+1)]
+    plt.xticks(arange(0, 5*YEAR+1, YEAR), xlabels)
+    plt.ylabel(&quot;Populations (%)&quot;)
+    plt.yticks(arange(0, 101, 10))
+    plt.axis([0, 5*YEAR, 0, 100])
+    plt.legend()
+    plt.grid(True)</code></pre>
+<p>La solution “évidente” pour prendre en charge une seuil limite qui peut varier est d’utiliser une variable globale :</p>
+<pre class="python"><code>I_max = 2.0
+
+def event(t, SIR):
+    S, I, R = SIR
+    return I - I_max</code></pre>
+<p>L’avantage est que le code appelant la simulation est inchangé :</p>
+<pre class="python"><code>results = solve_ivp(
+    dSIR, 
+    y0=(S0, I0, R0), 
+    t_span=t_span, 
+    dense_output=True, 
+    events=[event]
+)</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; plot(t, **results)</code></pre>
+<p><img src="images/SIR-events-2.svg" /></p>
+<p>Si vous n’aimez pas beaucoup les variables globales, vous pouvez les éviter en utilisant une fonction d’ordre supérieur qui renvoie une fonction <code>event</code> :</p>
+<pre class="python"><code>def I_crosses(I_threshold):
+    def event(t, SIR):
+        S, I, R = SIR
+        return I - I_threshold
+    return event</code></pre>
+<p>Vous l’exploitez alors de la façon suivante :</p>
+<pre class="python"><code>results = solve_ivp(
+    dSIR, 
+    y0=(S0, I0, R0), 
+    t_span=t_span, 
+    dense_output=True, 
+    events=[I_crosses(2.0)]
+)</code></pre>
+<p>avec les même résultats que précédemment</p>
+</div>
+<h2 id="génération-de-dynamique">Génération de dynamique</h2>
+<p>Vous avez sans doute remarqué que la dynamique du modèle SIR est entièrement déterminée par les flux existant entre les “compartiments” de population <span class="math inline">\(S\)</span>, <span class="math inline">\(I\)</span> et <span class="math inline">\(R\)</span>, qui peuvent être décrits par la structure :</p>
+<pre class="python"><code>SIR_dynamics = {
+ (&quot;S&quot;, &quot;I&quot;): &quot;beta * I * S / N&quot;,
+ (&quot;I&quot;, &quot;R&quot;): &quot;gamma * I&quot;,
+ (&quot;R&quot;, &quot;S&quot;): &quot;omega * R&quot;
+}</code></pre>
+<p>Au lieu d’écrire “à la main” la fonction <code>dSIR</code> comme précédemment, on peut définir une fonction <code>make_d_state</code> qui prend comme argument le type de dictionnaire ci-dessus et produit automatiquement la fonction <code>dSIR_auto</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> :</p>
+<pre class="python"><code>dSIR_manu = dSIR
+dSIR_auto = make_dstate(SIR_dynamics)</code></pre>
+<h4 id="création-du-champ-de-vecteurs-de-la-dynamique">🚀 Création du champ de vecteurs de la dynamique</h4>
+<p>Implémenter la fonction <code>make_dstate</code>. On vérifiera que les comportements de la version manuelle et automatique sont identiques. Par exemple :</p>
+<pre class="python"><code>&gt;&gt;&gt; dSIR_manu(0.0, (1/3, 1/3, 1/3))
+(0.0007545118504022613, -0.023650793650793648, 0.02289628180039139)
+&gt;&gt;&gt; dSIR_auto(0.0, (1/3, 1/3, 1/3))
+(0.0007545118504022613, -0.023650793650793648, 0.02289628180039139)</code></pre>
+<h4 id="solution-5">✨ Solution</h4>
+<div class="collapse">
+<pre class="python"><code>def get_vars(dynamics):
+    vars = []
+    for pair in dynamics.keys():
+        vars.extend(pair)
+    # remove duplicated vars
+    return list(set(vars))</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; get_vars(SIR_dynamics)
+[&#39;S&#39;, &#39;I&#39;, &#39;R&#39;]</code></pre>
+<pre class="python"><code>def make_dstate(dynamics):
+    vars = get_vars(dynamics)
+    
+    def fun(t, state):
+        ns = globals().copy()
+        for var, value in zip(vars, state):
+            ns[var] = value
+        dstate = []
+        for var in vars:
+            d = 0
+            for (edge, expr) in dynamics.items():
+                source, target = edge
+                if source == var:
+                    d -= eval(expr, ns)
+                if target == var:
+                    d += eval(expr, ns)
+            dstate.append(d)
+        return dstate
+        
+    return fun </code></pre>
+</div>
+<section class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>On peut ainsi éviter les erreurs dans la traduction du modèle de flux en équations différentielles, définir plus rapidement de nouveaux modèles compartimentaux, etc.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>

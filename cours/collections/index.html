@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
+          }
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault, MINES Paris – PSL" name="author"/>
+<title>Collections</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Collections</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
+Boisgérault</a>, MINES Paris – PSL</p>
+<p class="date">Friday 25 august 2023</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/7da617f">
+          #7da617f
+        </a>
+</p>
+</header>
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#listes" id="toc-listes">Listes</a></li>
+<li><a href="#dictionnaires" id="toc-dictionnaires">Dictionnaires</a></li>
+<li><a href="#n-uplets" id="toc-n-uplets">N-uplets</a></li>
+<li><a href="#ensembles" id="toc-ensembles">Ensembles</a></li>
+</ul>
+</nav></details>
+
+
+<h1 id="listes">Listes</h1>
+<p>Les listes Python sont des collections ordonnées d’objets de type
+arbitraire. Elles sont (potentiellement) hétérogènes : il n’est pas
+nécessaire que le type de tous les éléments d’une liste soit le même</p>
+<pre class="python"><code>&gt;&gt;&gt; l = [1.0, True, 2, 3]</code></pre>
+<p>Les listes sont modifiables ; leurs éléments peuvent être lus et
+écrits avec l’opération <code>l[index]</code> ; l’indice du premier
+élément est <code>0</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; l[1]
+True
+&gt;&gt;&gt; l
+[1.0, True, 2, 3]
+&gt;&gt;&gt; l[1] = 42
+[1.0, 42, 2, 3]</code></pre>
+<p>La longueur d’une liste est variable ; on peut en retirer des
+éléments et en ajouter, à une position arbitraire dans la liste.</p>
+<pre class="python"><code>&gt;&gt;&gt; len(l)
+3
+&gt;&gt;&gt; del l[1]
+&gt;&gt;&gt; len(l)
+2
+&gt;&gt;&gt; l
+[1.0, 2, 3]
+&gt;&gt;&gt; l.append(12)
+&gt;&gt;&gt; l
+[1.0, 2, 3, 12]
+&gt;&gt;&gt;
+&gt;&gt;&gt; l.extend([9, 10, 11, 12])
+&gt;&gt;&gt; l
+[1.0, 2, 3, 12, 9, 10, 11, 12]
+&gt;&gt;&gt; l.insert(True, 0)
+&gt;&gt;&gt; l
+[True, 1.0, 2, 3, 12, 9, 10, 11, 12]</code></pre>
+<p>Un indice négatif <code>i</code> sera interpété comme l’indice
+<code>len(l) + i</code>. En particulier, le dernier élement d’une liste
+peut être désigné par l’indice <code>-1</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; l[-1]
+12</code></pre>
+<p>Il est possible de <strong>dépiler</strong> (🇺🇸 <strong>pop</strong>)
+un élément d’une liste, c’est-à-dire de l’enlever de la liste et de
+récupérer sa valeur. Par défaut, c’est le dernier élément de la liste
+qui est dépilé, mais cela est configurable.</p>
+<pre class="python"><code>&gt;&gt;&gt; l.pop()
+12
+&gt;&gt;&gt; l
+[1.0, 2, 3, 12, 9, 10, 11]
+&gt;&gt;&gt; l.pop(0)
+1.0
+&gt;&gt;&gt; l
+[2, 3, 12, 9, 10, 11]</code></pre>
+<p>Il est possible de localiser, compter et enlever les éléments d’une
+liste possédant une valeur donnée.</p>
+<pre class="python"><code>&gt;&gt;&gt; l
+[2, 3, 12, 9, 10, 11]
+&gt;&gt;&gt; l.remove(9)
+&gt;&gt;&gt; l
+[2, 3, 12, 10, 11]
+&gt;&gt;&gt; l.index(10)
+3
+&gt;&gt;&gt; l.count(63)
+0</code></pre>
+<p>On peut créer une liste résulant de la concaténation de deux
+listes.</p>
+<pre class="python"><code>&gt;&gt;&gt; l
+[1, 2, 3, 4]
+&gt;&gt;&gt; l1 = [1, 2]
+&gt;&gt;&gt; l2 = [3, 4]
+&gt;&gt;&gt; l3 = l1 + l2
+&gt;&gt;&gt; l1
+[1, 2]
+&gt;&gt;&gt; l2
+[3, 4]
+&gt;&gt;&gt; l3
+[1, 2, 3, 4]</code></pre>
+<p>L’opération <code>extend</code> réalise la même opération, à ceci
+près qu’elle modifie la liste à étendre plutôt que de créer une nouvelle
+liste.</p>
+<pre class="python"><code>&gt;&gt;&gt; l3 = l1.extend(l2)
+&gt;&gt;&gt; l1
+[1, 2, 3, 4]
+&gt;&gt;&gt; l2
+[3, 4]
+&gt;&gt;&gt; l3 is None
+True</code></pre>
+<p>La mutiplication d’une liste par un entier <code>n</code> est
+également définie : elle produit <code>n</code> copies de la liste
+initiale qui sont concaténées.</p>
+<pre class="python"><code>&gt;&gt;&gt; 3 * [7, 1]
+[7, 1, 7, 1, 7, 1]</code></pre>
+<p>La boucle <code>for</code> permet d’itérer sur tous les éléments
+d’une liste.</p>
+<pre class="python"><code>&gt;&gt;&gt; l = [1, 2, 3, 4]
+&gt;&gt;&gt; len(l)
+4
+&gt;&gt;&gt; for i in l:
+...     print(i)
+...
+1
+2
+3
+4</code></pre>
+<p>Une séquence d’ entiers entre <code>0</code> et <code>n-1</code> est
+produite par <code>range(n)</code>. Ce n’est toutefois pas une liste
+classique, mais une liste paresseuse, dont les valeurs sont produites à
+la demande, ce qui permet d’économiser de la mémoire. On peut néanmoins
+la convertir sans difficulté en une liste classique si le besoin s’en
+fait sentir.</p>
+<pre class="python"><code>&gt;&gt;&gt; for i in range(5):
+...     print(i)
+...
+0
+1
+2
+3
+4
+&gt;&gt;&gt; range(5)
+range(0, 5)
+&gt;&gt;&gt;
+&gt;&gt;&gt; list(range(5))
+[0, 1, 2, 3, 4]</code></pre>
+<p>⚠️ Attention aux listes partageant des objets modifiables … par
+exemple des listes ! Ce sont les références aux objets qui sont stockés
+dans les listes, pas les objets eux-mêmes ; en modifiant un élément
+d’une liste, on modifie donc également toute liste dont il est
+élément.</p>
+<pre class="python"><code>&gt;&gt;&gt; l = [[1, 2], [3, 4]]
+&gt;&gt;&gt; elt = l[0]
+&gt;&gt;&gt; elt
+[1, 2]
+&gt;&gt;&gt; elt.append(42)
+&gt;&gt;&gt; elt
+[1, 2, 42]
+&gt;&gt;&gt; l
+[[1, 3, 42], [3, 4]]</code></pre>
+<h1 id="dictionnaires">Dictionnaires</h1>
+<p>Les <strong>dictionnaires</strong> (🇺🇸 <strong>dictionaries</strong>)
+Python sont des structures de données qui associent à des clés (🇺🇸
+<strong>keys</strong>) des valeurs (🇺🇸 <strong>values</strong>). On
+parle dans d’autre langages de tableaux associatifs (🇺🇸
+<strong>associative arrays</strong>) ou en référence à leur
+implémentation, de <strong>tables de hachage</strong> (🇺🇸 <strong>hash
+tables</strong>).</p>
+<p>Le dictionnaire Python représentant les associations suivantes</p>
+<table style="width:33%;">
+<colgroup>
+<col style="width: 9%"/>
+<col style="width: 11%"/>
+<col style="width: 12%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">clé</th>
+<th style="text-align: center;"><span class="math inline">\(\to\)</span></th>
+<th style="text-align: center;">valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>"a"</code></td>
+<td style="text-align: center;"><span class="math inline">\(\to\)</span></td>
+<td style="text-align: center;"><code>1</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>"b"</code></td>
+<td style="text-align: center;"><span class="math inline">\(\to\)</span></td>
+<td style="text-align: center;"><code>2</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>"c"</code></td>
+<td style="text-align: center;"><span class="math inline">\(\to\)</span></td>
+<td style="text-align: center;"><code>3</code></td>
+</tr>
+</tbody>
+</table>
+<p>peut être défini par l’instruction</p>
+<pre class="python"><code>&gt;&gt;&gt; d = {"a": 1, "b": 2, "c": 3}</code></pre>
+<p>Les données d’un dictionaire peuvent être lues, écrites et effacées
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; d["a"]
+1
+&gt;&gt;&gt; d
+{'a': 1, 'b': 2, 'c': 3}
+&gt;&gt;&gt; d["d"] = 4
+&gt;&gt;&gt; d
+{'a': 1, 'b': 2, 'c': 3, 'd': 4}
+&gt;&gt;&gt; del d["a"]
+&gt;&gt;&gt; d
+{'b': 2, 'c': 3, 'd': 4}</code></pre>
+<p>Accéder à une clé manquante avec la notation <code>[]</code> génère
+une erreur</p>
+<pre class="python"><code>&gt;&gt;&gt; d["a"]
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+KeyError: 'a'</code></pre>
+<p>mais la méthode <code>get</code> des dictionnaires permet de renvoyer
+la valeur associée à la clé demandée si la clé est présente et
+<code>None</code> dans le cas contraire.</p>
+<pre class="python"><code>&gt;&gt;&gt; d.get("b")
+2
+&gt;&gt;&gt; d.get("a")</code></pre>
+<p>On peut également spécifier une autre valeur de repli que
+<code>None</code> si besoin :</p>
+<pre class="python"><code>&gt;&gt;&gt; d.get("b", 0)
+2
+&gt;&gt;&gt; d.get("a", 0)
+0</code></pre>
+<p>Pour les dictionnaires, les tests d’appartenance et l’itération ne
+concernent que les clés et pas les valeurs :</p>
+<pre class="python"><code>&gt;&gt;&gt; "a" in d
+False
+&gt;&gt;&gt; "b" in d
+True
+&gt;&gt;&gt; for k in d:
+...     print(k)
+... 
+b
+c
+d
+&gt;&gt;&gt; list(d)
+['b', 'c', 'd']</code></pre>
+<p>Cela n’est toutefois que le comportement par défaut : les méthodes
+<code>keys</code>, <code>values</code> et <code>items</code> permettent
+de choisir plus précisément sur quels objets du dictionnaire on souhaite
+itérer.</p>
+<pre class="python"><code>&gt;&gt;&gt; for k in d.keys():
+...     print(k)
+... 
+b
+c
+d
+&gt;&gt;&gt; list(d.keys())
+['b', 'c', 'd']</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; for v in d.values():
+...     print(v)
+... 
+2
+3
+4
+&gt;&gt;&gt; list(d.values())
+[2, 3, 4]</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; for k, v in d.items():
+...     print(k, v)
+... 
+b 2
+c 3
+d 4
+&gt;&gt;&gt; list(d.items())
+[('b', 2), ('c', 3), ('d', 4)]</code></pre>
+<p>Il existe des méthodes d’importance moindre qui sont parfois utiles.
+Par exemple <code>update</code> permet d’ajouter / modifier plusieurs
+associations clés-valeurs à un dictionnaire ou <code>pop</code> qui
+permet de lire la valeur associée à une clé avant de la retirer du
+dictionnaire.</p>
+<pre class="python"><code>&gt;&gt;&gt; d
+{'b': 2, 'c': 3, 'd': 4}
+&gt;&gt;&gt; d.update({"e": 5, "f": 6})
+&gt;&gt;&gt; d
+{'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6}
+&gt;&gt;&gt; d.pop("b")
+2
+&gt;&gt;&gt; d
+{'c': 3, 'd': 4, 'e': 5, 'f': 6}</code></pre>
+<p>La palme de la complexité revient à l’infâme méthode
+<code>setdefault</code> dont la description est la suivante :</p>
+<blockquote>
+<p><code>setdefault(d, key, default=None)</code></p>
+<p>Insert <code>key</code> in the dictionary <code>d</code> with a value
+of <code>default</code> if key is not in <code>d</code>.</p>
+<p>Return the value for key if key is in the dictionary, else
+default.</p>
+</blockquote>
+<p>Plus important : les clés ne sont pas nécessairement des chaînes de
+caractères ou les valeurs des nombres :</p>
+<pre class="python"><code>&gt;&gt;&gt; import math
+&gt;&gt;&gt; {math.pi: 90.0}
+{3.141592653589793: 90.0}
+&gt;&gt;&gt; {1: 4.0, 2.0: 8, False: "yep"}
+{1: 4.0, 2.0: 8, False: 'yep'}
+&gt;&gt;&gt; {(1, 2): 7, (7, 8, 9): 9}
+{(1, 2): 7, (7, 8, 9): 9}
+&gt;&gt;&gt; {(1, ("aa", "bb")): 90}
+{(1, ('aa', 'bb')): 90}</code></pre>
+<p>Il n’y a en fait aucune restriction sur le type des valeurs que vous
+pouvez stocker dans un dictionnaire. Par contre, les clés doivent être
+<strong>hachable</strong> (🇺🇸 <strong>hashable</strong>), ce qui n’est
+par exemple pas le cas des listes :</p>
+<pre class="python"><code>&gt;&gt;&gt; {[2]: 90.0}
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: unhashable type: 'list'
+&gt;&gt;&gt; hash([2])
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: unhashable type: 'list'</code></pre>
+<p>C’est le cas de la plupart des types atomiques immuables de
+Python</p>
+<pre class="python"><code>&gt;&gt;&gt; hash(None)
+5891579141320
+&gt;&gt;&gt; hash(False)
+0
+&gt;&gt;&gt; hash(42)
+42
+&gt;&gt;&gt; hash(math.pi)
+326490430436040707
+&gt;&gt;&gt; hash("Hello!")
+3339764772054024462</code></pre>
+<p>ainsi que des <a href="#n-uplets">N-uplets</a> eux-mêmes composés
+d’objets hashables</p>
+<pre class="python"><code>&gt;&gt;&gt; hash((None, False, 42, math.pi, "Hello!"))
+&gt;&gt;&gt; hash((0, (1, (2, (3, ())))))
+&gt;&gt;&gt; hash((1, 2, [3]))
+&gt;&gt;&gt; hash((1, 2, [3]))
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: unhashable type: 'list'</code></pre>
+<details>
+<summary>
+<strong>Pourquoi cette restriction ? 🤔</strong>
+</summary>
+Pour des raisons de performance ! En effet les tables de hachage
+permettent (sous certains hypothèses) d’accéder aux valeurs en un temps
+qui ne dépend pas du nombre d’éléments dans la structure, cf. par
+exemple <a href="https://fr.wikipedia.org/wiki/Table_de_hachage">l’article
+Wikipédia qui y est consacré</a>. A l’inverse, l’implémentation des
+tableaux associatifs dans une structure plus simple, comme la liste de
+liste <code>[["a", 1], ["b": 2], ["c": 3]]</code> conduirait à une
+augmentation du temps d’accès croissant linéairement avec le nombre
+d’élements dans la structure.
+</details>
+<h1 id="n-uplets">N-uplets</h1>
+<p>Les n-uplets sont souvent utilisés de façon implicite, pour concevoir
+une fonction renvoyant plusieurs valeurs ou pour affecter en une
+instruction unique plusieurs variables.</p>
+<pre class="python"><code>&gt;&gt;&gt; def compute_pi():
+...     value = 3.14
+...     error = 0.005
+...     return value, error
+... 
+&gt;&gt;&gt; value, error = compute_pi()
+&gt;&gt;&gt; print(f"{value} ± {error}")
+3.14 ± 0.005</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; a = 1
+&gt;&gt;&gt; b = 2
+&gt;&gt;&gt; c = 3
+&gt;&gt;&gt; a, b = b, c
+&gt;&gt;&gt; a
+2
+&gt;&gt;&gt; b
+3</code></pre>
+<p>L’instruction <code>value, error = compute_pi()</code> produit en
+fait une paire (un n-uplet de longueur 2) qui est instantanément
+<strong>destructuré</strong> pour fournir des valeurs aux variables
+<code>value</code> et <code>error</code>. Cela devient beaucoup plus
+évident si l’on décompose ces étapes :</p>
+<pre class="python"><code>&gt;&gt;&gt; value_and_error = compute_pi()
+&gt;&gt;&gt; value_and_error
+(3.14, 0.005)
+&gt;&gt;&gt; type(value_and_error)
+&lt;class 'tuple'&gt;
+&gt;&gt;&gt; len(value_and_error)
+2
+&gt;&gt;&gt; value, error = value_and_error
+&gt;&gt;&gt; value
+3.14
+&gt;&gt;&gt; error
+0.005</code></pre>
+<p>Quant à l’affectation <code>a, b = b, c</code>, elle passe aussi
+implicitement par la création d’une paire : elle équivaut à</p>
+<pre class="python"><code>&gt;&gt;&gt; b_and_c = b, c
+&gt;&gt;&gt; b_and_c
+(2, 3)
+&gt;&gt;&gt; type(b_and_c)
+&lt;class 'tuple'&gt;
+&gt;&gt;&gt; len(b_and_c)
+2
+&gt;&gt;&gt; a, b = b_and_c
+&gt;&gt;&gt; a
+2
+&gt;&gt;&gt; b
+3</code></pre>
+<p>Si nous avons pu oublier qu’un tuple était crée, c’est qu’un tuple
+peut le plus souvent être défini par une notation très légère, avec une
+suite d’objets séparés par des virgules. Mais la notation
+universellement valide des tuples met entre parenthèses cette suite. Au
+lieu du code initial, nous aurions très bien pu écrire</p>
+<pre class="python"><code>&gt;&gt;&gt; def compute_pi():
+...     value = 3.14
+...     error = 0.005
+...     return (value, error)
+... 
+&gt;&gt;&gt; (value, error) = compute_pi()
+&gt;&gt;&gt; print(f"{value} ± {error}")
+3.14 ± 0.005</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; a = 1
+&gt;&gt;&gt; b = 2
+&gt;&gt;&gt; c = 3
+&gt;&gt;&gt; (a, b) = (b, c)
+&gt;&gt;&gt; a
+2
+&gt;&gt;&gt; b
+3</code></pre>
+<p>ce qui est équivalent, mais plus explicite. Le tuple vide est
+d’ailleurs désigné par la notation <code>()</code> ; pour un n-uplet de
+longueur 0 contenant par exemple l’unique argument 1, on serait tenté
+d’utiliser la notation <code>(1)</code> mais il y aurait alors une
+ambiguité dans les notations car les parenthèses sont aussi utilisées
+pour indiquer des priorités entre opérations dans les calculs. Il faut
+donc se résigner à adopter une <strong>virgule finale</strong> (🇺🇸
+<strong>trailing comma</strong>) et utiliser la notation
+<code>(1,)</code>. On peut conserver la virgule finale pour les n-uplets
+de longueur 2 ou plus, mais elle n’est plus nécessaire.</p>
+<pre class="python"><code>&gt;&gt;&gt; ()
+()
+&gt;&gt;&gt; (1) # ⚠️ not a tuple!
+1
+&gt;&gt;&gt; (1,)
+(1,)
+&gt;&gt;&gt; 1,
+&gt;&gt;&gt; (1, 2)
+(1, 2)
+&gt;&gt;&gt; (1, 2,)
+(1, 2)
+&gt;&gt;&gt; 1, 2
+(1, 2)
+&gt;&gt;&gt; 1, 2,
+(1, 2)</code></pre>
+<p>Les n-uplets sont immuables : de longueur fixe et dont les élements
+ne peuvent être remplacés.</p>
+<pre class="python"><code>&gt;&gt;&gt; t = (1, 2)
+&gt;&gt;&gt; t[0]
+1
+&gt;&gt;&gt; t[1]
+2
+&gt;&gt;&gt; t[0] = 3
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: 'tuple' object does not support item assignment</code></pre>
+<p>Néanmoins cette immuabilité est superficielle : si un n-uplet
+contient une valeur modifiable (comme une liste), il est toujours
+possible de modifier la liste et donc de modifier
+<strong>indirectement</strong> le n-uplet.</p>
+<pre class="python"><code>&gt;&gt;&gt; l = [1, 2, 3]
+&gt;&gt;&gt; t = (l, 2, 3, 3)
+&gt;&gt;&gt; t
+([1, 2, 3], 2, 3, 3)
+&gt;&gt;&gt; l.append(42)
+&gt;&gt;&gt; t
+([1, 2, 3, 42], 2, 3, 3)</code></pre>
+<h1 id="ensembles">Ensembles</h1>
+<p>Un ensemble peut être défini par une suite d’objets séparés par des
+virgules et entourée par des accolades</p>
+<pre class="python"><code>&gt;&gt;&gt; {1, 2, 3, 4}
+{1, 2, 3, 4}</code></pre>
+<p>Il est également possible de passer par le constructeur
+<code>set</code> avec une une liste comme argument</p>
+<pre class="python"><code>&gt;&gt;&gt; set([1, 2, 3, 4])
+{1, 2, 3, 4}</code></pre>
+<p>Inversement, il est aisé de convertir un ensemble en liste</p>
+<pre class="python"><code>&gt;&gt;&gt; list({1, 2, 3, 4})
+[1, 2, 3, 4]</code></pre>
+<p>⚠️ La notation <code>{}</code> ne définit pas un ensemble vide, mais
+un dictionnaire vide<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a>. L’ensemble vide peut être défini
+par <code>set()</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; type({})
+&lt;class 'dict'&gt;
+&gt;&gt;&gt; set()
+set()</code></pre>
+<p>L’implémentation d’un ensemble est similaire à celle d’un
+dictionnaire qui auraient les élements de l’ensemble comme clés et (par
+exemple) <code>True</code> comme valeur commune à toutes les clés.</p>
+<pre class="python"><code>&gt;&gt;&gt; s = {1, 2, 3, 4}
+&gt;&gt;&gt; d = {1: True, 2: True, 3: True, 4: True}</code></pre>
+<p>Cela permet de comprendre pourquoi les élements répétés d’un ensemble
+sont ignorés et pourquoi bien que l’ordre d’insertion des éléments soit
+préservé, cet ordre ne rentre pas en ligne de compte dans les
+comparaisons</p>
+<pre class="python"><code>&gt;&gt;&gt; {1, 2, 2, 3, 3, 3, 4, 4, 4, 4}
+{1, 2, 3, 4}
+&gt;&gt;&gt; {4, 3, 2, 1}
+{4, 3, 2, 1}
+&gt;&gt;&gt; {1, 2, 3, 4} == {4, 3, 2, 1}
+True</code></pre>
+<p>Sans surprise, on peut également en déduire que seuls les objets
+hashables peuvent être utilisés comme éléments d’un ensemble.</p>
+<pre class="python"><code>&gt;&gt;&gt; s = {1, 2, "djksjds", (2, 3), (2, ("jsdksjk", 90))}
+&gt;&gt;&gt; s = {[]}
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: unhashable type: 'list'</code></pre>
+<p>Les ensembles sont modifiables : il est possible d’ajouter des
+éléments à un ensemble et d’en retirer. Il est également possible de
+tester si un objet appartient à l’ensemble et d’itérer sur les éléments
+de l’ensemble.</p>
+<pre class="python"><code>&gt;&gt;&gt; s = {1, 2, "djksjds", (2, 3), (2, ("jsdksjk", 90))}
+&gt;&gt;&gt; s.add(42)
+&gt;&gt;&gt; s
+{(2, ('jsdksjk', 90)), 1, 2, (2, 3), 'djksjds', 42}
+&gt;&gt;&gt; s.remove(42)
+&gt;&gt;&gt; s
+{(2, ('jsdksjk', 90)), 1, 2, (2, 3), 'djksjds'}
+&gt;&gt;&gt; 1 in s
+True
+&gt;&gt;&gt; for x in s:
+...     print(x)
+... 
+(2, ('jsdksjk', 90))
+1
+2
+(2, 3)
+djksjds</code></pre>
+<p>Les opération ensemblistes classiques sont supportées par des
+opérateurs :</p>
+<table style="width:74%;">
+<colgroup>
+<col style="width: 33%"/>
+<col style="width: 18%"/>
+<col style="width: 22%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Opération ensembliste</th>
+<th style="text-align: center;">Symbole</th>
+<th style="text-align: center;">Opérateur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Union</td>
+<td style="text-align: center;"><span class="math inline">\(\cup\)</span></td>
+<td style="text-align: center;"><code>|</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Intersection</td>
+<td style="text-align: center;"><span class="math inline">\(\cap\)</span></td>
+<td style="text-align: center;"><code>&amp;</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Différence</td>
+<td style="text-align: center;"><span class="math inline">\(\setminus\)</span></td>
+<td style="text-align: center;"><code>-</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Différence symmétrique</td>
+<td style="text-align: center;"><span class="math inline">\(\Delta\)</span></td>
+<td style="text-align: center;"><code>^</code></td>
+</tr>
+</tbody>
+</table>
+<p>Ainsi, avec</p>
+<pre class="python"><code>&gt;&gt;&gt; s1 = {1, 2, 3, 4, 5}
+&gt;&gt;&gt; s2 = {4, 5, 6, 7, 8}</code></pre>
+<p>on obtient</p>
+<pre class="python"><code>&gt;&gt;&gt; s1 | s2
+{1, 2, 3, 4, 5, 6, 7, 8}
+&gt;&gt;&gt; s1 &amp; s2
+{4, 5}
+&gt;&gt;&gt; s1 - s2
+{1, 2, 3}
+&gt;&gt;&gt; s1 ^ s2
+{1, 2, 3, 6, 7, 8}</code></pre>
+<section class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr/>
+<ol>
+<li id="fn1" role="doc-endnote"><p>Les dictionnaires existaient dans
+Python bien avant que les ensembles ne soient introduits. Ils ont donc
+exploité les premiers la notation <code>{}</code> et les ensembles ont
+dû s’en accomoder a posteriori.<a class="footnote-back" href="#fnref1" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>

@@ -1,0 +1,116 @@
+---
+import { Icon } from "astro-icon";
+
+interface Props {
+  type?: "note" | "solution" | "warning";
+  label?: string;
+  open?: boolean;
+}
+
+let { type = "note", label = undefined, open = true } = Astro.props;
+
+function capitalize(word: string) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+const styles = {
+  note: {
+    icon: "pencil",
+    light: "#e0f2fe",
+    dark: "#164e63",
+  },
+  warning: {
+    icon: "alert-triangle",
+    light: "#ffedd5",
+    dark: "#ea580c",
+  },
+  solution: {
+    icon: "bulb",
+    light: "#fbcfe8",
+    dark: "#db2777",
+  },
+};
+
+const { icon, light, dark } = styles[type];
+label = label ? label : capitalize(type);
+
+console.log(`tabler:${icon}`);
+---
+
+<aside>
+  <details open={open}>
+    <summary
+      style="display:flex;align-items:center;justify-content:space-between;"
+    >
+      <span style="display:flex;gap:0.5em;align-items:center;">
+        <span class="circle">
+          <Icon name={`tabler:${icon}`} />
+        </span>
+        <span style="font-weight:500;">{label}</span>
+      </span>
+      <span class="minmax">
+        <Icon class="closed" name="tabler:arrows-maximize" />
+        <Icon class="open" name="tabler:arrows-minimize" />
+      </span>
+    </summary>
+    <div class="content">
+      <div style="margin: 1rem;">
+        <slot />
+      </div>
+    </div>
+  </details>
+</aside>
+<style define:vars={{ light, dark }}>
+  aside {
+    border: 0.125rem solid var(--dark); /* sky-700 */
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+  }
+  summary {
+    padding: 1rem;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    background-color: var(--light); /* sky-100 */
+  }
+  details > summary {
+    list-style: none;
+    border-radius: 0.25rem;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .minmax {
+    color: var(--dark);
+  }
+  details[open] .open {
+    display: inline;
+  }
+  details[open] .closed {
+    display: none;
+  }
+
+  details:not([open]) .open {
+    display: none;
+  }
+  details:not([open]) .closed {
+    display: inline;
+  }
+
+  .content {
+    border-bottom-right-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+  }
+  svg {
+    height: 1rem;
+  }
+  .circle {
+    height: 1.25rem;
+    width: 1.25rem;
+    border-radius: 0.25rem;
+    background-color: var(--dark); /* sky-700 */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>

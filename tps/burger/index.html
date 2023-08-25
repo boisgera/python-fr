@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
+          }
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault, MINES Paris – PSL" name="author"/>
+<title>I Can Has Cheezburger?</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">I Can Has Cheezburger?</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
+Boisgérault</a>, MINES Paris – PSL</p>
+<p class="date">Friday 25 august 2023</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/7da617f">
+          #7da617f
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/edit.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/edit/master/tps/burger/index.md">
+          Edition
+        </a>
+</p>
+</header>
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#au-commencement" id="toc-au-commencement">Au commencement
+…</a></li>
+<li><a href="#architecture-graphique" id="toc-architecture-graphique">Architecture graphique</a></li>
+<li><a href="#composant-sur-mesure" id="toc-composant-sur-mesure">Composant sur mesure</a></li>
+<li><a href="#composant-localement-fonctionnel" id="toc-composant-localement-fonctionnel">Composant localement
+fonctionnel</a></li>
+<li><a href="#composant-pleinement-fonctionnel" id="toc-composant-pleinement-fonctionnel">Composant pleinement
+fonctionnel</a></li>
+<li><a href="#intégration" id="toc-intégration">Intégration</a></li>
+</ul>
+</nav></details>
+
+
+<figure>
+<img alt="Miam! 😋" src="images/sk-CK6tjAIMJWM-unsplash.jpg"/>
+<figcaption aria-hidden="true">Miam! 😋</figcaption>
+</figure>
+<h1 id="au-commencement">Au commencement …</h1>
+<p><a href="https://flet.dev/">Flet</a> est une bibliothèque Python
+permettant de réaliser des applications graphiques.</p>
+<p>Mettez en oeuvre l’exemple donné dans <a href="https://flet.dev/docs/">l’introduction de sa documentation</a>
+pour vous familiariser avec elle.</p>
+<figure>
+<img alt="Compteur" src="images/flet-counter.png"/>
+<figcaption aria-hidden="true">Compteur</figcaption>
+</figure>
+<h1 id="architecture-graphique">Architecture graphique</h1>
+<p>Développez l’architecture graphique d’une application de commande de
+menu, représentée dans la figure ci-dessous :</p>
+<figure>
+<img alt="Interface graphique de commande d’un menu" src="images/burger-gui.png"/>
+<figcaption aria-hidden="true">Interface graphique de commande d’un
+menu</figcaption>
+</figure>
+<p>Vous allez pour ce faire devoir explorer la documentation des <a href="https://flet.dev/docs/controls">composants</a> proposés par
+flet.</p>
+<p>Dans un premier temps :</p>
+<ul>
+<li><p>Rien n’est “fonctionnel” dans votre interface: toutes les valeurs
+numériques sont codées “en dur”, il ne se passe rien quand on clique sur
+un bouton, etc.</p></li>
+<li><p>Ne vous en faites pas si l’apparence de votre interface n’est pas
+exactement la même que celle donnée en exemple. Il sera toujours temps
+d’y revenir plus tard pour affiner cette représentation.</p></li>
+</ul>
+<p>Vous pouvez utiliser <a class="uri" href="https://emojipedia.org/">https://emojipedia.org/</a> pour trouvez les émojis dont
+vous avez besoin (🍔 hamburger, 🍟 frites, etc.)</p>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>from flet import app, icons
+from flet import MainAxisAlignment
+from flet import (
+    Card,
+    Column,
+    Container,
+    Divider,
+    FilledButton,
+    IconButton,
+    Markdown,
+    Row,
+    Text,
+    TextField,
+)
+
+
+def main(page):
+    page.title = "I Can Has Cheezburger?"
+    page.window_width = 400
+    page.window_height = 430
+    page.add(
+        Column(
+            alignment=MainAxisAlignment.CENTER,
+            controls=[
+                Row(
+                    [
+                        Text("🍔", size=50),
+                        Text("5.95 €"),
+                        Container(
+                            width=100,
+                            content=TextField(
+                                value="0", read_only=True
+                            ),
+                        ),
+                        IconButton(icon=icons.ADD),
+                        IconButton(icon=icons.REMOVE),
+                    ],
+                    alignment=MainAxisAlignment.CENTER,
+                ),
+                Row(
+                    [
+                        Text("🍟", size=50),
+                        Text("3.60 €"),
+                        Container(
+                            width=100,
+                            content=TextField(value="0"),
+                        ),
+                        IconButton(icon=icons.ADD),
+                        IconButton(icon=icons.REMOVE),
+                    ],
+                    alignment=MainAxisAlignment.CENTER,
+                ),
+                Row(
+                    [
+                        Text("🥗", size=50),
+                        Text("8.30 €"),
+                        Container(
+                            width=100,
+                            content=TextField(value="0"),
+                        ),
+                        IconButton(icon=icons.ADD),
+                        IconButton(icon=icons.REMOVE),
+                    ],
+                    alignment=MainAxisAlignment.CENTER,
+                ),
+                Row(
+                    [
+                        Text("🥤", size=50),
+                        Text("2.60 €"),
+                        Container(
+                            width=100,
+                            content=TextField(value="0"),
+                        ),
+                        IconButton(icon=icons.ADD),
+                        IconButton(icon=icons.REMOVE),
+                    ],
+                    alignment=MainAxisAlignment.CENTER,
+                ),
+                Divider(),
+                Row(
+                    [
+                        Card(
+                            Container(
+                                Markdown(
+                                    "**TOTAL:** 0.00 €"
+                                ),
+                                padding=10,
+                            )
+                        ),
+                        FilledButton(
+                            text="Buy", icon=icons.PAYMENT
+                        ),
+                    ],
+                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                ),
+            ],
+        )
+    )
+
+
+app(target=main)</code></pre>
+</details>
+<h1 id="composant-sur-mesure">Composant sur mesure</h1>
+<p>La documentation de flet explique comment vous pouvez créer <a href="https://flet.dev/docs/guides/python/user-controls">vos propres
+composants</a>. Utilisée judicieusement, cette possibilité devait vous
+permettre de rendre l’architecture de votre application de commande plus
+lisible.</p>
+<p>Idéalement, on souhaiterait avoir un composant <code>Product</code>
+qui prend en charge la représentation d’un produit, l’affichage de son
+prix ainsi que le comptage du nombre d’unités que le client souhaite en
+commander. L’application qui en résulte pourrait alors prendre la forme
+suivante :</p>
+<pre class="python"><code>from flet import app, icons
+from flet import MainAxisAlignment
+from flet import (
+    Card,
+    Column,
+    Container,
+    Divider,
+    FilledButton,
+    IconButton,
+    Markdown,
+    Row,
+    Text,
+    TextField,
+)
+
+from product import Product
+
+
+def main(page):
+    page.title = "I Can Has Cheezburger?"
+    page.window_width = 400
+    page.window_height = 430
+    page.add(
+        Column(
+            alignment=MainAxisAlignment.CENTER,
+            controls=[
+                Product("🍔", 5.95),
+                Product("🍟", 3.60),
+                Product("🥗", 8.30),
+                Product("🥤", 2.60),
+                Divider(),
+                Row(
+                    [
+                        Card(
+                            Container(
+                                Markdown(
+                                    "**TOTAL:** 0.00 €"
+                                ),
+                                padding=10,
+                            )
+                        ),
+                        FilledButton(
+                            text="Buy", icon=icons.PAYMENT
+                        ),
+                    ],
+                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                ),
+            ],
+        )
+    )
+
+
+app(target=main)</code></pre>
+<p>Développez une classe <code>Product</code> dans un fichier
+<code>product.py</code> pour faire en sorte que cette nouveau programme
+fonctionne (comme précédemment).</p>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>from flet import icons
+from flet import MainAxisAlignment
+from flet import (
+    IconButton,
+    Container,
+    Row,
+    Text,
+    TextField,
+    UserControl,
+)
+
+
+class Product(UserControl):
+    def __init__(self, emoji, price):
+        super().__init__()
+        self.price = price
+        self.emoji = emoji
+
+    def build(self):
+        return Row(
+            [
+                Text(self.emoji, size=50),
+                Text(f"{self.price:.2f} €"),
+                Container(
+                    width=100, content=TextField(value="0")
+                ),
+                IconButton(icon=icons.ADD),
+                IconButton(icon=icons.REMOVE),
+            ],
+            alignment=MainAxisAlignment.CENTER,
+        )</code></pre>
+</details>
+<h1 id="composant-localement-fonctionnel">Composant localement
+fonctionnel</h1>
+<p>Faites en sorte que les boutons <code>+</code> et <code>-</code> de
+votre composant <code>Product</code> incrémentent et décrémentent la
+quantité du produit. Ne vous préocuppez pas encore du total de la
+commande. Par contre, assurez-vous que la quantité d’unité commandée
+d’un produit ne puisse pas être négative.</p>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>from flet import icons
+from flet import MainAxisAlignment
+from flet import (
+    IconButton,
+    Container,
+    Row,
+    Text,
+    TextField,
+    UserControl,
+)
+
+
+class Product(UserControl):
+    def __init__(self, emoji, price):
+        super().__init__()
+        self.price = price
+        self.emoji = emoji
+        self.quantity = 0
+
+    def add_one(self, event):
+        self.quantity += 1
+        self.price_field.value = str(self.quantity)
+        self.update()
+
+    def remove_one(self, event):
+        self.quantity -= 1
+        self.quantity = max(self.quantity, 0)
+        self.price_field.value = str(self.quantity)
+        self.update()
+
+    def build(self):
+        more = IconButton(
+            icon=icons.ADD, on_click=self.add_one
+        )
+        less = IconButton(
+            icon=icons.REMOVE, on_click=self.remove_one
+        )
+        self.price_field = TextField(
+            value=str(self.quantity), read_only=True
+        )
+
+        return Row(
+            [
+                Text(self.emoji, size=50),
+                Text(f"{self.price:.2f} €"),
+                Container(
+                    width=100, content=self.price_field
+                ),
+                more,
+                less,
+            ],
+            alignment=MainAxisAlignment.CENTER,
+        )</code></pre>
+</details>
+<h1 id="composant-pleinement-fonctionnel">Composant pleinement
+fonctionnel</h1>
+<p>Il manque deux choses à notre composant produit :</p>
+<ul>
+<li><p>Un attribut (ou une propriété) <code>total</code> qui permet de
+savoir combien le nombre d’unités choisi de ce composant va coûter.</p>
+<pre class="python"><code>hamburgers = Product("🍔", 5.95)
+hamburgers.total  # 0.0 initially</code></pre></li>
+<li><p>Un “hook” (optionnel) permettant de signaler à l’utilisateur du
+composant que le nombre d’unités (et donc le coût) de ce produit a
+changé. Ce hook prendra la forme d’une fonction de callback que l’on
+fournit au produit lors de sa construction:</p>
+<pre class="python"><code>def print_hamburgers_total(event):
+    print(hamburgers.total)
+
+hamburgers = Product("🍔", 5.95, on_change=print_hamburgers_total)</code></pre></li>
+</ul>
+<p>Réalisez les changements nécessaires dans
+<code>product.py</code>.</p>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>from flet import icons
+from flet import MainAxisAlignment
+from flet import (
+    IconButton,
+    Container
+    Row,
+    Text,
+    TextField,
+    UserControl,
+)
+
+
+def do_nothing(event):
+    pass
+
+
+class Product(UserControl):
+    def __init__(self, emoji, price, on_change=None):
+        super().__init__()
+        self.price = price
+        self.emoji = emoji
+        self.quantity = 0
+        self.on_change = on_change or do_nothing
+
+    def get_total(self):
+        return self.price * self.quantity
+
+    total = property(get_total)
+
+    def add_one(self, event):
+        self.quantity += 1
+        self.price_field.value = str(self.quantity)
+        self.on_change(event)
+        self.update()
+
+    def remove_one(self, event):
+        self.quantity -= 1
+        self.quantity = max(self.quantity, 0)
+        self.price_field.value = str(self.quantity)
+        self.on_change(event)
+        self.update()
+
+    def build(self):
+        more = IconButton(
+            icon=icons.ADD, on_click=self.add_one
+        )
+        less = IconButton(
+            icon=icons.REMOVE, on_click=self.remove_one
+        )
+        self.price_field = TextField(
+            value=str(self.quantity), read_only=True
+        )
+
+        return Row(
+            [
+                Text(self.emoji, size=50),
+                Text(f"{self.price:.2f} €"),
+                Container(
+                    width=100, content=self.price_field
+                ),
+                more,
+                less,
+            ],
+            alignment=MainAxisAlignment.CENTER,
+        )</code></pre>
+</details>
+<h1 id="intégration">Intégration</h1>
+<p>Complétez votre application pour que le total de la commande soit
+toujours à jour.</p>
+<details>
+<summary>
+<strong>✨ Solution</strong>
+</summary>
+<pre class="python"><code>from flet import app, icons
+from flet import MainAxisAlignment
+from flet import (
+    Card,
+    Column,
+    Container,
+    Divider,
+    FilledButton,
+    Markdown,
+    Row,
+)
+
+from product import Product
+
+
+def main(page):
+    page.title = "I Can Has Cheezburger?"
+    page.window_width = 400
+    page.window_height = 430
+
+    total_markdown = Markdown("**Total:** 0.0 €")
+
+    def on_change(event):
+        total = sum([p.total for p in products])
+        total_markdown.value = f"**Total:** {total:.2f} €"
+        page.update()
+
+    products = [
+        Product("🍔", 5.95, on_change=on_change),
+        Product("🍟", 3.60, on_change=on_change),
+        Product("🥗", 8.30, on_change=on_change),
+        Product("🥤", 2.60, on_change=on_change),
+    ]
+
+    page.add(
+        Column(
+            alignment=MainAxisAlignment.CENTER,
+            controls=[
+                *products,
+                Divider(),
+                Row(
+                    [
+                        Card(
+                            Container(
+                                total_markdown, padding=10
+                            )
+                        ),
+                        FilledButton(
+                            text="Buy", icon=icons.PAYMENT
+                        ),
+                    ],
+                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                ),
+            ],
+        )
+    )
+
+
+app(target=main)</code></pre>
+</details>
+</body>
+</html>

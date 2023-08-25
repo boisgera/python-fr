@@ -1,0 +1,535 @@
+---
+title: Le serpent
+author: "[Sébastien Boisgérault](mailto:Sebastien.Boisgerault@minesparis.psl.eu), 
+Mines Paris -- PSL"
+license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
+layout: ../layouts/MDXLayout.astro
+---
+
+import Admonition from '/src/components/Admonition.astro';
+import { Image } from 'astro:assets';
+
+
+import snake from "/src/assets/snake.jpg";
+
+<Image src={snake} alt="Boa constrictor by Jan Kopřiva"/>
+
+Projet original par Aurélien Noce (aka [@ushu](https://github.com/ushu)).
+
+{/* ## Table des matières */}
+
+## Introduction
+
+Ce TP vous propose de développer un petit jeu en Python.
+Il constitue une introduction à la conception et à la réalisation
+d'un programme complet.
+
+Son sujet est un standard du jeu vidéo, le 🐍 [snake].
+
+[[🎮 Snake!](https://kitao.github.io/pyxel/wasm/examples/07_snake.html) ;
+une version classique du snake, réalisée avec la plate-forme de retro-gaming
+Python [Pyxel](https://github.com/kitao/pyxel).](images/snake-pyxel.jpg)
+
+De nombreuses variantes de ce jeu existent ; [slither.io](https://slither.io)
+est un bon exemple de snake modernisé (et notamment, massivement multijoueur !).
+
+[snake]: https://fr.wikipedia.org/wiki/Snake_(genre_de_jeu_vid%C3%A9o)
+
+Rassurez-vous, notre objectif sera modeste et donc proche de la version
+classique du jeu : nous réaliserons plusieurs versions d'un **programme qui marche**
+(et pas un programme parfait) dont les fonctionnalités s'enrichiront à
+chaque nouvelle étape.
+
+## C'est parti !
+
+Notre point de départ : un message dont la couleur varie avec le temps.
+
+<video controls width="768">
+  <source src="/videos/hello-snake.webm" type="video/webm" />
+</video>
+
+```python
+import pyxel
+
+def update():
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+
+def draw():
+    pyxel.cls(0)
+    pyxel.text(56, 54, "Hello, Snake!", pyxel.frame_count % 16)
+
+pyxel.init(160, 120, title="Hello Pyxel")
+pyxel.run(update, draw)
+```
+
+## Comment ça marche ?
+
+**TODO:**
+
+  - couleurs: faire le tour des possibles, renvoyer sur la "doc"?
+
+  - Text: comprendre la taille (fixe) de chaque caractère,
+    display d'une "grille" de caractères., comprendre comment est
+    placé le "Hello world!", ajuster le programme pour que le texte
+    soit toujours centré (même si plusieurs lignes ?).
+
+## Nombre d'images par seconde
+
+La fonction `time.time` de la bibliothèque standard Python renvoie le temps 
+écoulé en secondes depuis le 1er janvier 1970 à midi.
+
+```
+>>> import time
+>>> time.time()
+1692980870.0990813
+>>> time.time()
+1692980871.2445116
+>>> time.time()
+1692980872.3245282
+```
+Utilisez-là pour mesurer le temps qui s'écoule entre deux appels à la fonction
+`draw` de Pyxel. Puis, affichez le nombre d'images par seconde 
+(ou FPS pour *frames per second*) dans le coin en haut à gauche de la fenêtre.
+
+<video controls width="768">
+  <source src="/videos/fps.webm" type="video/webm" />
+</video>
+
+
+<Admonition type="solution" open={false} >
+```python
+import math
+import time
+import pyxel
+
+def update():
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+
+def draw():
+    global t
+    t_new = time.time()
+    dt = t_new - t
+    t = t_new
+    fps = 1.0 / dt
+    pyxel.cls(0)
+    pyxel.text(0, 0, f"fps: {int(round(fps))}", 7)
+
+pyxel.init(160, 120, title="🐍 Snake")
+t = time.time()
+pyxel.run(update, draw)
+```
+</Admonition>
+
+## Evènements
+
+  - évènement claviers: détecter les flèches, afficher les symboles,
+    avec ceux qui sont pressés d'une couleur différente (plus vive).
+
+  - éventuellement: "P" pour pause ? Plus rien n'est mis à jour ?
+   (sauf la détection de la touche "P")
+
+## Événements
+
+Pygame permet de spécifier comment réagir aux actions de l'utilisateur,
+par exemple son utilisation du clavier ou de la souris.
+
+Nous pouvons ainsi faire en sorte de forcer l'arrêt du programme lorsque
+l'utilisateur clique sur le bouton de fermeture de la fenêtre ou appuie sur
+la touche Q :
+
+```python
+import random
+import sys
+import pygame
+
+pygame.init()
+screen = pygame.display.set_mode([300, 300])
+clock = pygame.time.Clock()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                pygame.quit()
+                sys.exit()
+    red = random.randint(0, 255)
+    green = random.randint(0, 255)
+    blue = random.randint(0, 255)
+    color = [red, green, blue]
+    screen.fill(color)
+    pygame.display.update()
+    clock.tick(1)
+```
+
+Modifier ce programme pour que lorsque l'utilisateur presse
+les flêches de son clavier, le programme affiche (avec la fonction `print`)
+les caractères `←`, `↑`, `→` ou `↓` dans le terminal.
+
+🗝️ Le code renvoyé par la flêche vers le haut est `pygame.K_UP` par exemple.
+
+## Le damier
+
+Nous allons commencer par construire notre plateau de jeu ainsi :
+
+- le plateau de jeu est découpé en 30x30 cases,
+
+- chaque case fait 20 pixels de côté.
+
+Pour vérifier la validité de ce plateau de jeu,
+écrivez un programme qui dessine un damier :
+
+{/* ![](images/damier.png) */}
+
+🗝️ Vous pouvez utiliser la méthode [`pygame.draw.rect`](https://www.pygame.org/docs/ref/draw.html#pygame.draw.rect) :
+
+```python
+x = 100
+y = 100
+width = 30
+height = 30
+rect = [x, y, width, height]
+red = 255
+green = 0
+blue = 0
+color = [red, green, blue]
+pygame.draw.rect(screen, color, rect)
+```
+
+## Un serpent fixe
+
+> No no he's not dead, he's, he's restin'!
+
+L'étape suivante est de dessiner le serpent, comme une suite de segments
+représentés par des rectangles colorés.
+On veut dessiner le serpent aux coordonnées suivantes :
+
+```python
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+```
+
+pour obtenir un schéma comme suit ;
+disons pour fixer les idées que dans ce cas de figure `[10, 15]` est la queue
+et `[12, 15]` est la tête :
+
+{/* ![](images/serpent.png) */}
+
+<details>
+<summary>
+**Solution**
+</summary>
+```python
+import sys
+import pygame
+
+white = [255, 255, 255]
+black = [0, 0, 0]
+snake = [
+[10, 15],
+[11, 15],
+[12, 15],
+]
+
+pygame.init()
+screen = pygame.display.set_mode([20*30, 20*30])
+clock = pygame.time.Clock()
+while True:
+    for event in pygame.event.get():
+    if event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
+    elif event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_q:
+            pygame.quit()
+            sys.exit()
+    screen.fill(white)
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, black, rect)  
+    pygame.display.update()
+    clock.tick(1)
+```
+</details>
+
+
+Un serpent qui bouge
+--------------------------------------------------------------------------------
+
+Ensuite, nous allons faire bouger le serpent :
+
+- nous créons un vecteur de "direction", par exemple
+
+  ```python
+  direction = [1, 0]
+  ```
+
+- à chaque itération de la boucle, nous pouvons déplacer le serpent dans
+  cette direction en "ajoutant" ce vecteur à la position de la tête du serpent
+
+{/* ![](images/serpent-bouge.gif) */}
+
+Une fois que le serpent bouge, ajouter les commandes pour se déplacer dans
+les 4 directions, en appuyant sur les touches de direction du clavier.
+
+Aussi on peut commencer à envisager d'accélérer un peu le jeu à ce stade ...
+
+**Bonus.** Faites en sorte que le serpent ne puisse pas faire demi-tour.
+
+<details>
+<summary>
+**Solution**
+</summary>
+
+```python
+import sys
+import pygame
+
+white = [255, 255, 255]
+black = [0, 0, 0]
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+
+pygame.init()
+screen = pygame.display.set_mode([20*30, 20*30])
+clock = pygame.time.Clock()
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                pygame.quit()
+                sys.exit()
+            if event.key == pygame.K_UP:
+                direction = [0.0, -1.0]
+            elif event.key == pygame.K_LEFT:
+                direction = [-1.0, 0.0]
+            elif event.key == pygame.K_DOWN:
+                direction = [0.0, 1.0]
+            elif event.key == pygame.K_RIGHT:
+                direction = [1.0, 0.0]
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    snake = snake[1:] + [new_head]
+    screen.fill(white)
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, black, rect)
+    pygame.display.update()
+    clock.tick(1)
+```
+
+</details>
+
+## Le fruit
+
+Il faut maintenant faire manger notre serpent.
+On va procéder comme suit:
+
+- on a toujours la position du serpent dans une variable `snake` :
+
+- on génère un "fruit", dans une position aléatoire
+
+  ```python
+  fruit = [10, 10]
+  ```
+
+- quand la tête du serpent mange le fruit,
+  on place un nouveau fruit à une position aléatoire
+  et on allonge le serpent d'une case
+
+  {/* ![](images/manger.gif) */}
+
+<details>
+<summary>
+**Solution**
+</summary>
+
+```python
+import random
+import sys
+import pygame
+
+white = [255, 255, 255]
+black = [0, 0, 0]
+red = [255, 0, 0]
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+fruit = [10, 10]
+
+pygame.init()
+screen = pygame.display.set_mode([20*30, 20*30])
+clock = pygame.time.Clock()
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                pygame.quit()
+                sys.exit()
+            if event.key == pygame.K_UP:
+                direction = [0, -1]
+            elif event.key == pygame.K_LEFT:
+                direction = [-1, 0]
+            elif event.key == pygame.K_DOWN:
+                direction = [0, 1]
+            elif event.key == pygame.K_RIGHT:
+                direction = [1, 0]
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    if new_head == fruit:
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29),
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+    screen.fill(white)
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, black, rect)
+    rect = [fruit[0]*20, fruit[1]*20, 20, 20]
+    pygame.draw.rect(screen, red, rect)
+    pygame.display.update()
+    clock.tick(1)
+```
+
+</details>
+
+## Épilogue
+
+Il nous reste deux petits changements pour avoir un serpent complètement
+fonctionnel :
+
+- Il faut détecter si le serpent se mord la queue, ou touche un
+  des murs, ce qui est une condition d'échec.
+
+- Enfin on peut afficher le score.
+  La façon la plus simple de procéder est de changer le titre de la fenêtre,
+  avec la fonction `set_caption` :
+
+  ```python
+  score = 0
+  pygame.display.set_caption(f"🐍 Score: {score}")
+  ```
+
+<details>
+<summary>
+**Solution**
+</summary>
+
+```python
+import random
+import sys
+import pygame
+
+white = [255, 255, 255]
+black = [0, 0, 0]
+red = [255, 0, 0]
+snake = [
+    [10, 15],
+    [11, 15],
+    [12, 15],
+]
+direction = [1, 0]
+fruit = [10, 10]
+score = 0
+
+pygame.init()
+screen = pygame.display.set_mode([20*30, 20*30])
+clock = pygame.time.Clock()
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                pygame.quit()
+                sys.exit()
+            if event.key == pygame.K_UP:
+                direction = [0, -1]
+            elif event.key == pygame.K_LEFT:
+                direction = [-1, 0]
+            elif event.key == pygame.K_DOWN:
+                direction = [0, 1]
+            elif event.key == pygame.K_RIGHT:
+                direction = [1, 0]
+    head = snake[-1]
+    new_head = [
+      head[0] + direction[0],
+      head[1] + direction[1]
+    ]
+    if (
+        new_head in snake
+        or new_head[0] < 0
+        or new_head[0] >= 30
+        or new_head[1] < 0
+        or new_head[1] >= 30
+    ):
+        pygame.quit()
+        sys.exit()
+    if new_head == fruit:
+        score = score + 1
+        snake = snake + [new_head]
+        fruit = [
+            random.randint(0, 29),
+            random.randint(0, 29)
+        ]
+    else:
+        snake = snake[1:] + [new_head]
+    screen.fill(white)
+    for x, y in snake:
+        rect = [x*20, y*20, 20, 20]
+        pygame.draw.rect(screen, black, rect)
+    rect = [fruit[0]*20, fruit[1]*20, 20, 20]
+    pygame.draw.rect(screen, red, rect)
+    pygame.display.update()
+    pygame.display.set_caption(f"🐍 Score: {score}")
+    clock.tick(1)
+```
+</details>
+
+## Annexe -- Codes RGB
+
+La couleur d'un pixel est décrite par son [code RGB](https://fr.wikipedia.org/wiki/Rouge_vert_bleu) : un triplet d'entiers compris entre 0 et 255 qui déterminent
+l'intensité de ses composantes rouge, verte et bleue.
+On a par exemple :
+
+| R         | G        | B        | Couleur |
+|-----------|----------|----------|---------|
+|       255 |        0 |        0 |      🟥 |
+|         0 |      255 |        0 |      🟩 |
+|         0 |        0 |      255 |      🟦 |
+|       255 |      255 |      255 |      ⬜ |
+|         0 |        0 |        0 |      ⬛ |
+|       128 |       64 |        0 |      🟫 |
+|       255 |      128 |        0 |      🟧 |
+|       255 |      255 |        0 |      🟨 |
+|       106 |       13 |      173 |      🟪 |

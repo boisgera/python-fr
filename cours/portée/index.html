@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Sébastien Boisgérault" />
+  <title>Portée des variables</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+  <!--
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet">
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let h3 = document.createElement("h3");
+          h3.innerHTML = "Table des matières";
+          let toc = document.getElementById("TOC");
+          toc.prepend(h3);
+      });    
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let elts = document.querySelectorAll('body > :not(header):not(nav)');
+          let headers = [...elts].filter(elt =>  
+              ["H1", "H2", "H3", "H4", "H5", "H6"].includes(elt.tagName)
+          )
+          for (let header of headers) {
+              let anchor = document.createElement("a");
+              anchor.setAttribute("href", `#${header.id}`);
+              anchor.setAttribute("style", "text-decoration: None;");
+              anchor.innerHTML = header.outerHTML;
+              header.replaceWith(anchor);
+          }
+      });    
+  </script>
+  <script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+  <script>
+
+  function copyAttributes(source, target) {
+    return Array.from(source.attributes).forEach(attribute => {
+      target.setAttribute(
+        attribute.nodeName,
+        attribute.nodeValue,
+      );
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", (event) => {
+      let details = document.querySelectorAll("section.details")
+      details.forEach((elt) => {
+          let details = document.createElement("details");
+          details.innerHTML = elt.innerHTML;
+          copyAttributes(elt, details)
+          elt.replaceWith(details);
+          let header = details.querySelector("h1, h2, h3, h4")
+          let summary = document.createElement("summary")
+          summary.appendChild(header.cloneNode(true))
+          header.replaceWith(summary)
+      })
+  })
+
+  </script>
+  <script>
+      // TODO: replace with clickable 📖, store inside (invis) the content ?
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let button = document.createElement("button");
+              let clone = elt.cloneNode(true);
+              clone.style.setProperty("display", "none");
+              button.appendChild(clone);
+              elt.replaceWith(button);
+
+              button.style.setProperty("height", "4.5em");
+              button.style.setProperty("width", "100%");
+
+              // button.style.setProperty("overflow", "hidden");
+
+              button.style.setProperty("position", "relative");
+              button.style.setProperty("border", "none");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              
+              /*
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              */
+
+              let icon = document.createElement("img");
+              button.appendChild(icon);
+              // button.style.setProperty("border", "none");
+              // button.style.setProperty("background", "none");
+              // button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              // button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  button.replaceWith(elt)
+
+              });
+
+
+              button.addEventListener('mouseover', (event) => {
+                  button.style.setProperty("cursor", "pointer");
+              });
+              
+              button.addEventListener('mouseout', (event) => {
+                  button.style.setProperty("cursor", "auto");
+              });
+
+      /*
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let wrapper = document.createElement("div");
+              let clone = elt.cloneNode(true);
+              wrapper.appendChild(clone);
+              elt.replaceWith(wrapper);
+
+              wrapper.style.setProperty("height", "4.5em");
+              wrapper.style.setProperty("overflow", "hidden");
+              wrapper.style.setProperty("position", "relative");
+              wrapper.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+
+              let button = document.createElement("div");
+              wrapper.appendChild(button);
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              
+              let icon = document.createElement("img");
+              let button = document.createElement("button");
+              button.appendChild(icon);
+              button.style.setProperty("border", "none");
+              button.style.setProperty("background", "none");
+              button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  wrapper.replaceWith(elt)
+
+              });
+
+
+  */
+          }
+      });    
+  </script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Portée des variables</h1>
+<p class="author">👤 <a
+href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
+Boisgérault</a></p>
+<p class="affiliation">🏦 MINES ParisTech, Université PSL</p>
+<p class="license">⚖️ <a
+href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#variables-globales" id="toc-variables-globales">Variables
+globales</a></li>
+<li><a href="#variables-locales" id="toc-variables-locales">Variables
+locales</a></li>
+<li><a href="#variables-intégrées"
+id="toc-variables-intégrées">Variables intégrées</a></li>
+<li><a href="#variables-non-locales"
+id="toc-variables-non-locales">Variables non-locales</a></li>
+</ul>
+</nav>
+<h1 id="introduction">Introduction</h1>
+<p>Pour savoir quelle valeur référence un identifiant Python dans un
+endroit donné du code, il est nécessaire de comprendre la notion de
+<strong>portée</strong> (🇺🇸 <strong>scope</strong>) d’une variable. Il
+existe quatre portées distinctes en Python.</p>
+<h1 id="variables-globales">Variables globales</h1>
+<p>La fonction <code>dir</code>, utilisée sans argument, liste les
+variables définies dans la portée globale de l’interpréteur ou d’un
+programme Python.</p>
+<pre class="python"><code>&gt;&gt;&gt; dir()
+[&#39;__annotations__&#39;, &#39;__builtins__&#39;, &#39;__doc__&#39;, &#39;__loader__&#39;, &#39;__name__&#39;, &#39;__package__&#39;, &#39;__spec__&#39;]</code></pre>
+<p>On constate ici que 7 variables sont prédéfinies dans l’interpréteur
+et l’on peut afficher leurs valeurs:</p>
+<pre class="python"><code>&gt;&gt;&gt; __annotations__
+{}
+&gt;&gt;&gt; __builtins__
+&lt;module &#39;builtins&#39; (built-in)&gt;
+&gt;&gt;&gt; __doc__
+&gt;&gt;&gt; __loader__
+&lt;class &#39;_frozen_importlib.BuiltinImporter&#39;&gt;
+&gt;&gt;&gt; __name__
+&#39;__main__&#39;
+&gt;&gt;&gt; __package__
+&gt;&gt;&gt; __spec__</code></pre>
+<p>En définissant une nouvelle variables globale <code>a</code>, on
+change le résultat de <code>dir()</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; a = 1
+&gt;&gt;&gt; dir()
+[&#39;__annotations__&#39;, &#39;__builtins__&#39;, &#39;__doc__&#39;, &#39;__loader__&#39;, &#39;__name__&#39;, &#39;__package__&#39;, &#39;__spec__&#39;, &#39;a&#39;]</code></pre>
+<p>Pour éviter de voir les valeurs prédéfinies, ici sans intérêt, on
+filtre les noms de variables qui commencent et finissent par un double
+caractère de soulignement.</p>
+<pre class="python"><code>&gt;&gt;&gt; def is_dunder(name):
+...     return name.startswith(&quot;__&quot;) and name.endswith(&quot;__&quot;)
+... 
+&gt;&gt;&gt; [name for name in dir() if not is_dunder(name)]
+[&#39;a&#39;, &#39;is_dunder&#39;]</code></pre>
+<p>Notons que la fonction nouvellement définie <code>is_dunder</code>
+est également listée. Il est possible d’introduire de nouvelles
+variables et ensuite de les faire disparaître au moyen du mot-clé
+<code>del</code>.</p>
+<pre><code>&gt;&gt;&gt; b = 42
+&gt;&gt;&gt; [name for name in dir() if not is_dunder(name)]
+[&#39;a&#39;, &#39;b&#39;, &#39;is_dunder&#39;]
+&gt;&gt;&gt; del a
+&gt;&gt;&gt; a
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+NameError: name &#39;a&#39; is not defined
+&gt;&gt;&gt; [name for name in dir() if not is_dunder(name)]
+[&#39;b&#39;, &#39;is_dunder&#39;]</code></pre>
+<h4 id="globals"><code>globals</code></h4>
+<p>Si l’on est intéressé non pas par uniquement le nom des variables
+globales mais aussi par les valeurs auquelles elles se réfèrent, la
+fonction <code>globals</code> fournit un dictionnaire contenant les deux
+informations.</p>
+<pre class="python"><code>&gt;&gt;&gt; globals()
+{&#39;__name__&#39;: &#39;__main__&#39;, &#39;__doc__&#39;: None, &#39;__package__&#39;: None, &#39;__loader__&#39;: &lt;class &#39;_frozen_importlib.BuiltinImporter&#39;&gt;, &#39;__spec__&#39;: None, &#39;__annotations__&#39;: {}, &#39;__builtins__&#39;: &lt;module &#39;builtins&#39; (built-in)&gt;, &#39;b&#39;: 42, &#39;is_dunder&#39;: &lt;function is_dunder at 0x7f29d337b760&gt;}</code></pre>
+<p>A nouveau, on peut éliminer de cette structure les variables
+prédéfinies.</p>
+<pre><code>&gt;&gt;&gt; globs = {name: value for name, value in globals().items() if not is_dunder(name)}
+&gt;&gt;&gt; globs
+{&#39;b&#39;: 42, &#39;is_dunder&#39;: &lt;function is_dunder at 0x7f29d337b760&gt;}</code></pre>
+<p>Les ajouts ou supression de variables peuvent se faire soit
+directement, soit en modifiant le dictionnaire des variables
+globales</p>
+<pre><code>&gt;&gt;&gt; a = 1
+&gt;&gt;&gt; globs[&quot;a&quot;]
+1
+&gt;&gt;&gt; del globs[&quot;a&quot;]
+&gt;&gt;&gt; a
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+NameError: name &#39;a&#39; is not defined
+&gt;&gt;&gt; globs[&quot;c&quot;] = 22
+&gt;&gt;&gt; c
+22</code></pre>
+<h1 id="variables-locales">Variables locales</h1>
+<p>Invoqué dans une fonction, <code>dir()</code> liste les variables
+<strong>locales</strong> (à la fonction).</p>
+<pre class="python"><code>&gt;&gt;&gt; def f():
+...     print(dir())
+... 
+&gt;&gt;&gt; f()
+[]</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; def f():
+...     a = 1
+...     print(dir())
+... 
+&gt;&gt;&gt; f()
+[&#39;a&#39;]</code></pre>
+<p>Sur l’exemple précédent, <code>a</code> n’est pas définie comme une
+variable globale mais bien locale à la fonction.</p>
+<pre class="python"><code>&gt;&gt;&gt; def f():
+...     a = 1
+...     print(&quot;a&quot; in globals())
+... 
+&gt;&gt;&gt; f()
+False</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; def f():
+...     a = 1
+...     print(&quot;a&quot; in locals())
+... 
+&gt;&gt;&gt; f()
+True</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; def f():
+...     a = 1
+...     print(locals())
+... 
+&gt;&gt;&gt; f()
+{&#39;a&#39;: 1}</code></pre>
+<p>Contrairement au cas des variables globales, on ne peut pas modifier
+les variables locales en modifiant le dictionnaire produit par
+<code>locals()</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; def f():
+...     a = 1
+...     locals()[&quot;a&quot;] = 2
+...     print(a)
+... 
+&gt;&gt;&gt; f()
+1</code></pre>
+<section id="ℹ-comportement-indéfini-de-locals"
+class="details div-details">
+<h4 class="details">ℹ️ Comportement indéfini de
+<code>locals()</code></h4>
+<p>Pour être précis, les conséquences d’une mise à jour du dictionnaire
+<code>locals()</code> peuvent dépendre de l’interpréteur Python utilisé.
+Pour l’interpréteur Python “classique” (CPython), ces mises à jour n’ont
+aucun effet. L’aide de la fonction <code>locals</code> est explicite
+:</p>
+<blockquote>
+<p>locals() returns a dictionary containing the current scope’s local
+variables.</p>
+<p>NOTE: Whether or not updates to this dictionary will affect name
+lookups in the local scope and vice-versa is <em>implementation
+dependent</em> and not covered by any backwards compatibility
+guarantees.</p>
+</blockquote>
+</section>
+<h4 id="section"></h4>
+<p>Les paramètres des fonctions font partie de ses variables
+locales.</p>
+<pre class="python"><code>&gt;&gt;&gt; def f(b):
+...     a = 1
+...     print(locals())
+... 
+&gt;&gt;&gt; f(7)
+{&#39;b&#39;: 7, &#39;a&#39;: 1}</code></pre>
+<p>Les variables globales sont accessibles en lecture depuis le code de
+la fonction …</p>
+<pre class="python"><code>&gt;&gt;&gt; c = 2
+&gt;&gt;&gt; def f(b):
+...     a = 1
+...     print(a, b, c)
+... 
+&gt;&gt;&gt; f(7)
+1 7 2</code></pre>
+<p>… mais pas en écriture …</p>
+<pre class="python"><code>&gt;&gt;&gt; def f():
+...     c = 3
+...     print(c)
+... 
+&gt;&gt;&gt; f()
+3
+&gt;&gt;&gt; c
+2</code></pre>
+<p>… sauf si elles sont explicitement déclarées comme globales, au moyen
+du mot-clé <code>global</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; def f():
+...     global c
+...     c = 3
+...     print(c)
+... 
+&gt;&gt;&gt; c
+2
+&gt;&gt;&gt; f()
+3
+&gt;&gt;&gt; c
+3</code></pre>
+<p>En présence de “conflit” et en l’absence de mot-clé
+<code>global</code>, dans le code de la fonction, les variables sont
+considérées locales.</p>
+<pre class="python"><code>&gt;&gt;&gt; c = 3
+&gt;&gt;&gt; def f():
+...     c = 2
+...     print(locals())
+... 
+&gt;&gt;&gt; f()
+{&#39;c&#39;: 2}</code></pre>
+<p>Dans ce cas on dit que la variable locale <strong>cache</strong> (🇺🇸
+<strong>shadows</strong>) la variable globale.</p>
+<h1 id="variables-intégrées">Variables intégrées</h1>
+<p>Certaines variables sont prédéfinies, mais n’appartiennent pas à la
+portée globale, mais à une portée encore plus fondamentale, la portée
+<strong>intégrée</strong> (🇺🇸 <strong>built-in</strong>).</p>
+<p>C’est par exemple le cas de la fonction <code>print</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; print
+&lt;built-in function print&gt;
+&gt;&gt;&gt; print(42)
+42</code></pre>
+<p>On ne peut pas effacer une variable intégrée aussi simplement qu’une
+variable globale.</p>
+<pre class="python"><code>&gt;&gt;&gt; del print
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+NameError: name &#39;print&#39; is not defined
+&gt;&gt;&gt; print(42)
+42</code></pre>
+<p>Il est techniquement possible de cacher une variable intégrée par une
+variable globale (même si cela n’est sans doute pas une bonne idée).</p>
+<pre class="python"><code>&gt;&gt;&gt; print = 9
+&gt;&gt;&gt; print(42)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+TypeError: &#39;int&#39; object is not callable
+&gt;&gt;&gt; print
+9</code></pre>
+<p>La variable intégrée sera de nouveau accessible si on se débarasse de
+la variable globale.</p>
+<pre class="python"><code>&gt;&gt;&gt; del print
+&gt;&gt;&gt; print(42)
+42</code></pre>
+<p>Si vous souhaitez vraiment faire disparaître définitivement une
+variable intégrée (toujours pas une bonne idée), cela est possible en
+modifiant le dictionnaire <code>__dict__</code> du module
+<code>builtin</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; import builtins
+&gt;&gt;&gt; &quot;print&quot; in builtins.__dict__
+True
+&gt;&gt;&gt; builtins.__dict__[&quot;print&quot;]
+&lt;built-in function print&gt;
+&gt;&gt;&gt; del builtins.__dict__[&quot;print&quot;]
+&gt;&gt;&gt; print
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+NameError: name &#39;print&#39; is not defined
+&gt;&gt;&gt; print(42)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+NameError: name &#39;print&#39; is not defined</code></pre>
+<h1 id="variables-non-locales">Variables non-locales</h1>
+<p>Il est possible de définir une fonction dans une fonction. La
+fonction interne a accès aux variables définies dans la fonction
+englobante – variables qualifiées de <strong>non-locales</strong> – en
+lecture seule, ainsi qu’aux variables globales qui ne sont pas cachées
+par ces variables (ainsi qu’au variables intégrées qui ne sont cachées
+par aucune autre portée). Pour accéder à ces variables non-locales en
+écriture, il faudra les déclarer explicitement au moyen du mot-clé
+<code>nonlocal</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; def f():
+...     a = 1
+...     def g():
+...        nonlocal a
+...        a = 3
+...     g()
+...     print(a)
+... 
+&gt;&gt;&gt; f()
+3</code></pre>
+</body>
+</html>

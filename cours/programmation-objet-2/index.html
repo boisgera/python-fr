@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
+          }
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault, MINES Paris, Université PSL" name="author"/>
+<title>Programmation Orientée Objet 2</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Programmation Orientée Objet 2</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
+Boisgérault</a>, MINES Paris, Université PSL</p>
+<p class="date">Friday 25 august 2023</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/7da617f">
+          #7da617f
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/edit.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/edit/master/cours/programmation-objet-2/index.md">
+          Edition
+        </a>
+</p>
+</header>
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#typage-implicite" id="toc-typage-implicite">Typage
+implicite 🦆</a>
+<ul>
+<li><a href="#etude-de-cas" id="toc-etude-de-cas">Etude de cas</a></li>
+<li><a href="#protocoles" id="toc-protocoles">Protocoles</a></li>
+<li><a href="#vérification-statique" id="toc-vérification-statique">Vérification statique</a></li>
+</ul></li>
+<li><a href="#héritage" id="toc-héritage">Héritage</a></li>
+<li><a href="#la-bibliothèque-standard" id="toc-la-bibliothèque-standard">La bibliothèque standard</a>
+<ul>
+<li><a href="#pathlib" id="toc-pathlib"><code>pathlib</code></a></li>
+<li><a href="#random" id="toc-random"><code>random</code></a></li>
+<li><a href="#doctest" id="toc-doctest"><code>doctest</code></a></li>
+</ul></li>
+</ul>
+</nav></details>
+
+
+<h1 id="typage-implicite">Typage implicite 🦆</h1>
+<h2 id="etude-de-cas">Etude de cas</h2>
+<p>La fonction <code>copy_file</code> ci-dessous lit le contenu d’un
+objet fichier et l’écrit dans un autre :</p>
+<pre class="python"><code>def copy_file(input, output):
+    data = input.read()
+    output.write(data)</code></pre>
+<p>Créons un (tout petit) fichier binaire <code>image.png</code> sur
+notre disque dur</p>
+<pre class="python"><code>with open("image.png", mode="bw") as image_file:
+...     image_file.write(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x01\x00\x00\x00\x01\x00\x01\x03\x00\x00\x00f\xbc:%\x00\x00\x00\x03PLTE\xb5\xd0\xd0c\x04\x16\xea\x00\x00\x00\x1fIDATh\x81\xed\xc1\x01\r\x00\x00\x00\xc2\xa0\xf7Om\x0e7\xa0\x00\x00\x00\x00\x00\x00\x00\x00\xbe\r!\x00\x00\x01\x9a`\xe1\xd5\x00\x00\x00\x00IEND\xaeB`\x82')
+...</code></pre>
+<p>puis exploitons <code>copy_file</code> pour en créer un copie nommée
+<code>image-copy.png</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; input = open("image.png", mode="br")
+&gt;&gt;&gt; output = open("image-copy.png", mode="bw")
+&gt;&gt;&gt; copy_file(input, output)</code></pre>
+<p>Tout se passe comme prévu ! Néanmoins, on aurait pu faire l’économie
+de la création du fichier initial et créer un objet similaire à un
+fichier, mais qui stocke son contenu en mémoire plutôt que sur notre
+disque dur.</p>
+<pre class="python"><code>&gt;&gt;&gt; import io
+&gt;&gt;&gt; buffer = io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x01\x00\x00\x00\x01\x00\x01\x03\x00\x00\x00f\xbc:%\x00\x00\x00\x03PLTE\xb5\xd0\xd0c\x04\x16\xea\x00\x00\x00\x1fIDATh\x81\xed\xc1\x01\r\x00\x00\x00\xc2\xa0\xf7Om\x0e7\xa0\x00\x00\x00\x00\x00\x00\x00\x00\xbe\r!\x00\x00\x01\x9a`\xe1\xd5\x00\x00\x00\x00IEND\xaeB`\x82')
+&gt;&gt;&gt; buffer.seek(0)</code></pre>
+<p>(L’appel <code>buffer.seek(0)</code> repositionne le curseur de
+lecture/écriture au début du fichier.)</p>
+<p>On peut alors copier son contenu de la même façon que
+précédemment</p>
+<pre class="python"><code>&gt;&gt;&gt; input = buffer
+&gt;&gt;&gt; output = open("image-copy.png", mode="bw")
+&gt;&gt;&gt; copy_file(input, output)</code></pre>
+<p>En fait l’image originale est une tuile bleue-gris utilisée par le
+projet de cartographie OpenStreetMap (cf. <a href="https://www.mjt.me.uk/posts/smallest-png/">“The smallest 256x256
+single-color PNG file, and where you’ve seen it”</a>).</p>
+<p>Elle est disponible en ligne à l’adresse <a class="uri" href="https://www.mjt.me.uk/assets/images/smallest-png/openstreetmap.png">https://www.mjt.me.uk/assets/images/smallest-png/openstreetmap.png</a>.
+On aurait donc pu créer un objet similaire à un fichier mais qui sait
+ouvrir des ressources Web plutôt que de recopier à la main son
+contenu.</p>
+<pre class="python"><code>&gt;&gt;&gt; from urllib.request import urlopen
+&gt;&gt;&gt; url = "https://www.mjt.me.uk/assets/images/smallest-png/openstreetmap.png"
+&gt;&gt;&gt; input = urlopen(url)</code></pre>
+<p>A nouveau, la copie entre ce fichier distant et sa copie locale
+s’effectue comme précédemment.</p>
+<pre class="python"><code>&gt;&gt;&gt; output = open("image-copy.png", mode="bw")
+&gt;&gt;&gt; copy_file(input, output)</code></pre>
+<h2 id="protocoles">Protocoles</h2>
+<p>Ce qui compte dans les trois cas d’usage précédents, ça n’est pas que
+l’objet <code>input</code> soit un vrai fichier, mais qu’il se comporte
+comme tel. Ici, très précisément la fonction <code>copy_file</code> a
+besoin d’un objet <code>input</code> qui :</p>
+<ul>
+<li><p>à une méthode <code>read</code>,</p></li>
+<li><p>qui s’invoque sans argument,</p></li>
+<li><p>et renvoie un objet de type <code>bytes</code>.</p></li>
+</ul>
+<p>C’est tout ce que la fonction <code>copy_file</code> exige de son
+argument <code>input</code> pour que ça marche : qu’il soit suffisamment
+similaire à un “vrai” fichier. On ne demande pas à ce qu’il soit d’un
+type particulier, par exemple qu’il valide un test du type
+<code>isinstance(input, File)</code>.</p>
+<p>Ce concept moins exigeant de typage, c’est ce qu’en Python on appelle
+le <strong>typage canard</strong> (🇺🇸 <strong>duck typing</strong>)
+d’après la citation attribuée à James Whitcomb Riley</p>
+<blockquote>
+<p>When I see a bird that walks like a duck and swims like a duck and
+quacks like a duck, I call that bird a duck. 🦆</p>
+</blockquote>
+<p>(Si je vois un oiseau qui vole comme un canard, nage comme un canard
+et cancane comme un canard, alors j’appelle cet oiseau un canard.)</p>
+<p>A noter que pour le moment, les contraintes que doit satisfaire
+l’argument <code>input</code> de la fonction <code>copy_file</code> est
+uniquement un contrat (moral) entre le concepteur de la fonction et son
+utilisateur : tant que l’utilisateur respecte le contrat, tout se
+passera comme prévu. On parle parfois de <strong>protocole</strong> (🇺🇸
+<strong>protocole</strong>) pour faire référence à ce contrat (ou de
+<strong>concept</strong> ou encore d’<strong>interface</strong>
+implicite).</p>
+<p>A ce stade, l’interpréteur Python n’est <strong>pas</strong> informé
+de ce contrat et ne fait rien de particulier pour assurer que
+l’engagement mutuel soit respecté. Il conviendra donc au développeur de
+la fonction de documenter ce protocole et à son utilisateur de lire et
+de le respecter.</p>
+<h2 id="vérification-statique">Vérification statique</h2>
+<p>Il existe des outils qui permettent de formaliser (partiellement) les
+contrats sur lesquels reposent vos programmes, par exemple <a href="http://mypy-lang.org/">mypy</a>.</p>
+<p>En contrepartie du travail qui consistera à décrire les protocoles,
+vous disposerez d’un outil qui vous informe de certains violations des
+contrats lors de l’écriture du code, et non bien plus tard, lors de son
+exécution.</p>
+<p>Par exemple, on peut formaliser les deux protocoles associés aux
+arguments de notre fonction <code>copy_file</code></p>
+<pre class="python"><code>from typing import Protocol
+
+class Readable(Protocol):
+    def read(self) -&gt; bytes:
+        pass
+
+class Writable(Protocol):
+    def write(self, data: bytes):
+        pass</code></pre>
+<p>puis annoter le type des arguments de la fonction pour indiquer quel
+protocole doit être respecté.</p>
+<pre class="python"><code>def copy_file(input: Readable, output: Writable):
+    data = input.read()
+    output.write(data)</code></pre>
+<p>Si l’on utilise le code client</p>
+<pre class="python"><code>from urllib.request import urlopen
+url = "https://www.mjt.me.uk/assets/images/smallest-png/openstreetmap.png"
+input = urlopen(url)
+output = open("image-copy.png", mode="bw")
+copy_file(input, output)</code></pre>
+<p>Mypy nous affirmera que de son point de vue, tout va bien</p>
+<pre class="bash"><code>$ mypy main.py 
+Success: no issues found in 1 source file</code></pre>
+<p>Par contre si l’on se trompe en fournissant par exemple comme second
+argument de la fonction <code>copy_file</code> un nom de fichier plutôt
+qu’un objet fichier</p>
+<pre class="python"><code>from urllib.request import urlopen
+url = "https://www.mjt.me.uk/assets/images/smallest-png/openstreetmap.png"
+input = urlopen(url)
+output = open("image-copy.png", mode="bw")
+copy_file(input, "image-copy.png")</code></pre>
+<p>alors mypy nous en informera.</p>
+<pre class="bash"><code>$ mypy main.py 
+main.py: error: Argument 2 to "copy_file" has incompatible type "str"; expected "Writable"
+Found 1 error in 1 file (checked 1 source file)</code></pre>
+<h1 id="héritage">Héritage</h1>
+<p>Considérons à nouveau notre classe de nombres complexes “maison”.</p>
+<pre class="python"><code>class Complex:
+    def __init__(self, real, imag):
+        self.set_real(real)
+        self.set_imag(imag)
+    def get_real(self):
+        return self._real
+    def set_real(self, real):
+        if isinstance(real, float):
+            self._real = real
+        else:
+            raise TypeError(f"{real!r} is not a float")
+    real = property(get_real, set_real)
+    def get_imag(self):
+        return self._imag
+    def set_imag(self, imag):
+        if isinstance(imag, float):
+            self._imag = imag
+        else:
+            raise TypeError(f"{imag!r} is not a float")
+    imag = property(get_imag, set_imag)
+    def conjugate(self):
+        return Complex(self._real, -self._imag)
+    def __repr__(self):
+        # ⚠️ weird output when self.imag &lt; 0
+        return f"({self._real}+{self._imag}j)"
+    def __add__(self, other):
+        return Complex(
+            self._real + other._real, 
+            self._imag + other._imag
+        )</code></pre>
+<p>Nous allons essayer de nous doter d’une nouvelle classe de nombres
+complexes, <code>Complex2</code> dont les instances auront un
+comportement qui nous convient mieux, sans modifier le code source de
+<code>Complex</code>, mais en exploitant ses fonctionnalités au
+maximum.</p>
+<p>Pour cela, nous allons <strong>dériver</strong> la classe
+<code>Complex2</code> de la classe <code>Complex</code> ; la nouvelle
+classe <strong>héritera</strong> du comportement de la classe
+précédente. Au minimum, cela signifie une déclaration de la forme</p>
+<pre class="python"><code>class Complex2(Complex):
+    pass</code></pre>
+<p>A ce stade, pour l’essentiel, pas de changement dans le comportement
+des nombres complexes qui en sont les instances, car toutes les méthodes
+de <code>Complex2</code> sont héritées de celles de <code>Complex</code>
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex2(0.5, 1.5)
+&gt;&gt;&gt; z
+(0.5+1.5j)
+&gt;&gt;&gt; z.real
+0.5
+&gt;&gt;&gt; z.real = -0.5
+&gt;&gt;&gt; z
+(-0.5+1.5j)
+&gt;&gt;&gt; z.real = "Hello"
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+  File "&lt;stdin&gt;", line 11, in set_real
+TypeError: 'Hello' is not a float
+&gt;&gt;&gt; w = Complex2.conjugate(z)
+&gt;&gt;&gt; w.real
+0.5
+&gt;&gt;&gt; w.imag
+-1.5
+&gt;&gt;&gt; z + z.conjugate()
+(1+0j)</code></pre>
+<p>On a même</p>
+<pre class="python"><code>&gt;&gt;&gt; isinstance(z, Complex)
+True</code></pre>
+<p>En conséquence, on pourra <strong>substituer</strong> une instance de
+la classe <code>Complex2</code> à une fonction qui attend une instance
+de la classe <code>Complex</code>. La fonction en question est dit
+<strong>polymorphique</strong> : elle fonctionne avec un type d’objet
+donné, mais également avec des types dérivés conçus par le
+programmeur.</p>
+<p>Le seuls changements visibles entre <code>Complex</code> et
+<code>Complex2</code> sont les tests qui demandent explicitement le type
+de l’objet complexe <code>z</code> et le test
+<code>isinstance(z, Complex2)</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; type(z) is Complex
+False
+&gt;&gt;&gt; type(z) is Complex2
+True
+&gt;&gt;&gt; isinstance(z, Complex2)</code></pre>
+<p>Ce qui motive au départ l’introduction d’une nouvelle classe de
+nombres complexes, c’est que l’on a oublié d’implémenter la
+multiplication :</p>
+<pre class="python"><code>&gt;&gt;&gt; Complex(1.0, 0.0) * Complex(0.0, 1.0)
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: unsupported operand type(s) for *: 'Complex' and 'Complex'</code></pre>
+<p>Réparons cet oubli en ajoutant une méthode <code>__mul__</code> à la
+classe <code>Complex2</code></p>
+<pre class="python"><code>class Complex2(Complex):
+    def __mul__(self, other):
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return Complex2(real, imag)</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; Complex2(1.0, 0.0) * Complex2(0.0, 1.0)
+(0.0+1.0j)</code></pre>
+<p>C’est mieux ! Il y a en fait un subtil bug (voyez-vous lequel ?) mais
+nous allons attendre un peu pour le corriger, nous serons bientôt mieux
+placés pour corriger le problème.</p>
+<p>En attendant, nous allons faire en sorte que notre constructeur soit
+un peu plus polyvalent ; nous aimerions bien pouvoir construire un
+nombre complexe à partir de tout objet qui possède des attributs
+numériques <code>real</code> et <code>imag</code>, par exemple, un
+nombre complexe intégré, instance de la class <code>complex</code>. Avec
+la classe <code>Complex</code>, cela ne marche pas :</p>
+<pre class="python"><code>&gt;&gt;&gt; Complex(0.5+1.5j)
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: __init__() missing 1 required positional argument: 'imag'</code></pre>
+<p>et pas plus avec la classe <code>Complex2</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; Complex2(0.5+1.5j)
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: __init__() missing 1 required positional argument: 'imag'</code></pre>
+<p>En effet, en l’absence de constructeur <code>__init__</code> qui lui
+soit propres, les nouveaux complexes sont instanciées au moyen de la
+méthode <code>__init__</code> héritée.</p>
+<p>Mais on peut définir un nouveau constructeur <code>__init__</code>
+qui aura la priorité. Pour ce faire, on teste si le premier argument
+nommé <code>real_or_complex</code> à des champs <code>real</code> et
+<code>imag</code>. Sinon c’est le cas on l’interprête comme un nombre
+complexe ; dans le cas contraire un utilise cet argument comme partie
+réelle et le second comme partie imaginaire.</p>
+<pre class="python"><code>class Complex2(Complex):
+    def __init__(self, real_or_complex, imag=None):
+        try:
+            real = real_or_complex.real
+            imag = real_or_complex.imag
+        except AttributeError:
+            real = real_or_complex
+            imag = imag
+        self.real = real
+        self.imag = imag
+    def __mul__(self, other):
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return Complex2(real, imag)</code></pre>
+<p>On notera que les deux dernières lignes du constructeurs sont un
+copier-coller du code du constructeur parent. Autant faire appel
+directement à celui-ci ! On pourra au choix utiliser la syntaxe
+explicite <code>Complex.__init__(self, real, imag)</code> ou la
+construction <code>super()</code> comme ci-dessous :</p>
+<pre class="python"><code>class Complex2(Complex):
+    def __init__(self, real_or_complex, imag=None):
+        try:
+            real = real_or_complex.real
+            imag = real_or_complex.imag
+        except AttributeError:
+            real = real_or_complex
+            imag = imag
+        super().__init__(real, imag)
+    def __mul__(self, other):
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return Complex2(real, imag)</code></pre>
+<p>Désormais, le constructeur de <code>Complex2</code> accepte les
+arguments complexes :</p>
+<pre class="python"><code>&gt;&gt;&gt; Complex2(0.5+1.5j)
+(0.5+1.5j)
+&gt;&gt;&gt; Complex2(Complex(0.5, 1.5))
+(0.5+1.5j)</code></pre>
+<p>Il est temps de revenir au subtil bug que nous avons évoqué. En
+héritant la méthode <code>__add__</code> de la classe parent
+<code>Complex</code>, on va malheureusement toujours obtenir une
+instance de <code>Complex</code> quand on additionne des instances de
+<code>Complex2</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex2(0.5, 1.5)
+&gt;&gt;&gt; w = z + z
+&gt;&gt;&gt; type(w)
+&lt;class '__main__.Complex'&gt;</code></pre>
+<p>Il est possible de corriger cela directement en réimplémentant
+<code>__add__</code> dans la classe dérivée</p>
+<pre class="python"><code>class Complex2(Complex):
+    def __init__(self, real_or_complex, imag=None):
+        try:
+            real = real_or_complex.real
+            imag = real_or_complex.imag
+        except AttributeError:
+            real = real_or_complex
+            imag = imag
+        super().__init__(real, imag)
+    def __add__(self, other):
+        return Complex2(
+            self.real + other.real, 
+            self.imag + other.imag
+        )
+    def __mul__(self, other):
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return Complex2(real, imag)</code></pre>
+<p>Ca marche, mais cela revient à perdre le bénéfice de ce qui a déjà
+été implémenté. On peut être plus subtil, appeler la méthode de la
+classe parente pour l’addition et corriger à posteriori le type du
+résultat, avec notre constructeur flambant neuf :</p>
+<pre class="python"><code>class Complex2(Complex):
+    def __init__(self, real_or_complex, imag=None):
+        try:
+            real = real_or_complex.real
+            imag = real_or_complex.imag
+        except AttributeError:
+            real = real_or_complex
+            imag = imag
+        super().__init__(real, imag)
+    def __add__(self, other):
+        # ℹ️ sum = Complex.__add__(self, other) would also work.
+        sum = super().__add__(other) 
+        return Complex2(sum)
+    def __mul__(self, other):
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return Complex2(real, imag)</code></pre>
+<p>Et désormais la somme se comporte comme prévu</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex2(0.5, 1.5)
+&gt;&gt;&gt; w = z + z
+&gt;&gt;&gt; type(w)
+&lt;class '__main__.Complex2'&gt;</code></pre>
+<p>Au passage, remarquons que si une génération future de développeur
+doit reprendre notre travail et introduire une classe
+<code>Complex3</code> qui dérivera de <code>Complex2</code>, ils vont
+être confrontés au même problème. Pour leur faciliter la vie, on peut
+utiliser un code qui va adapter le type de la valeur renvoyée au type de
+<code>self</code> et qui pourra donc être héritée telle quelle dans
+<code>Complex3</code>.</p>
+<pre class="python"><code>class Complex2(Complex):
+    def __init__(self, real_or_complex, imag=None):
+        try:
+            real = real_or_complex.real
+            imag = real_or_complex.imag
+        except AttributeError:
+            real = real_or_complex
+            imag = imag
+        super().__init__(real, imag)
+    def __add__(self, other):
+        ComplexType = type(self)
+        sum = super().__add__(other)
+        return ComplexType(sum)
+    def __mul__(self, other):
+        ComplexType = type(self)
+        r1, i1 = self.real, self.imag
+        r2, i2 = other.real, other.imag
+        real = r1*r2 - i1*i2
+        imag = r1*i2 + r2*i1
+        return ComplexType(real, imag)</code></pre>
+<h1 id="la-bibliothèque-standard">La bibliothèque standard</h1>
+<h2 id="pathlib"><code>pathlib</code></h2>
+<p>Le module de la bibliothèque Python standard <a href="https://docs.python.org/fr/3/library/pathlib.html"><code>pathlib</code></a>
+fournit des classes de chemins représentant les fichiers et répertoires
+d’un système de fichiers. Plus précisément</p>
+<blockquote>
+<p>Les classes de chemins sont divisées en chemins purs, qui fournissent
+uniquement des opérations de manipulation sans entrées-sorties, et
+chemins concrets, qui héritent des chemins purs et fournissent également
+les opérations d’entrées-sorties.</p>
+</blockquote>
+<p>Autrement dit, les chemins purs – instances de <code>PurePath</code>
+– permettent de désigner des fichiers mais sans accéder au système de
+fichier proprement dit. Les instances de <code>Path</code> – qui dérive
+de <code>PurePath</code> – le permettent.</p>
+<p>Les classes de chemin sont de plus distinguées selon que le système
+de fichier soit Windows ou Posix (Linux et MacOS), mais on ne s’en
+préoccupera pas ici.</p>
+<p>Par exemple, sur ma machine (Linux), je peux désigner la racine du
+système de fichier par un chemin pur et l’utiliser pour construire le
+chemin (pur) vers le répertoire racine d’hypothétiques utilisateurs
+<code>linus</code> et <code>boisgera</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; ROOT = PurePath("/")
+&gt;&gt;&gt; LINUS_HOMEDIR = ROOT / "home" / "linus"
+&gt;&gt;&gt; BOISGERA_HOMEDIR = ROOT / "home" / "boisgera"</code></pre>
+<p>mais je ne peux pas tester si ces répertoires existent bel et bien
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; LINUS_HOMEDIR.exists()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: 'PurePosixPath' object has no attribute 'exists'
+&gt;&gt;&gt; BOISGERA_HOMEDIR.exists()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: 'PurePosixPath' object has no attribute 'exists'</code></pre>
+<p>Par contre, je peux le faire après avoir converti ces fichiers en
+instances de <code>Path</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; LINUS_HOMEDIR = Path(LINUS_HOMEDIR)
+&gt;&gt;&gt; BOISGERA_HOMEDIR = Path(BOISGERA_HOMEDIR)
+&gt;&gt;&gt; LINUS_HOMEDIR.exists()
+False
+&gt;&gt;&gt; BOISGERA_HOMEDIR.exists()
+True</code></pre>
+<p>Alternativement, et c’est sans doute le plus simple, on aurait pu
+partir dès le début d’un <code>Path</code> pour désigner la racine</p>
+<pre class="python"><code>&gt;&gt;&gt; ROOT = Path("/")
+&gt;&gt;&gt; LINUS_HOMEDIR = ROOT / "home" / "linus"
+&gt;&gt;&gt; BOISGERA_HOMEDIR = ROOT / "home" / "boisgera"
+&gt;&gt;&gt; LINUS_HOMEDIR.exists()
+False
+&gt;&gt;&gt; BOISGERA_HOMEDIR.exists()
+True</code></pre>
+<p>Comme <code>Path</code> dérive de <code>PurePath</code>, les
+instances de <code>Path</code> peuvent être utilisées partout où les
+instances de <code>PurePath</code> feraient l’affaire.</p>
+<h2 id="random"><code>random</code></h2>
+<h3 id="introduction">Introduction</h3>
+<p>Le module de la bibliothèque Python standard <a href="https://docs.python.org/fr/3/library/random.html"><code>random</code></a>
+permet de générer des nombres pseudo-aléatoires.</p>
+<pre class="python"><code>&gt;&gt;&gt; import random</code></pre>
+<p>La fonction <code>random</code> du module va générer des nombres à
+virgule flottante uniformément distribués entre 0 et 1.</p>
+<pre class="python"><code>&gt;&gt;&gt; random.random()
+0.17288416418484898
+&gt;&gt;&gt; random.random()
+0.7270494197615684
+&gt;&gt;&gt; random.random()
+0.22967289202282093</code></pre>
+<p>De multiples fonctions sont fournies pour générer des nombres
+pseudo-aléatoires suivant des distributions de probabilité diverses. Par
+exemple, pour générer des nombres distribués selon la gaussienne
+d’espérance <span class="math inline">\(\mu = 0.0\)</span> et
+d’écart-type <span class="math inline">\(\sigma = 1.0\)</span>, on peut
+invoquer</p>
+<pre class="python"><code>&gt;&gt;&gt; random.gauss(mu=0.0, sigma=1.0)
+0.7010040262172509
+&gt;&gt;&gt; random.gauss(mu=0.0, sigma=1.0)
+0.11430668630347102
+&gt;&gt;&gt; random.gauss(mu=0.0, sigma=1.0)
+-0.49389733826503307</code></pre>
+<h3 id="interface-orientée-objet">Interface orientée objet</h3>
+<p>L’étude du fichier source <a href="https://github.com/python/cpython/blob/3.10/Lib/random.py">random.py</a>
+nous informe que l’interface classique du module n’est qu’un fin vernis
+au-dessus d’une architecture objet. Le module définit une classe
+<code>Random</code>, puis crée une instance privé <code>_inst</code>
+dans ce module. Les “fonctions” du module <code>random</code> comme
+<code>gauss</code> sont simplement des raccourcis vers les méthodes de
+cette instance</p>
+<pre class="python"><code>&gt;&gt;&gt; random.random
+&lt;built-in method random of Random object at 0x55a5a09ad260&gt;
+&gt;&gt;&gt; random.gauss
+&lt;bound method Random.gauss of &lt;random.Random object at 0x55a5a09ad260&gt;&gt;
+&gt;&gt;&gt; r = random._inst
+&gt;&gt;&gt; type(r)
+&lt;class 'random.Random'&gt;
+&gt;&gt;&gt; r.random
+&lt;built-in method random of Random object at 0x55a5a09ad260&gt;
+&gt;&gt;&gt; r.gauss
+&lt;bound method Random.gauss of &lt;random.Random object at 0x55a5a09ad260&gt;&gt;</code></pre>
+<p>La méthode <code>random</code> utilisée par défaut génère des nombres
+entiers aléatoires compris entre <span class="math inline">\(0\)</span>
+et <span class="math inline">\(2^{53} - 1\)</span> (la probabilité de
+chaque entier étant identique), puis divise le résultat par <span class="math inline">\(2^{53}\)</span>. Inconvénient de cette approche :
+<code>random()</code> renvoie une grandeur qui est toujours un multiple
+de <span class="math inline">\(2^{-53}\)</span>. Le nombre flottant
+<span class="math inline">\(2^{-1074}\)</span> par exemple, qui est le
+plus petit nombre flottant strictement positif n’a aucune chance d’être
+produit.</p>
+<pre class="python"><code>&gt;&gt;&gt; r.random() * 2**53
+4346481833061509.0
+&gt;&gt;&gt; r.random() * 2**53
+6826402970501312.0
+&gt;&gt;&gt; r.random() * 2**53
+5570978756682725.0</code></pre>
+<p>Si c’est un problème pour vous, il est possible de corriger ce
+comportement comme le suggère la <a href="https://docs.python.org/fr/3/library/random.html#recipes">documentation
+du module <code>random</code></a> en définissant une classe dérivée de
+<code>Random</code> qui surcharge la méthode <code>random</code></p>
+<pre class="python"><code>from math import ldexp
+
+class AltRandom(random.Random):
+    def random(self):
+        mantissa = 0x10_0000_0000_0000 | self.getrandbits(52)
+        exponent = -53
+        x = 0
+        while not x:
+            x = self.getrandbits(32)
+            exponent += x.bit_length() - 32
+        return ldexp(mantissa, exponent)</code></pre>
+<p>L’usage est immédiat</p>
+<pre class="python"><code>&gt;&gt;&gt; r = AltRandom()
+&gt;&gt;&gt; r.random()
+0.2768487552410033
+&gt;&gt;&gt; r.random()
+0.08881389087065399
+&gt;&gt;&gt; r.random()
+0.28173863914986846</code></pre>
+<p>Les valeurs produites par la méthode <code>random</code> ne sont plus
+nécessairement des multiples de <span class="math inline">\(2^{-53}\)</span> (il y a néanmoins plus d’une
+chance sur deux que cela soit le cas).</p>
+<pre class="python"><code>&gt;&gt;&gt; r.random() * 2**53
+6118147054761291.0
+&gt;&gt;&gt; r.random() * 2**53
+1809975186779188.8
+&gt;&gt;&gt; r.random() * 2**53
+6828617072759119.0</code></pre>
+<p>Les autres distributions de probabilités exploitant la méthode
+<code>random</code> comme source de valeurs aléatoires, nous n’avons pas
+besoin de réimplémenter quoi que ce soit d’autre pour bénéficier très
+largement de cette source aléatoire améliorée.</p>
+<pre class="python"><code>&gt;&gt;&gt; r.gauss(mu=0.0, sigma=1.0)
+-0.28865100238160024
+&gt;&gt;&gt; r.gauss(mu=0.0, sigma=1.0)
+-0.5190938357947126
+&gt;&gt;&gt; r.gauss(mu=0.0, sigma=1.0)
+1.0356452612439027
+</code></pre>
+<h2 id="doctest"><code>doctest</code></h2>
+<p><a href="https://docs.python.org/fr/3/library/doctest.html">Doctest</a> est
+un module de tests unitaires dans la bibliothèque standard. Il vérifie
+que les exemples de votre documentation sont conformes au comportement
+effectif de votre code.</p>
+<p>Par exemple, avec le code</p>
+<pre class="python"><code># file: add.py
+
+def add(x, y):
+    """
+    Numerical sum of two objects
+
+    Usage:
+
+    &gt;&gt;&gt; add(1, 1)
+    2
+    &gt;&gt;&gt; add(0.5, 0.25)
+    0.75
+    &gt;&gt;&gt; add([1], [2])
+    [3]
+    """
+    return x+y
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()</code></pre>
+<p>l’exécution du fichier vous signale que parmi les trois exemples
+d’usage de votre fonction <code>add</code>, le résultat pour l’un
+d’entre eux est différent de ce qui était attendu :</p>
+<pre class="python"><code>$ python add.py 
+**********************************************************************
+File "add.py", line 13, in __main__.add
+Failed example:
+    add([1], [2])
+Expected:
+    [3]
+Got:
+    [1, 2]
+**********************************************************************
+1 items had failures:
+   1 of   3 in __main__.add
+***Test Failed*** 1 failures.</code></pre>
+<p>En effet, si on veut une addition des listes “à la NumPy”, alors le
+code actuel n’est pas le bon ! Car <code>+</code> utilisé sur les listes
+les concatène au lieu de faire la somme élément par élément.</p>
+<p>Nous avons diagnostiqué le problème, mais nous n’avons pas le temps
+d’y apporter une solution dans l’immédiat. Nous allons donc faire en
+sorte de supprimer temporairement de telles erreurs en marquant les
+résults connus comme erronés par un symbole 🐛 (🇺🇸 <strong>bug</strong>
+ou 🇫🇷 <strong>bogue</strong>). Cela nous servira de pense-bête !</p>
+<p>Pour cela, nous allons dériver de la classe <a href="https://docs.python.org/fr/3/library/doctest.html#doctest.OutputChecker"><code>OutputChecker</code></a>
+de <code>doctest</code> et surcharger sa méthode
+<code>check_output</code> pour signaler que tout test dont le résultat
+comporte un symbole de bug doit être considéré comme validé. Puis, nous
+allons insérer la classe qui en résulte en lieu et en place de la classe
+<code>OutputChecker</code> de <code>doctest</code>, pour changer le
+comportement du module.</p>
+<pre class="python"><code># file: doctest_patch.py
+
+import doctest
+_doctest_OutputChecker = doctest.OutputChecker
+
+class OutputChecker(_doctest_OutputChecker):
+    def check_output(self, want, got, optionflags):
+        if "🐛" in want:
+            return True
+        else:
+            return super().check_output(want, got, optionflags)
+
+# 🐒 Monkey-patching
+doctest.OutputChecker = OutputChecker</code></pre>
+<p>Si l’on modifie légèrement le fichier <code>add.py</code> pour
+marquer notre test problématique et importer
+<code>doctest_patch</code></p>
+<pre class="python"><code># file: add.py
+
+def add(x, y):
+    """
+    Numerical sum of two objects
+
+    Usage:
+
+    &gt;&gt;&gt; add(1, 1)
+    2
+    &gt;&gt;&gt; add(0.5, 0.25)
+    0.75
+    &gt;&gt;&gt; add([1], [2])
+    [3] 🐛
+    """
+    return x+y
+
+if __name__ == "__main__":
+    import doctest
+    import doctest_patch
+    doctest.testmod()</code></pre>
+<p>alors les tests s’exécutent sans erreur (aucun affichage veut dire
+que tout va bien).</p>
+<pre class="bash"><code>$ python add.py</code></pre>
+<p>On peut le vérifier en exécutant les tests en mode “verbeux” :</p>
+<pre class="bash"><code>$ python add.py -v
+Trying:
+    add(1, 1)
+Expecting:
+    2
+ok
+Trying:
+    add(0.5, 0.25)
+Expecting:
+    0.75
+ok
+Trying:
+    add([1], [2])
+Expecting:
+    [3] 🐛
+ok
+1 items had no tests:
+    __main__
+1 items passed all tests:
+   3 tests in __main__.add
+3 tests in 2 items.
+3 passed and 0 failed.
+Test passed.</code></pre>
+</body>
+</html>

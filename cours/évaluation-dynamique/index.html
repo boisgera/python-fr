@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Sébastien Boisgérault" />
+  <title>Evaluation dynamique de code</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+  <!--
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet">
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let h3 = document.createElement("h3");
+          h3.innerHTML = "Table des matières";
+          let toc = document.getElementById("TOC");
+          toc.prepend(h3);
+      });    
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let elts = document.querySelectorAll('body > :not(header):not(nav)');
+          let headers = [...elts].filter(elt =>  
+              ["H1", "H2", "H3", "H4", "H5", "H6"].includes(elt.tagName)
+          )
+          for (let header of headers) {
+              let anchor = document.createElement("a");
+              anchor.setAttribute("href", `#${header.id}`);
+              anchor.setAttribute("style", "text-decoration: None;");
+              anchor.innerHTML = header.outerHTML;
+              header.replaceWith(anchor);
+          }
+      });    
+  </script>
+  <script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+  <script>
+
+  function copyAttributes(source, target) {
+    return Array.from(source.attributes).forEach(attribute => {
+      target.setAttribute(
+        attribute.nodeName,
+        attribute.nodeValue,
+      );
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", (event) => {
+      let details = document.querySelectorAll("section.details")
+      details.forEach((elt) => {
+          let details = document.createElement("details");
+          details.innerHTML = elt.innerHTML;
+          copyAttributes(elt, details)
+          elt.replaceWith(details);
+          let header = details.querySelector("h1, h2, h3, h4")
+          let summary = document.createElement("summary")
+          summary.appendChild(header.cloneNode(true))
+          header.replaceWith(summary)
+      })
+  })
+
+  </script>
+  <script>
+      // TODO: replace with clickable 📖, store inside (invis) the content ?
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let button = document.createElement("button");
+              let clone = elt.cloneNode(true);
+              clone.style.setProperty("display", "none");
+              button.appendChild(clone);
+              elt.replaceWith(button);
+
+              button.style.setProperty("height", "4.5em");
+              button.style.setProperty("width", "100%");
+
+              // button.style.setProperty("overflow", "hidden");
+
+              button.style.setProperty("position", "relative");
+              button.style.setProperty("border", "none");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              
+              /*
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              */
+
+              let icon = document.createElement("img");
+              button.appendChild(icon);
+              // button.style.setProperty("border", "none");
+              // button.style.setProperty("background", "none");
+              // button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              // button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  button.replaceWith(elt)
+
+              });
+
+
+              button.addEventListener('mouseover', (event) => {
+                  button.style.setProperty("cursor", "pointer");
+              });
+              
+              button.addEventListener('mouseout', (event) => {
+                  button.style.setProperty("cursor", "auto");
+              });
+
+      /*
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let wrapper = document.createElement("div");
+              let clone = elt.cloneNode(true);
+              wrapper.appendChild(clone);
+              elt.replaceWith(wrapper);
+
+              wrapper.style.setProperty("height", "4.5em");
+              wrapper.style.setProperty("overflow", "hidden");
+              wrapper.style.setProperty("position", "relative");
+              wrapper.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+
+              let button = document.createElement("div");
+              wrapper.appendChild(button);
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              
+              let icon = document.createElement("img");
+              let button = document.createElement("button");
+              button.appendChild(icon);
+              button.style.setProperty("border", "none");
+              button.style.setProperty("background", "none");
+              button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  wrapper.replaceWith(elt)
+
+              });
+
+
+  */
+          }
+      });    
+  </script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Evaluation dynamique de code</h1>
+<p class="author">👤 <a
+href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
+Boisgérault</a></p>
+<p class="affiliation">🏦 MINES ParisTech, Université PSL</p>
+<p class="license">⚖️ <a
+href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></p>
+</header>
+<p>Le langage Python permet l’exécution dynamique de code. La fonction
+<code>exec</code> permet d’exécuter des <strong>instructions</strong>
+(🇺🇸 : <strong>statements</strong>) :</p>
+<pre class="python"><code>&gt;&gt;&gt; exec(&quot;print(&#39;Hello world!&#39;)&quot;)
+Hello world!</code></pre>
+<p>et la fonction <code>eval</code> d’évaluer des
+<strong>expressions</strong> (🇺🇸 : <strong>expressions</strong>) :</p>
+<pre class="python"><code>&gt;&gt;&gt; eval(&quot;1+1&quot;)
+2</code></pre>
+<p>Dans de nombreux cas, évaluer la représentation d’un objet Python
+sous forme de chaînes de caractères génère un objet identique à l’objet
+original. Par exemple :</p>
+<pre class="python"><code>&gt;&gt;&gt; one = 1
+&gt;&gt;&gt; repr(one)
+&#39;1&#39;
+&gt;&gt;&gt; eval(repr(one))
+1
+&gt;&gt;&gt; eval(repr(one)) == one
+True</code></pre>
+<p>ou encore</p>
+<pre class="python"><code>&gt;&gt;&gt; hello = &quot;Hello world!&quot;
+&gt;&gt;&gt; repr(hello)
+&quot;&#39;Hello world!&#39;&quot;
+&gt;&gt;&gt; eval(repr(hello))
+&#39;Hello world!&quot;
+&gt;&gt;&gt; eval(repr(hello)) == hello
+True</code></pre>
+<p>et</p>
+<pre class="python"><code>&gt;&gt;&gt; numbers = [1, 2, 3]
+&gt;&gt;&gt; repr(numbers)
+&#39;[1, 2, 3]&#39;
+&gt;&gt;&gt; eval(repr(numbers))
+[1, 2, 3]
+&gt;&gt;&gt; eval(repr(numbers)) == numbers
+True</code></pre>
+<p>Ce n’est toutefois pas une règle universelle.</p>
+<section id="contre-exemples" class="details div-details">
+<h4 class="details">Contre-exemples</h4>
+<p>La représentation d’un objet fonction par exemple ne permet pas sa
+reconstruction :</p>
+<pre class="python"><code>&gt;&gt;&gt; def f():
+...     pass
+... 
+&gt;&gt;&gt; repr(f)
+&#39;&lt;function f at 0x7f9bd685f640&gt;&#39;
+&gt;&gt;&gt; eval(repr(f))
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;string&gt;&quot;, line 1
+    &lt;function f at 0x7f9bd685f640&gt;
+    ^
+SyntaxError: invalid syntax</code></pre>
+<p>Mais il est possible de trouver un contre-exemple en utilisant
+uniquement les listes :</p>
+<pre class="python"><code>&gt;&gt;&gt; loop  = []
+&gt;&gt;&gt; loop.append(loop)  # Ooooooh ! 🤯
+&gt;&gt;&gt; repr(loop)
+&#39;[[...]]&#39;
+&gt;&gt;&gt; ...
+Ellipsis
+&gt;&gt;&gt; eval(repr(loop))
+[[Ellipsis]]
+&gt;&gt;&gt; loop2 = eval(repr(loop))
+&gt;&gt;&gt; loop2[0] 
+[Ellipsis]
+&gt;&gt;&gt; loop2[0] == loop2
+False</code></pre>
+</section>
+<section id="dangers" class="details div-details">
+<h4 class="details">⚠️ Dangers</h4>
+<p>L’utilisation de <code>eval</code> et <code>exec</code> est souvent
+découragée en pratique. En particulier, l’exécution de code inconnu (et
+donc potentiellement malveillant) est susceptible de faire de gros
+dégats ; par exemple si votre programme Python, s’exécutant sur votre
+serveur, exécute une chaîne de caractères fournie par son utilisateur
+distant, et que celui-ci fournit</p>
+<pre class="python"><code>code = &#39;import os\nwhile True:\n\tprint(os.popen(input(&quot;$ &quot;)).read())&#39;</code></pre>
+<p>Alors il dispose alors d’un accès complet au terminal de votre
+serveur … Il peut donc très facilement ajouter des fichiers, lire des
+fichiers locaux et les transférer leur contenu par le réseau, éteindre
+l’ordinateur, etc.</p>
+</section>
+<h4 id="section"></h4>
+<p>Les options plus avancées de <code>exec</code> et <code>eval</code>
+sont détaillées dans la documentation de la bibliothèque standard Python
+:</p>
+<ul>
+<li><p>📖 <a
+href="https://docs.python.org/3/library/functions.html#exec">exec</a></p></li>
+<li><p>📖 <a
+href="https://docs.python.org/3/library/functions.html#eval">eval</a></p></li>
+</ul>
+</body>
+</html>

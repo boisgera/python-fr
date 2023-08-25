@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Sébastien Boisgérault" />
+  <title>Egalité et identité</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+  <!--
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet">
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let h3 = document.createElement("h3");
+          h3.innerHTML = "Table des matières";
+          let toc = document.getElementById("TOC");
+          toc.prepend(h3);
+      });    
+  </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let elts = document.querySelectorAll('body > :not(header):not(nav)');
+          let headers = [...elts].filter(elt =>  
+              ["H1", "H2", "H3", "H4", "H5", "H6"].includes(elt.tagName)
+          )
+          for (let header of headers) {
+              let anchor = document.createElement("a");
+              anchor.setAttribute("href", `#${header.id}`);
+              anchor.setAttribute("style", "text-decoration: None;");
+              anchor.innerHTML = header.outerHTML;
+              header.replaceWith(anchor);
+          }
+      });    
+  </script>
+  <script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+  <script>
+
+  function copyAttributes(source, target) {
+    return Array.from(source.attributes).forEach(attribute => {
+      target.setAttribute(
+        attribute.nodeName,
+        attribute.nodeValue,
+      );
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", (event) => {
+      let details = document.querySelectorAll("section.details")
+      details.forEach((elt) => {
+          let details = document.createElement("details");
+          details.innerHTML = elt.innerHTML;
+          copyAttributes(elt, details)
+          elt.replaceWith(details);
+          let header = details.querySelector("h1, h2, h3, h4")
+          let summary = document.createElement("summary")
+          summary.appendChild(header.cloneNode(true))
+          header.replaceWith(summary)
+      })
+  })
+
+  </script>
+  <script>
+      // TODO: replace with clickable 📖, store inside (invis) the content ?
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let button = document.createElement("button");
+              let clone = elt.cloneNode(true);
+              clone.style.setProperty("display", "none");
+              button.appendChild(clone);
+              elt.replaceWith(button);
+
+              button.style.setProperty("height", "4.5em");
+              button.style.setProperty("width", "100%");
+
+              // button.style.setProperty("overflow", "hidden");
+
+              button.style.setProperty("position", "relative");
+              button.style.setProperty("border", "none");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              
+              /*
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              */
+
+              let icon = document.createElement("img");
+              button.appendChild(icon);
+              // button.style.setProperty("border", "none");
+              // button.style.setProperty("background", "none");
+              // button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              // button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  button.replaceWith(elt)
+
+              });
+
+
+              button.addEventListener('mouseover', (event) => {
+                  button.style.setProperty("cursor", "pointer");
+              });
+              
+              button.addEventListener('mouseout', (event) => {
+                  button.style.setProperty("cursor", "auto");
+              });
+
+      /*
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let collapse = document.querySelectorAll(".collapse")
+          for (let elt of collapse) {
+              let wrapper = document.createElement("div");
+              let clone = elt.cloneNode(true);
+              wrapper.appendChild(clone);
+              elt.replaceWith(wrapper);
+
+              wrapper.style.setProperty("height", "4.5em");
+              wrapper.style.setProperty("overflow", "hidden");
+              wrapper.style.setProperty("position", "relative");
+              wrapper.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+
+              let button = document.createElement("div");
+              wrapper.appendChild(button);
+              button.style.setProperty("z-index", "10");
+              button.style.setProperty("background-color", "#f8f9fa"); // "#fff5f5");
+              button.style.setProperty("position", "absolute");
+              button.style.setProperty("top", "0px");
+              button.style.setProperty("left", "0px");
+              button.style.setProperty("bottom", "0px");
+              button.style.setProperty("right", "0px");
+              
+              let icon = document.createElement("img");
+              let button = document.createElement("button");
+              button.appendChild(icon);
+              button.style.setProperty("border", "none");
+              button.style.setProperty("background", "none");
+              button.appendChild(button);
+              icon.setAttribute("src", "icons/chevron-down.svg");
+              button.style.setProperty("display", "flex");
+              button.style.setProperty("align-items", "center");
+              button.style.setProperty("justify-content", "center");
+              button.style.setProperty("box-shadow", "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px")
+
+              button.addEventListener('click', (event) => {
+                  wrapper.replaceWith(elt)
+
+              });
+
+
+  */
+          }
+      });    
+  </script>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Egalité et identité</h1>
+<p class="author">👤 <a
+href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
+Boisgérault</a></p>
+<p class="affiliation">🏦 MINES ParisTech, Université PSL</p>
+<p class="license">⚖️ <a
+href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#egalité" id="toc-egalité">Egalité</a>
+<ul>
+<li><a href="#nombres" id="toc-nombres">Nombres</a></li>
+<li><a href="#collections" id="toc-collections">Collections</a></li>
+<li><a href="#chaînes-de-caractères"
+id="toc-chaînes-de-caractères">Chaînes de caractères</a></li>
+</ul></li>
+<li><a href="#identité" id="toc-identité">Identité</a>
+<ul>
+<li><a href="#egalité-et-identité" id="toc-egalité-et-identité">Egalité
+et identité</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="egalité">Egalité</h1>
+<p>L’expression <code>x == y</code> détermine si les objets
+<code>x</code> et <code>y</code> sont égaux :</p>
+<pre class="python"><code>&gt;&gt;&gt; 0 == 0
+True
+&gt;&gt;&gt; 0 == 1
+False</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; &quot;Hello!&quot; == &quot;Hello!&quot;
+True
+&gt;&gt;&gt; &quot;Hello&quot; == &quot;World&quot;
+False</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; [1, 2, 3] == [1, 2, 3]
+True
+&gt;&gt;&gt; [1, 2, 3] == [4, 5, 6]
+False</code></pre>
+<p>Les tests d’égalité en Python dépendent du type des objets comparés :
+il n’y a pas d’interprétation totalement universelle de <code>==</code>
+; il faut se reporter à la documentation des types concernés. Vous
+pourrez d’ailleurs décider quel sens donner aux égalités des types que
+vous serez amenés à définir.</p>
+<section
+id="comment-interpréter-x-y-si-les-types-de-x-et-y-sont-différents"
+class="details div-details">
+<h4 class="details">🤔 Comment interpréter <code>x == y</code> si les
+types de <code>x</code> et <code>y</code> sont différents ?</h4>
+<p>Si le type de <code>y</code> est un sous-type du type de
+<code>x</code>, il détermine en priorité quel sens donner à
+<code>==</code> ; dans le cas contraire c’est le type de <code>x</code>
+auquel est donné la priorité.</p>
+<p>Source: <a
+href="https://docs.python.org/fr/3/reference/datamodel.html#object.__eq__">📖
+Méthodes de comparaison riches</a></p>
+</section>
+<h2 id="nombres">Nombres</h2>
+<p>Le test d’égalité de nombres se passe sans grande surprise si l’on
+laisse de coté certains propriétés des <a href="#IEEE754">nombres (à
+virgule flottante) spéciaux</a>.</p>
+<p>Notons simplement que les test d’égalité entre nombres sont
+suffisamment permissifs pour permettre de comparer des nombres dont le
+type est différent :</p>
+<pre class="python"><code>&gt;&gt;&gt; 1 == True
+True
+&gt;&gt;&gt; 1 == 1.0
+True
+&gt;&gt;&gt; 1 == 1 + 0j
+True</code></pre>
+<section id="IEEE754" class="details div-details">
+<h4 class="details">Egalité des nombres à virgule flottante</h4>
+<p>Le nombres à virgule flottante (<code>float</code>) de Python sont de
+précision finie. Par conséquent des erreurs d’arrondi dans les calculs
+peuvent faire échouer les tests d’égalité. Ainsi, on a par exemple :</p>
+<pre class="python"><code>&gt;&gt;&gt; 0.1 + 0.2 == 0.3
+False</code></pre>
+<p>car l’addition a introduit une (petite) erreur dans le calcul :</p>
+<pre class="python"><code>&gt;&gt;&gt; 0.1 + 0.2
+0.30000000000000004</code></pre>
+<p>Le standard IEEE 754 régit la représentation et le calcul des nombres
+flottants. Il introduit des nombres spéciaux ; il y a ainsi deux zéros
+distincts (<span class="math inline">\(0^+\)</span> et <span
+class="math inline">\(0^-\)</span>) mais considérés égaux :</p>
+<pre class="python"><code>&gt;&gt;&gt; +0.0
+0.0
+&gt;&gt;&gt; -0.0
+-0.0
+&gt;&gt;&gt; +0.0 == -0.0
+True</code></pre>
+<p>Plus surprenant, le “non-nombre” <code>nan</code> (🇺🇸: <strong>not a
+number</strong>) est une valeur spéciale … qui n’est pas égale à
+elle-même ! (Tous les “non-nombres” sont réputés différents.)</p>
+<pre class="python"><code>&gt;&gt;&gt; from math import nan
+&gt;&gt;&gt; nan == nan
+False</code></pre>
+<p>Il faudra utiliser la fonction <code>isnan</code> pour savoir si une
+valeur est un non-nombre.</p>
+<pre class="python"><code>&gt;&gt;&gt; from math import isnan
+&gt;&gt;&gt; isnan(nan)
+True</code></pre>
+<p>Source: <a href="https://fr.wikipedia.org/wiki/IEEE_754">📖 Standard
+IEEE 754</a></p>
+</section>
+<h2 id="collections">Collections</h2>
+<p>Deux collections – listes, n-uplets, dictionnaires, ensembles, etc. –
+délèguent le test d’égalité aux éléments qui les composent –
+récursivement si ceux-ci sont également des collections. Ainsi :</p>
+<pre class="python"><code>&gt;&gt;&gt; [] == [0]
+False
+&gt;&gt;&gt; [0] == [0]
+True
+&gt;&gt;&gt; [0] == [1]
+False
+&gt;&gt;&gt; [0] == [0, 0]
+False
+&gt;&gt;&gt; [0] == [0.0]
+True
+&gt;&gt;&gt; [[0]] == [[0.0]]
+True</code></pre>
+<p>Pour les dictionnaires :</p>
+<pre class="python"><code>&gt;&gt;&gt; {&quot;a&quot;: 1, &quot;b&quot;: 2} == {&quot;a&quot;: 1, &quot;b&quot;: 2}
+True</code></pre>
+<p>et</p>
+<pre class="python"><code>&gt;&gt;&gt; {&quot;a&quot;: 1, &quot;b&quot;: 2} == {&quot;a&quot;: 1.0, &quot;b&quot;: 2.0}
+True</code></pre>
+<p>L’ordre des couples clés-valeurs n’a pas d’importance</p>
+<pre class="python"><code>&gt;&gt;&gt; {&quot;a&quot;: 1, &quot;b&quot;: 2} == {&quot;b&quot;: 2, &quot;a&quot;: 1}
+True</code></pre>
+<p>mais il suffit qu’une clé ou qu’une valeur diffère dans les deux
+collections comparées pour invalider l’égalité :</p>
+<pre class="python"><code>&gt;&gt;&gt; {&quot;a&quot;: 1, &quot;b&quot;: 2} == {&quot;a&quot;: 1, &quot;b&quot;: 2, &quot;c&quot;: 3}
+False
+&gt;&gt;&gt; {&quot;a&quot;: 1, &quot;b&quot;: 2} == {&quot;a&quot;: 2, &quot;b&quot;: 1}
+False</code></pre>
+<h2 id="chaînes-de-caractères">Chaînes de caractères</h2>
+<p>La comparaison des chaînes de caractères se passe la plupart du temps
+comme on s’y attend :</p>
+<pre class="python"><code>&gt;&gt;&gt; &quot;Hello&quot; == &quot;Hello&quot;
+True
+&gt;&gt;&gt; &quot;Hello&quot; == &quot;Halo&quot;
+False</code></pre>
+<p>A ceci près que dans le standard unicode il y a parfois plusieurs
+façons d’obtenir visuellement le même caractère. Il y a ainsi un
+caractère “e accent aigu”</p>
+<pre class="python"><code>&gt;&gt;&gt; &quot;\xe9&quot;
+&#39;é&#39;</code></pre>
+<p>mais aussi un symbole “accent aigu” qu’on peut combiner à un “e”
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; &quot;e\u0301&quot;
+&#39;é&#39;</code></pre>
+<p>Les deux séquences de code points sont différentes, donc les deux
+chaînes de caractères sont considérées comme différentes :</p>
+<pre class="python"><code>&gt;&gt;&gt; &quot;\xe9&quot; == &quot;e\u0301&quot;
+False</code></pre>
+<p>C’est toutefois beaucoup plus surprenant quand le test est effectué
+sous la forme suivante :</p>
+<pre class="python"><code>&gt;&gt;&gt; &quot;é&quot; == &quot;é&quot;
+False</code></pre>
+<h1 id="identité">Identité</h1>
+<p>L’expression <code>x is y</code> détermine si l’objet <code>x</code>
+<strong>est</strong> l’objet <code>y</code>, à la même
+<strong>identité</strong></p>
+<pre class="python"><code>x is y</code></pre>
+<p>La négation de <code>==</code> est <code>!=</code>, celle de
+<code>is</code> est <code>is not</code> :</p>
+<pre class="python"><code>x != y</code></pre>
+<pre class="python"><code>x is not y</code></pre>
+<section id="ℹ-terminologie" class="details div-details">
+<h4 class="details">ℹ️ Terminologie</h4>
+<ul>
+<li><p>On pourra utiliser le terme <strong>est égal à</strong> pour
+affirmer l’égalité entre objets et tout simplement <strong>est</strong>
+pour affirmer qu’ils ont la même identité (utiliser le terme “identique”
+serait trompeur).</p></li>
+<li><p>L’égalité entre objets est parfois appelée <strong>égalité
+structurelle</strong> et l’identité entre objets <strong>égalité
+référentielle</strong>.</p></li>
+</ul>
+</section>
+<h4 id="section"></h4>
+<p>L’identité <code>x is y</code> signifie que les variables
+<code>x</code> et <code>y</code> réfèrent au même objet Python : les
+données sont à la même adresse en mémoire. Une copie parfaite d’un objet
+aura donc une identité différente de l’originale, alors qu’il sera
+considéré égal à l’original. Par contre, si deux objets sont identiques
+(au sens de : ont la même identité, sont un seul est unique objet),
+alors ils sont nécessairement égaux.</p>
+<h3 id="egalité-et-identité">Egalité et identité</h3>
+<p>A titre d’exemple, considérons les trois listes <code>a</code>,
+<code>b</code> et <code>c</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; a = [1, 2, 3]
+&gt;&gt;&gt; b = [1, 2, 3]
+&gt;&gt;&gt; c = b</code></pre>
+<p>Les listes <code>a</code> et <code>b</code> sont égales, ainsi que
+<code>b</code> et <code>c</code>, mais ne sont pas identiques, elles ne
+désignent pas le même objet (en mémoire) ; les variables <code>b</code>
+et <code>c</code> par contre désignent le même objet :</p>
+<pre class="python"><code>&gt;&gt;&gt; a == b
+True
+&gt;&gt;&gt; b == c
+True
+&gt;&gt;&gt; a is b
+False
+&gt;&gt;&gt; b is c
+True</code></pre>
+<p>On peut s’assurer que les variables <code>b</code> et <code>c</code>
+désignent le même objet en évaluant l’<strong>identifiant</strong> de
+ces objets (un entier) avec la fonction <code>id</code> :</p>
+<pre><code>&gt;&gt;&gt; id(a)
+140636096399680
+&gt;&gt;&gt; id(b)
+140636098130688
+&gt;&gt;&gt; id(c)
+140636098130688
+&gt;&gt;&gt; id(a) == id(b)
+False
+&gt;&gt;&gt; id(b) == id(c)
+True</code></pre>
+<p>Une conséquence importante de cette distinction : les modifications
+de la liste (désignée par) <code>b</code> vont impacter la liste
+<code>c</code> (qui est le même objet), mais pas la liste <code>a</code>
+(qui est un objet distinct) :</p>
+<pre class="python"><code>&gt;&gt;&gt; b.append(4)
+&gt;&gt;&gt; b
+[1, 2, 3, 4]
+&gt;&gt;&gt; c
+[1, 2, 3, 4]
+&gt;&gt;&gt; a
+[1, 2, 3]</code></pre>
+<section id="x-is-not-y-nest-pas-la-même-chose-que-x-is-not-y"
+class="details div-details">
+<h4 class="details">⚠️ <code>x is not y</code> n’est pas la même chose
+que <code>x is (not y)</code></h4>
+<p>Bien qu’étant composé de deux mot-clés séparés par un espace,
+<code>is not</code> est un opérateur en tant que tel. L’expression
+<code>x is not y</code> est équivalente à <code>not (x is y)</code> …
+mais plus lisible ! Si l’on a besoin d’utiliser <code>is</code> et
+<code>not</code> comme des opérateurs distincts, pour signifier
+<code>x is (not y)</code>, il conviendra de garder les parenthèses.
+Ainsi, avec</p>
+<pre class="python"><code>&gt;&gt;&gt; x = 1
+&gt;&gt;&gt; y = True</code></pre>
+<p>on a</p>
+<pre><code>&gt;&gt;&gt; x is not y
+True
+&gt;&gt;&gt; x is y
+False
+&gt;&gt;&gt; not (x is y)
+True</code></pre>
+<p>mais</p>
+<pre class="python"><code>&gt;&gt;&gt; not y
+False
+&gt;&gt;&gt; x is (not y)
+False</code></pre>
+</section>
+</body>
+</html>

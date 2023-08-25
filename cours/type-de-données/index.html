@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
+          }
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault" name="author"/>
+<title>Types de données</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Types de données</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@mines-paristech.fr">Sébastien
+Boisgérault</a></p>
+<p class="date">Friday, 25 august 2023</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/7da617f">
+          #7da617f
+        </a>
+</p>
+</header>
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#absence-de-valeur" id="toc-absence-de-valeur">Absence de
+valeur</a>
+<ul>
+<li><a href="#mécanismes" id="toc-mécanismes">Mécanismes</a></li>
+<li><a href="#usages" id="toc-usages">Usages</a></li>
+</ul></li>
+<li><a href="#types-numériques" id="toc-types-numériques">Types
+numériques</a>
+<ul>
+<li><a href="#booléens" id="toc-booléens">Booléens</a></li>
+<li><a href="#entiers" id="toc-entiers">Entiers</a></li>
+<li><a href="#nombres-flottants" id="toc-nombres-flottants">Nombres
+flottants</a></li>
+</ul></li>
+</ul>
+</nav></details>
+
+
+<h1 id="absence-de-valeur">Absence de valeur</h1>
+<p>Python fournit une valeur <code>None</code> qui signale … l’absence
+de valeur ! D’ailleurs, l’interpréteur Python ne veut pas nous
+l’afficher quand on fournit cette valeur sur l’invite de commandes :</p>
+<pre class="python"><code>&gt;&gt;&gt; None</code></pre>
+<p>Passer par une variable ne change rien.</p>
+<pre class="python"><code>&gt;&gt;&gt; a = None
+&gt;&gt;&gt; a</code></pre>
+<p>Par contre on peut explicitement afficher <code>None</code>, par
+exemple avec la fonction <code>print</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; print(a)
+None</code></pre>
+<p>La valeur <code>None</code> n’a rien de très complexe en soi ; mais
+ses cas d’usage classiques méritent d’être étudiés : ce n’est pas
+comment fonctionne <code>None</code> qui est subtil, mais plutôt comment
+on peut l’utiliser à bon escient.</p>
+<h2 id="mécanismes">Mécanismes</h2>
+<p><code>None</code> est une valeur unique en Python (il n’y a aucun
+moyen de générer deux <code>None</code> qui soient différents). On peut
+donc tester si une variable <code>x</code> est <code>None</code> en
+évaluant l’expression <code>x is None</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; x = 1
+&gt;&gt;&gt; x is None
+False
+&gt;&gt;&gt; x = None
+&gt;&gt;&gt; x is None
+True</code></pre>
+<p>Attention, une variable affectée à <code>None</code> ; une variable
+indéfinie (qui n’est liée à aucune valeur) c’est (subtilement)
+différent. Si la variable <code>y</code> n’a pas encore été introduite
+(ou a été effacée avec <code>del y</code>), l’évaluation de l’expression
+<code>y is None</code> provoque une erreur</p>
+<pre class="python"><code>&gt;&gt;&gt; y is None
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+NameError: name 'y' is not defined</code></pre>
+<p>comme d’ailleurs toute expression qui utilise <code>y</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; y
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+NameError: name 'y' is not defined</code></pre>
+<p>Dans un contexte booléen, <code>None</code> est évalué comme
+<code>False</code>, mais le test <code>x is None</code> est plus
+sélectif, donc en général préférable :</p>
+<pre class="python"><code>&gt;&gt;&gt; x = None
+&gt;&gt;&gt; if x is None:
+...    print("x is None")
+...
+x is None
+&gt;&gt;&gt; if not x:
+...    print("x is false-ish")
+...
+x is false-ish
+&gt;&gt;&gt; x = 0
+&gt;&gt;&gt; if not x:
+...    print("x is false-ish")
+...
+x is false-ish</code></pre>
+<h2 id="usages">Usages</h2>
+<h3 id="fonctions-sans-valeur-de-retour">Fonctions sans valeur de
+retour</h3>
+<p>Comme les fonctions mathématiques, les fonctions Python ont des
+arguments et renvoient des valeurs</p>
+<pre class="python"><code>&gt;&gt;&gt; abs(-1)
+1</code></pre>
+<p>Mais invoquer une fonction Python peut aussi avoir des <strong>effets
+de bords</strong> (🇺🇸 <strong>side-effect</strong>), par exemple:</p>
+<ul>
+<li><p>afficher du texte dans le terminal,</p></li>
+<li><p>modifier une variable globale,</p></li>
+<li><p>écrire dans un fichier,</p></li>
+<li><p>envoyer un e-mail,</p></li>
+<li><p>etc.</p></li>
+</ul>
+<p>Si cet effet de bord est l’unique raison d’être de la fonction, il
+est alors inutile de renvoyer une valeur.</p>
+<p>Par exemple, invoquer la fonction <code>sleep</code> du module Python
+<code>time</code> va mettre en pause le programme qui l’invoque (ici
+l’interpréteur Python) pendant un temps déterminé, puis le laisser
+suivre son cours. L’effet de bord attendu ici, c’est la pause dans le
+programme. Utilisons cette fonction dans notre propre fonction
+<code>think</code></p>
+<pre class="python"><code>import time
+def think():
+    print("Je réfléchis ...", end=" ")
+    time.sleep(3.0)
+    print("J'ai fini !")</code></pre>
+<p>que l’on invoquera de la façon suivante</p>
+<pre class="python"><code>&gt;&gt;&gt; think()
+Je réfléchis ... J'ai fini !</code></pre>
+<p>Mais toute valeur Python renvoie – implicitement ou explicitement –
+une valeur. Il est donc légitime d’affecter le résultat de
+<code>think()</code> à une variable. La difficulté, c’est que
+l’interpréteur Python ne l’affiche pas:</p>
+<pre class="python"><code>&gt;&gt;&gt; result = think()
+Je réfléchis ... J'ai fini !
+&gt;&gt;&gt; result
+&gt;&gt;&gt;</code></pre>
+<p>Notre fonction a en fait renvoyé la valeur spéciale <code>None</code>
+qui peut être interprétée comme “absence de valeur” (oui, c’est un peu
+paradoxal !). En insistant, on peut quand même faire en sorte que
+l’interpréteur Python avoue quelle est la réalité :</p>
+<pre class="python"><code>&gt;&gt;&gt; print(result)
+None</code></pre>
+<p>Tout se passe en fait comme si l’interpréteur Python, constatant que
+la définition de notre fonction <code>think</code> ne renvoyait
+<em>explicitement</em> aucune valeur (le mot-clé <code>return</code>
+n’est pas utilisé) y avait ajouté l’instruction
+<code>return None</code>:</p>
+<pre class="python"><code>def think():
+    print("Je réfléchis ...", end=" ")
+    time.sleep(3.0)
+    print("J'ai fini !")
+    return None</code></pre>
+<h3 id="fonction-avec-valeur-de-retour-optionnelle">Fonction avec valeur
+de retour optionnelle</h3>
+<p>Les dictionnaires Python génère une erreur lorsque l’on essaie
+d’accéder à la valeur d’une clé qui n’existe pas.</p>
+<pre class="python"><code>&gt;&gt;&gt; d = {"a": 1, "b": 2}
+&gt;&gt;&gt; d["a"]
+1
+&gt;&gt;&gt; d["c"]
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+KeyError: 'c'</code></pre>
+<p>Cela n’est pas toujours très pratique. Heureusement il existe une
+méthode auxiliaire qui permet de renvoyer une valeur particulière en cas
+d’échec. Par défaut, cette valeur est <code>None</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; help(dict.get)
+Help on method_descriptor:
+
+get(self, key, default=None, /)
+    Return the value for key if key is in the dictionary, else default.</code></pre>
+<p>Ainsi, si l’on souhaite afficher les valeurs associées aux clés
+<code>"a"</code>, <code>"b"</code> et <code>"c"</code> (supposées
+différentes de <code>None</code>) si elles existent et rien sinon, on
+pourra faire :</p>
+<pre class="python"><code>&gt;&gt;&gt; for key in ["a", "b", "c"]:
+...     value = d.get(key)
+...     if value is not None:
+...         print(value)
+1
+2</code></pre>
+<h3 id="fonction-et-absence-dargument">Fonction et absence
+d’argument</h3>
+<p>La valeur <code>None</code> est souvent utilisée comme valeur par
+défaut associée à l’argument d’une fonction. Ne pas affecter
+(explicitement) de valeur à cet argument revient à lui affecter la
+valeur <code>None</code>, ce que la fonction pourra détecter et gérer de
+façon appropriée.</p>
+<p>Nous allons illustrer cela avec la fonction <code>seterr</code> de
+NumPy, dont la documentation commence de la façon suivante :</p>
+<pre class="python"><code>&gt;&gt;&gt; help(np.seterr) # doctest: +ELLIPSIS
+Help on function seterr in module numpy:
+
+seterr(all=None, divide=None, over=None, under=None, invalid=None)
+    Set how floating-point errors are handled.
+...</code></pre>
+<p>Pour mémoire, en cas de division par zéro, les nombres flottants
+standards (<code>float</code>) de Python génèrent une erreur :</p>
+<pre class="python"><code>&gt;&gt;&gt; 1.0 / 0.0
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+ZeroDivisionError: float division by zero</code></pre>
+<p>Mais ce qui se passe si l’on utilise les nombres flottants fournis
+par NumPy (<code>float64</code>) est un peu différent:</p>
+<pre class="python"><code>&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; one = np.float64(1.0)
+&gt;&gt;&gt; zero = np.float64(0.0)
+&gt;&gt;&gt; one / zero
+&lt;stdin&gt;:1: RuntimeWarning: divide by zero encountered in double_scalars
+inf</code></pre>
+<p>Python émet un <strong>avertissement</strong><a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a> (🇺🇸
+<strong>warning</strong>) mais renvoie bien une valeur :
+<code>inf</code> (c’est-à-dire <span class="math inline">\(+\infty\)</span>).</p>
+<p>Ce comportement est toutefois configurable : en appelant la fonction
+<code>seterr</code> de NumPy sans argument, vous pouvez lire la
+configuration courante :</p>
+<pre class="python"><code>&gt;&gt;&gt; np.seterr()
+{'divide': 'warn', 'over': 'warn', 'under': 'ignore', 'invalid': 'warn'}</code></pre>
+<p>Si ce comportement par défaut ne vous plait pas, vous pouvez utiliser
+la fonction <code>seterr</code> de NumPy pour générer une erreur en cas
+de division par zero.</p>
+<pre class="python"><code>&gt;&gt;&gt; _ = np.seterr(divide="raise")
+&gt;&gt;&gt; one / zero
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+FloatingPointError: divide by zero encountered in double_scalars</code></pre>
+<p>Si à l’inverse vous pensez que <span class="math inline">\(1.0 /
+0.0\)</span> est une opération “normale” qui doit renvoyer un
+“non-nombre” (<span class="math inline">\(\bot\)</span> c’est-à-dire
+<code>nan</code>), faites en sorte que le mécanisme de gestion des
+avertissements et erreurs de NumPy les ignore.</p>
+<pre class="python"><code>&gt;&gt;&gt; _ = np.seterr(divide="ignore")
+&gt;&gt;&gt; one / zero
+inf</code></pre>
+<p>Si ce résultat vous convient, mais que vous souhaitez une erreur en
+cas de <strong>dépassement</strong> (🇺🇸 <strong>overflow</strong>)
+(sous-entendu : du plus grand nombre flottant fini), vous pouvez
+invoquer <code>seterr</code> en conséquence :</p>
+<pre class="python"><code>&gt;&gt;&gt; _ = np.seterr(overflow="raise")
+&gt;&gt;&gt; np.float64(2.0) ** 10000
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+FloatingPointError: overflow encountered in double_scalars</code></pre>
+<p>La documentation de <code>seterr</code> nous apprend que la fonction
+a 5 arguments, qui ont tous la valeur par défaut <code>None</code>. Les
+appels successifs que nous avons fait à <code>seterr</code></p>
+<pre class="python"><code>np.seterr()
+np.seterr(divide="raise")
+np.seterr(divide="error")
+np.seterr(over="raise")</code></pre>
+<p>sont donc équivalents à</p>
+<pre class="python"><code>np.seterr(all=None, divide=None, over=None, under=None, invalid=None)
+np.seterr(all=None, divide="error", over=None, under=None, invalid=None)
+np.seterr(all=None, divide="raise", over=None, under=None, invalid=None)
+np.seterr(all="raise", divide=None, over=None, under=None, invalid=None)</code></pre>
+<p>La valeur de <code>None</code> interprétée par <code>seterr</code>
+comme un argument que l’on n’a pas explicitement spécifié et donc dont
+on ne souhaite pas modifier la configuration. Cette stratégie permet de
+lire la configuration sans la changer, de changer la réaction en
+présence d’une division par zéro sans changer celle en cas d’overflow,
+etc.</p>
+<h1 id="types-numériques">Types numériques</h1>
+<h2 id="booléens">Booléens</h2>
+<p>On peut considérer que les booléens <code>True</code> et
+<code>False</code> sont de valeurs numériques. Ils se combinent au moyen
+d’opérateurs logiques et sont principalement exploités dans des tests
+qui contrôlent le flux d’exécution des programmes.</p>
+<pre class="python"><code>&gt;&gt;&gt; not False
+True
+&gt;&gt;&gt; not True
+False</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; False or False
+False
+&gt;&gt;&gt; False or True
+True
+&gt;&gt;&gt; True or False
+True
+&gt;&gt;&gt; True or True
+True</code></pre>
+<pre class="python"><code>&gt;&gt;&gt; False and False
+False
+&gt;&gt;&gt; False and True
+False
+&gt;&gt;&gt; True and False
+False
+&gt;&gt;&gt; True and True
+True</code></pre>
+<h2 id="entiers">Entiers</h2>
+<p>Les entiers Python sont des nombres dotés d’un signe et n’ayant pas
+de limite de taille (autre que celle fixée par la mémoire de votre
+ordinateur !). Ils supportent les opérations de calcul classiques :
+addition <code>+</code>, multiplication <code>*</code>, puissance
+<code>**</code>, etc.</p>
+<pre class="python"><code>&gt;&gt;&gt; -1
+-1
+&gt;&gt;&gt; 1 + 3 * 2
+7
+&gt;&gt;&gt; 2**8
+256
+&gt;&gt;&gt; 2**1000
+10715086071862673209484250490600018105614048117055336074437503883703510511249361224931983788156958581275946729175531468251871452856923140435984577574698574803934567774824230985421074605062371141877954182153046474983581941267398767559165543946077062914571196477686542167660429831652624386837205668069376</code></pre>
+<p>Il est possible de calculer le reste et le quotient d’une division
+euclidienne de deux entiers.</p>
+<pre class="python"><code>&gt;&gt;&gt; 17 % 12
+5
+&gt;&gt;&gt; 17 // 2
+8
+&gt;&gt;&gt; 17 / 12
+1.4166666666666667</code></pre>
+<p>Même si leur description privilégiée est décimale, les entiers Python
+peuvent également être représentés ou définis sous forme binaire ou
+hexadécimale :</p>
+<pre class="python"><code>&gt;&gt;&gt; bin(42)
+'0b101010'
+&gt;&gt;&gt; hex(42)
+'0x2a'
+&gt;&gt;&gt; 0b101010
+42
+&gt;&gt;&gt; 0x2a
+42
+&gt;&gt;&gt; 0b101010 == 0x2a == 42
+True</code></pre>
+<h2 id="nombres-flottants">Nombres flottants</h2>
+<p>Les nombres flottants – ou <strong>à virgule flottante</strong> –
+permettent de représenter des valeur numériques non entières, comme
+<span class="math inline">\(e\)</span> ou <span class="math inline">\(\pi\)</span> :</p>
+<pre class="python"><code>&gt;&gt;&gt; from math import e, pi
+&gt;&gt;&gt; e
+2.718281828459045
+&gt;&gt;&gt; pi
+3.141592653589793</code></pre>
+<p>On peut convertir un nombre flottant en une approximation entière
+avec <code>int</code>, mais cela ne garantit pas que l’on obtienne
+l’entier le plus proche. Pour cela il faudra utiliser la fonction
+<code>round</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; int(pi)
+3
+&gt;&gt;&gt; int(e)
+2
+&gt;&gt;&gt; round(pi)
+3
+&gt;&gt;&gt; round(e)
+3</code></pre>
+<p>Il est également possible d’obtenir des approximations “dirigées” à
+l’entier directement inférieur ou supérieur au nombre flottant.</p>
+<pre class="python"><code>&gt;&gt;&gt; import math
+&gt;&gt;&gt; math.floor(pi)
+3
+&gt;&gt;&gt; math.ceil(pi)
+4</code></pre>
+<p>Une caractéristique majeure des nombres flottants est qu’il sont une
+représentation de précision finie des nombres réels et que les calculs
+effectués avec eux induisent donc (a priori) des erreurs :</p>
+<pre class="python"><code>&gt;&gt;&gt; 0.1 + 0.2
+0.30000000000000004
+&gt;&gt;&gt; 0.1 + 0.2 == 0.3
+False
+&gt;&gt;&gt; math.sin(pi)
+1.2246467991473532e-16
+&gt;&gt;&gt; math.sin(pi) == 0.0
+False</code></pre>
+<p>Si nécessaire on peut obtenir la représentation réelle d’un nombre
+flottant, ce qui n’est pas ce qui est affiché par défaut :</p>
+<pre class="python"><code>&gt;&gt;&gt; print(0.1)
+0.1
+&gt;&gt;&gt; print(f"{0.1:.1000}")
+0.1000000000000000055511151231257827021181583404541015625
+&gt;&gt;&gt; print(0.2)
+0.2
+&gt;&gt;&gt; print(f"{0.2:.1000}")
+0.200000000000000011102230246251565404236316680908203125
+&gt;&gt;&gt; print(0.3)
+0.3
+&gt;&gt;&gt; print(f"{0.3:.1000}")
+'0.299999999999999988897769753748434595763683319091796875'
+&gt;&gt;&gt; print(0.1+0.2)
+0.30000000000000004
+&gt;&gt;&gt; print(f"{0.1+0.2:.1000}")
+0.3000000000000000444089209850062616169452667236328125</code></pre>
+<p>Les nombres flottants comportent également des valeurs spéciales :
+<span class="math inline">\(\infty\)</span> (l’infini) et <span class="math inline">\(\bot\)</span> (nombre indéfini / 🇺🇸
+<strong>not-a-number</strong>) :</p>
+<pre class="python"><code>&gt;&gt;&gt; from math import inf, nan
+&gt;&gt;&gt; inf
+inf
+&gt;&gt;&gt; -inf
+-inf
+&gt;&gt;&gt; inf + 1.0
+inf
+&gt;&gt;&gt; inf - inf
+nan
+&gt;&gt;&gt;&gt; nan + inf
+nan</code></pre>
+<section class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr/>
+<ol>
+<li id="fn1" role="doc-endnote"><p>Il est probable que cet avertissement
+ne s’affiche que la première fois que vous effectuez la division par
+zéro, mais plus ensuite. Les fonctions du module <code>warnings</code>
+permettent de controller ce comportement.<a class="footnote-back" href="#fnref1" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>

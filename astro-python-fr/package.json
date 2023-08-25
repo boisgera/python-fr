@@ -1,0 +1,21 @@
+{
+  "name": "astro-python-fr",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^0.19.7",
+    "@fontsource-variable/fira-code": "^5.0.8",
+    "@fontsource-variable/inter": "^5.0.8",
+    "astro": "^2.10.13",
+    "astro-icon": "^0.8.1",
+    "rehype-toc": "^3.0.2",
+    "remark-toc": "^8.0.1"
+  }
+}

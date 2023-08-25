@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+
+<html lang="fr" xml:lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script>
+        window.MathJax = {
+          tex: {
+            tags: 'ams'
+          }
+        };
+       </script>
+
+<meta charset="utf-8"/>
+<meta content="pandoc" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+<meta content="Sébastien Boisgérault, MINES Paris, Université PSL" name="author"/>
+<title>Programmation Orientée Objet</title>
+<style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+
+      function filterConsole(text) {
+          let lines = text.split("\n");
+
+          console.log(lines);
+
+          let pythonConsole = lines && lines[0].startsWith(">>>");
+          if (!pythonConsole) {
+              return text + "\n\n";
+          } else {
+              let newLines = [];
+              for (let line of lines) {
+                  if (line.startsWith(">>> ") || line.startsWith("... ")) {
+                      newLines.push(line.slice(4));
+                  } else if (line.startsWith("...")){
+                      newLines.push(line.slice(3));
+                  }
+
+              }
+              return newLines.join("\n") + "\n";
+          }
+
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+          let codeBlocks = document.querySelectorAll("pre.python")
+          for (let codeBlock of codeBlocks) {
+
+              let button = document.createElement("button")
+              let icon = document.createElement("img");
+              button.appendChild(icon)
+              codeBlock.insertBefore(button, codeBlock.firstChild);
+
+              icon.setAttribute("src", "icons/copy.svg");
+              icon.setAttribute("style", "opacity: 0.5;")
+              button.addEventListener('click', (event) => {
+                  let text = button.nextElementSibling.textContent;
+                  text = filterConsole(text);
+                  navigator.clipboard.writeText(text);
+              });
+
+              codeBlock.setAttribute("style", "position: relative");
+              button.setAttribute("style", 
+              "position: absolute; right: 1em; top: 1em; opacity: 0.0;");
+
+              codeBlock.addEventListener("mouseover", (event) => {
+                  button.style.setProperty("transition", "opacity 0.1s ease-out");
+                  button.style.setProperty("opacity", "1.0");
+              });
+
+              codeBlock.addEventListener("mouseout", (event) => {
+                  button.style.setProperty("transition", "opacity 0.75s ease-out");
+                  button.style.setProperty("opacity", "0.0");
+              });
+
+              button.addEventListener("mouseover", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.1s ease-out");
+                  icon.style.setProperty("opacity", "0.75");
+              })
+
+              button.addEventListener("mouseout", (event) => {
+                  icon.style.setProperty("transition", "opacity 0.75s ease-out");
+                  icon.style.setProperty("opacity", "0.5");
+              })
+
+
+          }
+      });    
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+<!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Programmation Orientée Objet</h1>
+<p class="author"><a href="mailto:Sebastien.Boisgerault@minesparis.psl.eu">Sébastien
+Boisgérault</a>, MINES Paris, Université PSL</p>
+<p class="date">Friday 25 august 2023</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/github.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr">
+          https://github.com/boisgera/python-fr
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/git.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/commit/7da617f">
+          #7da617f
+        </a>
+</p>
+
+<p>
+<span style="display:inline-block;width:1em;position:relative;margin-right:0.25em">
+<img height="auto" src="icons/edit.svg" style="position:relative;top:0.15em;" width="100%"/>
+</span>
+<a href="https://github.com/boisgera/python-fr/edit/master/cours/programmation-objet/index.md">
+          Edition
+        </a>
+</p>
+</header>
+<details>
+<summary>
+<h2>Table des matières</h2>
+</summary>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#usage-des-objets" id="toc-usage-des-objets">Usage des
+objets</a>
+<ul>
+<li><a href="#des-objets-partout" id="toc-des-objets-partout">Des objets
+partout !</a></li>
+<li><a href="#des-nombres-pas-si-complexes" id="toc-des-nombres-pas-si-complexes">Des nombres pas si
+complexes</a></li>
+</ul></li>
+<li><a href="#conception-de-types" id="toc-conception-de-types">Conception de types</a>
+<ul>
+<li><a href="#constructeur-et-attributs" id="toc-constructeur-et-attributs">Constructeur et attributs</a></li>
+<li><a href="#méthodes-1" id="toc-méthodes-1">Méthodes</a></li>
+<li><a href="#méthodes-magiques-1" id="toc-méthodes-magiques-1">Méthodes
+magiques</a></li>
+<li><a href="#attributs-privés" id="toc-attributs-privés">Attributs
+privés</a></li>
+<li><a href="#propriétés" id="toc-propriétés">Propriétés</a></li>
+</ul></li>
+</ul>
+</nav></details>
+
+
+<h1 id="usage-des-objets">Usage des objets</h1>
+<h2 id="des-objets-partout">Des objets partout !</h2>
+<p>Avant de découvrir comment utiliser les objets, il est bon de se
+convaincre que cette compétence sera très utile en Python, car :</p>
+<blockquote>
+<p>Tout ce qui peut être désigné par une variable est un objet !</p>
+</blockquote>
+<p>Techniquement :</p>
+<blockquote>
+<p>est une <strong>instance</strong> du <strong>type</strong>
+<code>object</code>.</p>
+</blockquote>
+<details>
+<summary>
+<h4 id="instance">Instance ?</h4>
+</summary>
+<p>Le terme “instance” est à interpréter dans son sens anglo-saxon :</p>
+<blockquote>
+<p>🇺🇸 an individual illustrative of a category</p>
+</blockquote>
+<p>(cf. <a class="uri" href="https://www.merriam-webster.com/dictionary/instance">https://www.merriam-webster.com/dictionary/instance</a>)</p>
+<p>On pourra donc considérer qu’un type est une catégorie d’objets ; ses
+instances sont alors les objets qui lui appartiennent.</p>
+<hr/>
+</details>
+<p>Entiers, booléens, chaînes de caractère, listes, sont donc des objets
+:</p>
+<pre class="python"><code>&gt;&gt;&gt; isinstance(42, object)
+True
+&gt;&gt;&gt; isinstance(True, object)
+True
+&gt;&gt;&gt; isinstance("Hello!", object)
+True
+&gt;&gt;&gt; isinstance([1, 2, 3], object)
+True</code></pre>
+<details>
+<summary>
+<h4 id="alors-42-serait-un-objet-pas-un-entier">🤔 Alors <code>42</code>
+serait un objet, pas un entier?</h4>
+</summary>
+<p>Mais si car les deux sont possibles simultanément ! Nous avons déjà
+constaté que <code>42</code> était bien un objet :</p>
+<pre class="python"><code>&gt;&gt;&gt; isinstance(42, object)
+True</code></pre>
+<p>Vérifions que c’est également un entier :</p>
+<pre class="python"><code>&gt;&gt;&gt; isinstance(42, int)
+True</code></pre>
+<p>Donc les deux propriétés ne sont pas contradictoires. Plus
+précisément, le type de <code>42</code> est entier, pas objet :</p>
+<pre class="python"><code>&gt;&gt;&gt; type(42) == int
+True</code></pre>
+<p>mais comme entier est un sous-type d’objet</p>
+<pre class="python"><code>&gt;&gt;&gt; issubclass(int, object)
+True</code></pre>
+<p>tous les entiers sont aussi des objets : les types peuvent être des
+catégories imbriquées les unes dans les autres.</p>
+<hr/>
+</details>
+<p>Bien que cela soit peut-être moins intuitif, des fonctions, des types
+ou des modules sont aussi des objets :</p>
+<pre class="python"><code>&gt;&gt;&gt; isinstance(print, object)
+True 
+&gt;&gt;&gt; isinstance(int, object)
+True
+&gt;&gt;&gt; import sys; isinstance(sys, object)
+True</code></pre>
+<h2 id="des-nombres-pas-si-complexes">Des nombres pas si complexes</h2>
+<p>Le type <code>complex</code> représente en Python les nombres
+complexes. Il fournit un bon example des interactions qu’on peut avoir
+avec des objets.</p>
+<h3 id="construction">Construction</h3>
+<p>Pour créer le nombre complexe <span class="math inline">\(z = 1/2 +
+(3/2)i\)</span>, on peut utiliser la notation litérale pour les nombres
+complexes :</p>
+<pre class="python"><code>&gt;&gt;&gt; z = 0.5 + 1.5j</code></pre>
+<p>Il est bon de connaître cette syntaxe car c’est celle que Python
+utilisera pour représenter les nombres complexes :</p>
+<pre class="python"><code>&gt;&gt;&gt; z
+(0.5+1.5j)</code></pre>
+<p>Tous les objets ne sont pas dotés d’une telle notation (dite
+<strong>litérale</strong>). Mais il existe une méthode alternative pour
+tous les objets : on peut appeler le type de l’objet que l’on souhaite
+instancier (comme s’il était une fonction) en lui passant les arguments
+nécessaires, ici partie réelle et imaginaire du nombre à construire. Le
+type de l’objet sert donc de <strong>constructeur</strong>.</p>
+<pre class="python"><code>&gt;&gt;&gt; z = complex(0.5, 1.5)
+&gt;&gt;&gt; z == 0.5+1.5j
+True</code></pre>
+<h3 id="attributs">Attributs</h3>
+<p>Un objet est une structure de données. Les données qu’il contient
+peuvent être rendues accessibles sous forme
+d’<strong>attributs</strong>. Tous les nombres complexes possèdent ainsi
+les attributs <code>real</code> et <code>imag</code> :</p>
+<pre class="python"><code>&gt;&gt;&gt; z.real
+0.5
+&gt;&gt;&gt; z.imag
+1.5</code></pre>
+<p>La syntaxe pour changer la valeur de l’attribut <code>real</code> du
+nombre <code>z</code> devrait être <code>z.real = ...</code>. Ici
+toutefois cette affectation échoue parce que les nombres complexes ont
+été conçus comme non-modifiables.</p>
+<pre class="python"><code>&gt;&gt;&gt; z.real = -0.5
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: readonly attribute</code></pre>
+<h3 id="méthodes">Méthodes</h3>
+<p>Un nombre complexe possède un attribut <code>conjugate</code> dont la
+nature est un peu particulière. C’est une <strong>méthode</strong> :</p>
+<pre class="python"><code>&gt;&gt;&gt; z.conjugate # doctest: +ELLIPSIS
+&lt;built-in method conjugate of complex object at 0x...&gt;</code></pre>
+<p>Les méthodes se comportent comme les fonctions : elles sont
+appelables.</p>
+<pre><code>&gt;&gt;&gt; callable(z.conjugate)
+True</code></pre>
+<p>Cette méthode est <strong>liée</strong> au nombre complexe
+<code>z</code> : elle peut utiliser <code>z</code> et les données qu’il
+contient pour produire un résultat, sans qu’il soit nécessaire de lui
+passer explicitement <code>z</code> comme argument. Ici,
+<code>z.conjugate()</code> renvoie le nombre complexe conjugé de
+<code>z</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; z.conjugate()
+(0.5-1.5j)</code></pre>
+<p>La méthode <code>conjugate</code> est également disponible comme
+attribut du type <code>complex</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; complex.conjugate
+&lt;method 'conjugate' of 'complex' objects&gt;</code></pre>
+<p>Elle n’est alors par liée à une instance particulière de nombre
+complexe ; il faudra donc lui fournir explicitement le nombre complexe à
+conjuguer en argument.</p>
+<pre class="python"><code>&gt;&gt;&gt; complex.conjugate(z)
+(0.5-1.5j)</code></pre>
+<h3 id="méthodes-magiques">Méthodes magiques</h3>
+<p>Sont <strong>magiques</strong> les méthodes d’un objet dont le nom
+commence et finit par un double soulignement <code>"__"</code>. Ces
+méthodes magiques sont rarement appelées directement par le programmeur,
+mais le plus souvent indirectement par l’interpréteur Python
+lui-même.</p>
+<p>Les méthodes magiques du type <code>complex</code> permettent par
+exemple de faire des calculs avec des nombres complexes avec une syntaxe
+concise : s’il est possible de calculer</p>
+<pre class="python"><code>&gt;&gt;&gt; 1j + 1j * 1j
+(-1+1j)</code></pre>
+<p>c’est que le type <code>complex</code> comporte les méthodes magiques
+<code>__add__</code> et <code>__mul__</code>, appelées en cas d’addition
+et de multiplication respectivement. Le calcul ci-dessus est donc
+équivalent à :</p>
+<pre class="python"><code>&gt;&gt;&gt; complex.__add__(1j, complex.__mul__(1j, 1j))
+(-1+1j)</code></pre>
+<p>ou bien, en utilisant la version liée de ces méthodes :</p>
+<pre class="python"><code>&gt;&gt;&gt; 1j.__add__(1j.__mul__(1j))
+(-1+1j)</code></pre>
+<p>Dans tous les cas, la notation initiale – où l’on laisse le soin à
+Python d’appeler lui-même les méthodes magiques – est sensiblement plus
+lisible !</p>
+<h1 id="conception-de-types">Conception de types</h1>
+<p>Notre objectif dans cette section va être de créer un type
+<code>Complex</code> qui va être une version simplifiée du type intégré
+<code>complex</code>. Nous allons pour cela définir une nouvelle
+<strong>classe</strong> d’objets ; pour créer une classe minimale, sans
+fonctionnalité spécifique, le code ci-dessous suffit :</p>
+<pre class="python"><code>class Complex:
+    pass</code></pre>
+<p>A ce stade, il est certes possible d’instancier un “nombre
+complexe”</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex()</code></pre>
+<p>ayant le bon type</p>
+<pre class="python"><code>&gt;&gt;&gt; type(z) is Complex
+True
+&gt;&gt;&gt; isinstance(z, Complex)
+True</code></pre>
+<p>mais il n’est doté d’aucun attribut ou méthode caractéristique des
+nombres complexes</p>
+<pre class="python"><code>&gt;&gt;&gt; z.real
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: 'Complex' object has no attribute 'real'
+&gt;&gt;&gt; z.conjugate()
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AttributeError: 'Complex' object has no attribute 'conjugate'
+&gt;&gt;&gt; z + z
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: unsupported operand type(s) for +: 'Complex' and 'Complex'</code></pre>
+<h2 id="constructeur-et-attributs">Constructeur et attributs</h2>
+<p>Pour gérer l’ajout des attributs <code>real</code> et
+<code>imag</code>, on pourrait définir une fonction</p>
+<pre class="python"><code>def Complex_init(z, real, imag):
+    z.real = real
+    z.imag = imag</code></pre>
+<p>qui nous permettrait de prendre un nombre complexe vide et d’y
+ajouter les attributs souhaités :</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex()
+&gt;&gt;&gt; Complex_init(z, 0.5, 1.5)
+&gt;&gt;&gt; z.real
+0.5
+&gt;&gt;&gt; z.imag
+1.5</code></pre>
+<p>Possible oui, mais pas pratique ! En définissant directement la
+fonction précédente dans la classe <code>Complex</code>, et en la
+nommant <code>__init__</code>, on définit une méthode magique qui est le
+constructeur associé à la classe <code>Complex</code> et on évite cette
+construction fastidieuse.</p>
+<p>En adoptant donc la définition suivante de <code>Complex</code></p>
+<pre class="python"><code>class Complex:
+    def __init__(z, real, imag):
+        z.real = real
+        z.imag = imag</code></pre>
+<p>on peut s’épargner la création d’un objet sans attributs, pris
+automatiquement en charge quand on appelle le constructeur de nombres
+complexes</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex(0.5, 1.5)
+&gt;&gt;&gt; z.real
+0.5
+&gt;&gt;&gt; z.imag
+1.5</code></pre>
+<p>L’usage quand une telle méthode est définie est d’appeler
+<code>self</code> le premier argument de la méthode, qui désignera
+toujours une instance de la classe considérée</p>
+<pre class="python"><code>class Complex:
+    def __init__(self, real, imag):
+        self.real = real
+        self.imag = imag</code></pre>
+<p>C’est uniquement une convention, qui ne change rien au comportement
+de la classe que nous avions définie.</p>
+<h2 id="méthodes-1">Méthodes</h2>
+<p>L’ajout de méthodes à une classe suit le même schéma que le
+constructeur. Ainsi pour avoir une méthode <code>conjugate</code> qui
+retourne le conjugué d’une instance de nombre complexe, on peut
+faire</p>
+<pre class="python"><code>class Complex:
+    def __init__(self, real, imag):
+        self.real = real
+        self.imag = imag
+    def conjugate(self):
+        return Complex(self.real, -self.imag)</code></pre>
+<p>Avec</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex(0.5, 1.5)</code></pre>
+<p>on a alors</p>
+<pre class="python"><code>&gt;&gt;&gt; w = Complex.conjugate(z)
+&gt;&gt;&gt; w.real
+0.5
+&gt;&gt;&gt; w.imag
+1.5</code></pre>
+<p>ou bien, puisque Python prend en charge automatiquement la création
+de méthodes liées aux instances</p>
+<pre class="python"><code>&gt;&gt;&gt; w = z.conjugate()
+&gt;&gt;&gt; w.real
+0.5
+&gt;&gt;&gt; w.imag
+1.5</code></pre>
+<h2 id="méthodes-magiques-1">Méthodes magiques</h2>
+<p>Il est un peu frustrant de ne pas voir les nombres complexes
+s’afficher proprement dans le terminal à ce stade :</p>
+<pre class="python"><code>&gt;&gt;&gt; Complex(0.5, 1.5) # doctest: +ELLIPSIS
+&lt;__main__.Complex object at 0x...&gt;</code></pre>
+<p>C’est un problème que nous pouvons résoudre en définissant une
+méthode magique <code>__repr__</code>, chargée de construire une
+représentation adaptée des instances sous forme de chaînes de
+caractères.</p>
+<pre class="python"><code>class Complex:
+    def __init__(self, real, imag):
+        self.real = real
+        self.imag = imag
+    def conjugate(self):
+        return Complex(self.real, -self.imag)
+    def __repr__(self):
+        # ⚠️ weird output when self.imag &lt; 0
+        return f"({self.real}+{self.imag}j")</code></pre>
+<p>On a alors une représentation compatible avec la notation litérale
+des nombres complexes intégrés</p>
+<pre class="python"><code>&gt;&gt;&gt; Complex(0.5, 1.5)
+(0.5+1.5j)</code></pre>
+<p>Le support des opérations arithmétiques est similaire. Pour disposer
+de l’addition par exemple, on peut faire :</p>
+<pre class="python"><code>class Complex:
+    def __init__(self, real, imag):
+        self.real = real
+        self.imag = imag
+    def conjugate(self):
+        return Complex(self.real, -self.imag)
+    def __repr__(self):
+        # ⚠️ weird output when self.imag &lt; 0
+        return f"({self.real}+{self.imag}j")
+    def __add__(w, z):
+        return Complex(w.real+z.real, w.imag+z.imag)</code></pre>
+<p>et alors</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex(0.5, 1.5)
+&gt;&gt;&gt; z + z.conjugate()
+(1+0j)</code></pre>
+<p>A noter que pour ce type de méthodes, qui acceptent deux instances de
+la classe en argument, l’usage est d’utiliser les noms <code>self</code>
+et <code>other</code> et donc de préférer la définition suivante
+(équivalente) :</p>
+<pre class="python"><code>class Complex:
+    def __init__(self, real, imag):
+        self.real = real
+        self.imag = imag
+    def conjugate(self):
+        return Complex(self.real, -self.imag)
+    def __repr__(self):
+        # ⚠️ weird output when self.imag &lt; 0
+        return f"({self.real}+{self.imag}j)"
+    def __add__(self, other):
+        return Complex(
+            self.real + other.real, 
+            self.imag + other.imag
+        )</code></pre>
+<h2 id="attributs-privés">Attributs privés</h2>
+<p>Tous les attributs d’un objet n’ont pas nécessairement vocation à
+être <strong>publics</strong> ; on peut vouloir des données
+<strong>privées</strong>, à usage interne, uniquement exploitables par
+les méthodes propres à un objet. La convention en Python est de préfixer
+le nom de tels attributs par un unique caractère de soulignement.</p>
+<p>Il est possible ensuite de contrôler au cas par cas la façon dont on
+autorise le monde extérieur à interagir avec ces données. Par exemple,
+nous pouvons faire en sorte que notre nombre complexe s’assure que ses
+parties réelles et imaginaires soient des nombres flottants. A ce stade
+aucune sécurité de ce type n’est présente ; il est donc très facile (y
+compris par accident) de créer des “nombres complexes” invalides qui
+seront sans doute la source de bugs futurs …</p>
+<pre class="python"><code>&gt;&gt;&gt; Complex("Hello", "world!")
+(Hello+world!j)</code></pre>
+<p>Mais nous pouvons heureusement remplacer les attributs publics
+<code>real</code> et <code>imag</code> par des attributs privés
+<code>_real</code> et <code>_imag</code> et exposer de façon contrôlée
+ces valeurs en lecture et/ou en écriture par le biais de méthodes
+dédiées : des <strong>accesseurs</strong> (<strong>getters</strong>
+et/ou <strong>setters</strong>).</p>
+<p>Par exemple, nous pouvons faire en sorte que lorsque l’on souhaite
+fixer la valeur de la partie réelle ou imaginaire, on s’assure au
+préalable d’avoir bien affaire à un nombre flottant et quand dans le cas
+contraure on génère immédiatemment une erreur circonstanciée. Nous
+pouvons même adapter le constructeur pour qu’il bénéficie de cette
+sécurité supplémentaire. Bien sûr comme nous avons rendus privés les
+parties réelles et imaginaires, il nous faudra fournir des fonctions
+d’accès en lecture pour que les utilisateurs externes des nombres
+complexes puissent les exploiter. En interne, il faudra adapter les
+méthodes pour qu’elles exploient les attributs privés ou les accesseurs,
+plutôt que les attributs publics qui ont été supprimés.</p>
+<pre class="python"><code>class Complex:
+    def __init__(self, real, imag):
+        self.set_real(real)
+        self.set_imag(imag)
+    def get_real(self):
+        return self._real
+    def set_real(self, real):
+        if isinstance(real, float):
+            self._real = real
+        else:
+            raise TypeError(f"{real!r} is not a float")
+    def get_imag(self):
+        return self._imag
+    def set_imag(self, imag):
+        if isinstance(imag, float):
+            self._imag = imag
+        else:
+            raise TypeError(f"{imag!r} is not a float")
+    def conjugate(self):
+        return Complex(self._real, -self._imag)
+    def __repr__(self):
+        # ⚠️ weird output when self.imag &lt; 0
+        return f"({self._real}+{self._imag}j)"
+    def __add__(self, other):
+        return Complex(
+            self._real + other._real, 
+            self._imag + other._imag
+        )</code></pre>
+<p>Les nombres complexes se comportent alors conformément à nos
+attentes.</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex(0.5, 1.5)
+&gt;&gt;&gt; z
+(0.5+1.5j)
+&gt;&gt;&gt; z.get_real()
+0.5
+&gt;&gt;&gt; z.set_real(-0.5)
+&gt;&gt;&gt; z
+(-0.5+1.5j)
+&gt;&gt;&gt; z.set_real("Hello")
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+  File "&lt;stdin&gt;", line 11, in set_real
+TypeError: 'Hello' is not a float</code></pre>
+<details>
+<summary>
+<h4 id="accès-à-lattribut-privé-ou-accesseur">Accès à l’attribut privé
+ou accesseur ?</h4>
+</summary>
+<p>Vous noterez que dans une méthode de la classes <code>Complex</code>,
+on a parfaitement le droit de faire appel aux attributs privés</p>
+<pre class="python"><code>def conjugate(self):
+    return Complex(self._real, -self._imag)</code></pre>
+<p>Dans ce cas précis, cela n’était toutefois pas indispensable ;
+l’interface publique des nombres complexes était suffisamment riche et
+nous aurions pu utiliser les getters pour implémenter la même
+fonctionnalité.</p>
+<pre class="python"><code>def conjugate(self):
+    return Complex(self.get_real(), -self.get_imag())</code></pre>
+<p>Il est probable que cela aurait été préférable. Certes l’appel à
+<code>conjugate</code> est un peu moins performant dans le second cas
+(un appel de fonction de plus est nécessaire), mais cela n’est
+probablement pas critique. Mais en contrepartie, si nous utilisons les
+accesseurs et que nous décidons ultérieurement de changer
+l’implémentation interne de la classe – par exemple de remplacer les
+attributs <code>_real</code> et <code>_imag</code> par un nombre
+complexe intégré <code>_complex</code> – en préservant son interface
+publique, il ne sera pas nécessaire de changer l’implémentation de ces
+méthodes.</p>
+</details>
+<h2 id="propriétés">Propriétés</h2>
+<p>On pourra regretter la lourdeur syntaxique des accesseurs par rapport
+à l’accès à des attributs publics. Heureusement il existe un mécanisme
+qui offre la même interface syntaxique que l’accès à des attributs, mais
+la même sécurité que le passage par des accesseurs : les
+<strong>propriétés</strong>. Ce sont des attributs “virtuels” que l’on
+définit par leur getter et/ou leur setter. Ainsi, si l’on rajoute les
+propriétés <code>real</code> et <code>imag</code> à notre implémentation
+de la classe <code>Complex</code></p>
+<pre class="python"><code>class Complex:
+    def __init__(self, real, imag):
+        self.set_real(real)
+        self.set_imag(imag)
+    def get_real(self):
+        return self._real
+    def set_real(self, real):
+        if isinstance(real, float):
+            self._real = real
+        else:
+            raise TypeError(f"{real!r} is not a float")
+    real = property(get_real, set_real)
+    def get_imag(self):
+        return self._imag
+    def set_imag(self, imag):
+        if isinstance(imag, float):
+            self._imag = imag
+        else:
+            raise TypeError(f"{imag!r} is not a float")
+    imag = property(get_imag, set_imag)
+    def conjugate(self):
+        return Complex(self._real, -self._imag)
+    def __repr__(self):
+        # ⚠️ weird output when self.imag &lt; 0
+        return f"({self._real}+{self._imag}j)"
+    def __add__(self, other):
+        return Complex(
+            self._real + other._real, 
+            self._imag + other._imag
+        )</code></pre>
+<p>on récupère l’usage simplifié de l’accès aux parties réelles et
+imaginaires, mais sans avoir perdu la sécurité de la vérification du
+type des attributs <code>real</code> et <code>imag</code>.</p>
+<pre class="python"><code>&gt;&gt;&gt; z = Complex(0.5, 1.5)
+&gt;&gt;&gt; z
+(0.5+1.5j)
+&gt;&gt;&gt; z.real
+0.5
+&gt;&gt;&gt; z.real = -0.5
+&gt;&gt;&gt; z
+(-0.5+1.5j)
+&gt;&gt;&gt; z.real = "Hello"
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+  File "&lt;stdin&gt;", line 11, in set_real
+TypeError: 'Hello' is not a float</code></pre>
+</body>
+</html>
