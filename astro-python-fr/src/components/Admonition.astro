@@ -1,59 +1,117 @@
 ---
 import { Icon } from "astro-icon";
 
-const { type = "note" } = Astro.props;
+interface Props {
+  type?: "note" | "warning";
+  label?: string;
+}
+
+let { type = "note", label = undefined } = Astro.props;
 
 function capitalize(word: string) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
+
+const styles = {
+  note: {
+    icon: "pencil",
+    light: "#e0f2fe",
+    dark: "#164e63",
+  },
+  warning: {
+    icon: "alert-triangle",
+    light: "#ffedd5",
+    dark: "#ea580c",
+  },
+};
+
+const { icon, light, dark } = styles[type];
+label = label ? label : capitalize(type);
+
+console.log(`tabler:${icon}`);  
+
 ---
 
-<div class="admonition">
-  <details>
-    <summary>
-      <Icon name="tabler:pencil" />
-      <strong>{capitalize(type)}</strong>
-      <Icon name="tabler:arrows-maximize" />
+<aside>
+  <details open>
+    <summary
+      style="display:flex;align-items:center;justify-content:space-between;"
+    >
+      <span style="display:flex;gap:0.5em;align-items:center;">
+        <span class="circle">
+          <Icon name={`tabler:${icon}`} />
+        </span>
+        <span style="font-weight:500;">{label}</span>
+      </span>
+      <span class="minmax">
+        <Icon
+          class="closed"
+          name="tabler:arrows-maximize"
+        />
+        <Icon
+          class="open"
+          name="tabler:arrows-minimize"
+        />
+      </span>
     </summary>
-    <div style="margin: 1rem;">
+    <div class="content">
+      <div style="margin: 1rem;">
         <slot />
       </div>
+    </div>
   </details>
-
-</div>
-
-<style>
-  .icon-span {
-    display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    border-radius: 100%;
-    background-color: #38bdf8; /* sky-400 */
-  }
-  .admonition {
-    border: 0.1rem solid #0369a1; /* sky-700 */
+</aside>
+<style define:vars={{ light, dark }}>
+  aside {
+    border: 0.125rem solid var(--dark); /* sky-700 */
     border-radius: 0.25rem;
+    margin-bottom: 1rem;
   }
   summary {
     padding: 1rem;
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
-    background-color: #e0f2fe; /* sky-100 */
+    background-color: var(--light); /* sky-100 */
   }
   details > summary {
     list-style: none;
-  }
-  details[open] > summary {
+    border-radius: 0.25rem;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
+
+  .minmax {
+    color: var(--dark);
+  }
+  details[open] .open {
+    display: inline;
+  }
+  details[open] .closed {
+    display: none;
+  }
+
+  details:not([open]) .open {
+    display: none;
+  }
+  details:not([open]) .closed {
+    display: inline;
+  }
+
+  .content {
+    border-bottom-right-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+  }
   svg {
     height: 1rem;
-    color: #0369a1;
   }
-  svg.circle {
-    border-radius: 100%;
-    background-color: #38bdf8; /* sky-400 */
+  .circle {
+    height: 1.25rem;
+    width: 1.25rem;
+    border-radius: 0.25rem;
+    background-color: var(--dark); /* sky-700 */
     color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 </style>

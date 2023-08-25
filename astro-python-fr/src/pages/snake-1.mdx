@@ -16,7 +16,7 @@ layout: ../layouts/MDXLayout.astro
 
 import Admonition from '/src/components/Admonition.astro'
 
-<Admonition>
+<Admonition type="note">
 Hey dude! I can see you now!
 ```python
 import pyxel
@@ -32,6 +32,10 @@ def draw():
 pyxel.init(160, 120, title="Hello Pyxel")
 pyxel.run(update, draw)
 ```
+</Admonition >
+
+<Admonition type="warning" label="🐺 Attention les p'tits loups !">
+Nan rien, c'est un test ...
 </Admonition>
 
 ## Introduction
