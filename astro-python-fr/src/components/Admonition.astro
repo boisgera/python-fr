@@ -2,11 +2,12 @@
 import { Icon } from "astro-icon";
 
 interface Props {
-  type?: "note" | "warning";
+  type?: "note" | "solution" | "warning";
   label?: string;
+  open?: boolean;
 }
 
-let { type = "note", label = undefined } = Astro.props;
+let { type = "note", label = undefined, open = true } = Astro.props;
 
 function capitalize(word: string) {
   return word.charAt(0).toUpperCase() + word.slice(1);
@@ -23,17 +24,21 @@ const styles = {
     light: "#ffedd5",
     dark: "#ea580c",
   },
+  solution: {
+    icon: "bulb",
+    light: "#fbcfe8",
+    dark: "#db2777",
+  },
 };
 
 const { icon, light, dark } = styles[type];
 label = label ? label : capitalize(type);
 
-console.log(`tabler:${icon}`);  
-
+console.log(`tabler:${icon}`);
 ---
 
 <aside>
-  <details open>
+  <details open={open}>
     <summary
       style="display:flex;align-items:center;justify-content:space-between;"
     >
@@ -44,14 +49,8 @@ console.log(`tabler:${icon}`);
         <span style="font-weight:500;">{label}</span>
       </span>
       <span class="minmax">
-        <Icon
-          class="closed"
-          name="tabler:arrows-maximize"
-        />
-        <Icon
-          class="open"
-          name="tabler:arrows-minimize"
-        />
+        <Icon class="closed" name="tabler:arrows-maximize" />
+        <Icon class="open" name="tabler:arrows-minimize" />
       </span>
     </summary>
     <div class="content">

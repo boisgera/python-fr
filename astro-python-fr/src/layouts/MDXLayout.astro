@@ -22,6 +22,10 @@ const { title, description } = frontmatter;
         font-family: "Inter Variable", sans-serif;
       }
 
+      h2 {
+        margin-top: 64px;
+      }
+
       pre.astro-code { /* pre:has(> code) support not there yet */
         border-radius: 0.25rem;
         overflow-x: auto;
@@ -29,6 +33,9 @@ const { title, description } = frontmatter;
       }
       code {
         font-family: "Fira Code Variable", sans-serif;
+      }
+      pre > code {
+        line-height: 1rem;
       }
     </style>
     <style>

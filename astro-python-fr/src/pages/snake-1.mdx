@@ -6,37 +6,17 @@ license: "[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
 layout: ../layouts/MDXLayout.astro
 ---
 
----
+import Admonition from '/src/components/Admonition.astro';
+import { Image } from 'astro:assets';
 
-🙏 Projet original par Aurélien Noce ([@ushu](https://github.com/ushu)).
 
----
+import snake from "/src/assets/snake.jpg";
 
-## Sandbox
+<Image src={snake} alt="Boa constrictor by Jan Kopřiva"/>
 
-import Admonition from '/src/components/Admonition.astro'
+Projet original par Aurélien Noce (aka [@ushu](https://github.com/ushu)).
 
-<Admonition type="note">
-Hey dude! I can see you now!
-```python
-import pyxel
-
-def update():
-    if pyxel.btnp(pyxel.KEY_Q):
-        pyxel.quit()
-
-def draw():
-    pyxel.cls(0)
-    pyxel.text(56, 54, "Hello, Snake!", pyxel.frame_count % 16)
-
-pyxel.init(160, 120, title="Hello Pyxel")
-pyxel.run(update, draw)
-```
-</Admonition >
-
-<Admonition type="warning" label="🐺 Attention les p'tits loups !">
-Nan rien, c'est un test ...
-</Admonition>
+{/* ## Table des matières */}
 
 ## Introduction
 
@@ -46,7 +26,7 @@ d'un programme complet.
 
 Son sujet est un standard du jeu vidéo, le 🐍 [snake].
 
-![[🎮 Snake!](https://kitao.github.io/pyxel/wasm/examples/07_snake.html) ;
+[[🎮 Snake!](https://kitao.github.io/pyxel/wasm/examples/07_snake.html) ;
 une version classique du snake, réalisée avec la plate-forme de retro-gaming
 Python [Pyxel](https://github.com/kitao/pyxel).](images/snake-pyxel.jpg)
 
@@ -85,29 +65,70 @@ pyxel.run(update, draw)
 
 ## Comment ça marche ?
 
-- 🗔 **Fenêtre.** Agrandissez la fenêtre du jeu -- initialement 300x300 --
-  pour adopter une taille de votre choix.
+**TODO:**
 
-- ⏲️ **Horloge.** Dans l'appel à la fonction `clock.tick`,
+  - couleurs: faire le tour des possibles, renvoyer sur la "doc"?
 
-  - remplacez l'argument `1` par `2` (puis exécutez le programme),
+  - Text: comprendre la taille (fixe) de chaque caractère,
+    display d'une "grille" de caractères., comprendre comment est
+    placé le "Hello world!", ajuster le programme pour que le texte
+    soit toujours centré (même si plusieurs lignes ?).
 
-  - procédez de même avec `5`,
+## Nombre d'images par seconde
 
-  - puis supprimez (ou commentez) l'appel à `clock.tick`.
+La fonction `time.time` de la bibliothèque standard Python renvoie le temps 
+écoulé en secondes depuis le 1er janvier 1970 à midi.
 
-  Que se passe-t'il dans chaque cas ?
-  A votre avis, quel est le rôle de la fonction `clock.tick`
-  et de son argument ?
+```
+>>> import time
+>>> time.time()
+1692980870.0990813
+>>> time.time()
+1692980871.2445116
+>>> time.time()
+1692980872.3245282
+```
+Utilisez-là pour mesurer le temps qui s'écoule entre deux appels à la fonction
+`draw` de Pyxel. Puis, affichez le nombre d'images par seconde 
+(ou FPS pour *frames per second*) dans le coin en haut à gauche de la fenêtre.
 
-- 🖌️ **Affichage.**
-  Que se passe-t'il si l'on commente la ligne `pygame.display.update()` ?
-  Savez-vous expliquer ce phénomène ?
+<video controls width="768">
+  <source src="/videos/fps.webm" type="video/webm" />
+</video>
 
-- 🎨 **Couleurs.** Faites en sorte que les couleurs qui s'affichent
-  soient toujours aléatoires, mais uniquement parmi des nuances de bleu.
 
-  🗝️ On pourra consulter l'annexe ["Codes RGB"](#annexe--codes-rgb).
+<Admonition type="solution" open={false} >
+```python
+import math
+import time
+import pyxel
+
+def update():
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+
+def draw():
+    global t
+    t_new = time.time()
+    dt = t_new - t
+    t = t_new
+    fps = 1.0 / dt
+    pyxel.cls(0)
+    pyxel.text(0, 0, f"fps: {int(round(fps))}", 7)
+
+pyxel.init(160, 120, title="🐍 Snake")
+t = time.time()
+pyxel.run(update, draw)
+```
+</Admonition>
+
+## Evènements
+
+  - évènement claviers: détecter les flèches, afficher les symboles,
+    avec ceux qui sont pressés d'une couleur différente (plus vive).
+
+  - éventuellement: "P" pour pause ? Plus rien n'est mis à jour ?
+   (sauf la détection de la touche "P")
 
 ## Événements
 
@@ -162,7 +183,7 @@ Nous allons commencer par construire notre plateau de jeu ainsi :
 Pour vérifier la validité de ce plateau de jeu,
 écrivez un programme qui dessine un damier :
 
-![](images/damier.png)
+{/* ![](images/damier.png) */}
 
 🗝️ Vous pouvez utiliser la méthode [`pygame.draw.rect`](https://www.pygame.org/docs/ref/draw.html#pygame.draw.rect) :
 
@@ -199,7 +220,7 @@ pour obtenir un schéma comme suit ;
 disons pour fixer les idées que dans ce cas de figure `[10, 15]` est la queue
 et `[12, 15]` est la tête :
 
-![](images/serpent.png)
+{/* ![](images/serpent.png) */}
 
 <details>
 <summary>
@@ -253,7 +274,7 @@ Ensuite, nous allons faire bouger le serpent :
 - à chaque itération de la boucle, nous pouvons déplacer le serpent dans
   cette direction en "ajoutant" ce vecteur à la position de la tête du serpent
 
-![](images/serpent-bouge.gif)
+{/* ![](images/serpent-bouge.gif) */}
 
 Une fois que le serpent bouge, ajouter les commandes pour se déplacer dans
 les 4 directions, en appuyant sur les touches de direction du clavier.
@@ -333,7 +354,7 @@ On va procéder comme suit:
   on place un nouveau fruit à une position aléatoire
   et on allonge le serpent d'une case
 
-  ![](images/manger.gif)
+  {/* ![](images/manger.gif) */}
 
 <details>
 <summary>
